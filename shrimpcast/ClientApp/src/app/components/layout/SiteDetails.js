@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import NotificationPrompt from "./Prompts/NotificationPrompt";
-import GithubPrompt from "./Prompts/GithubPrompt";
+//import NotificationPrompt from "./Prompts/NotificationPrompt";
+//import GithubPrompt from "./Prompts/GithubPrompt";
 import MultistreamPrompt from "./Prompts/MultistreamPrompt";
 
 const BlockSx = {
@@ -28,8 +28,6 @@ const SiteDetails = (props) => {
   return (
     <Grid width="100%" container>
       {streamEnabled && enableMultistreams && <MultistreamPrompt {...props} />}
-      <NotificationPrompt {...props} />
-      <GithubPrompt {...props} />
       <Grid>
         <Box sx={BlockSx}>
           <Box sx={{ wordBreak: "break-word" }}>
