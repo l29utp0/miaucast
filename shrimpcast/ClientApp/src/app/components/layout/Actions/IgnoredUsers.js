@@ -7,7 +7,7 @@ import LocalStorageManager from "../../../managers/LocalStorageManager";
 const IgnoredUsers = (props) => {
   return (
     <GenericActionList
-      title="Ignored users"
+      title="Utilizadores ignorados"
       getItems={() => LocalStorageManager.getIgnoredUsers()}
       removeItem={ChatActionsManager.Unignore}
       icon={VisibilityOffIcon}

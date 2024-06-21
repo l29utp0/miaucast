@@ -141,7 +141,7 @@ const PollOption = React.memo((props) => {
                 <DeleteIcon sx={{ fontSize: "16px" }} />
               </IconButton>
               {showPromptDialog && (
-                <ConfirmDialog title="Remove option?" confirm={removeOption} cancel={closeConfirmPrompt} />
+                <ConfirmDialog title="Remover opção?" confirm={removeOption} cancel={closeConfirmPrompt} />
               )}
             </>
           )}

@@ -150,7 +150,7 @@ const ChatTextField = (props) => {
         }}
         type="text"
         autoComplete="off"
-        placeholder={isDisabled ? "Chat temporarily disabled" : "Write a message.."}
+        placeholder={isDisabled ? "Chat temporáriamente desligado" : "Escreve aqui.."}
         color="secondary"
         fullWidth
         sx={SendTextFieldSx}

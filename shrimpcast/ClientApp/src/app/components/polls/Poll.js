@@ -64,7 +64,7 @@ const Poll = (props) => {
               Reset
             </Button>
             {showPromptDialog && (
-              <ConfirmDialog title="Remove all options?" confirm={removeAllOptions} cancel={closeConfirmPrompt} />
+              <ConfirmDialog title="Remover todas as opções?" confirm={removeAllOptions} cancel={closeConfirmPrompt} />
             )}
           </>
         )}
@@ -85,7 +85,7 @@ const Poll = (props) => {
             maxLength: 250,
           }}
           type="text"
-          label={"Add option"}
+          label={"Adicionar opção"}
           color="secondary"
           fullWidth
           size="small"

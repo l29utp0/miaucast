@@ -78,7 +78,7 @@ const WiFiSignalStrength = (props) => {
       </Typography>
       {rttName === WiFiColours.low && (
         <Typography sx={SlowNetworkSx} variant="overline">
-          Slow network
+          Rede lenta
         </Typography>
       )}
     </Box>

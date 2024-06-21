@@ -31,7 +31,7 @@ const Notifications = (props) => {
       {open && (
         <ConfirmDialog
           isLoading={isLoading}
-          title="Notify subscribed users of stream start?"
+          title="Notificar utilizadores do inicio do stream?"
           confirm={dispatchNotifications}
           cancel={setClosed}
         />

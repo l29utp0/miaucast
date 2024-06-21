@@ -6,7 +6,7 @@ class TokenManager {
     let url = "/api/session/GetNewOrExisting?accessToken=" + LocalStorageManager.getToken();
     let response = await axios.get(url, { signal: abortSignal }).catch((ex) => {
       if (!abortSignal.aborted)
-        return { data: { message: `Could not load the site: ${ex.message}. Refresh to try again.` } };
+        return { data: { message: `Não foi possível carregar o site: ${ex.message}. Refresca para tentar outra vez.` } };
     });
     this.SaveData(response?.data?.sessionToken, response?.data?.name);
     return response?.data;

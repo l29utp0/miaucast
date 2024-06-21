@@ -54,15 +54,15 @@ const AccountInfo = (props) => {
     setLoading(true);
     const response = await TokenManager.Import(props.signalR, importToken);
     setLoading(false);
-    if (!response) displayToast("Error: invalid token.");
+    if (!response) displayToast("Erro: token inválido.");
   };
 
   const handleKeys = async (e) => e.key === "Enter" && (await submitTokenChange());
   const copyToken = () =>
     navigator.clipboard
       .writeText(sessionToken)
-      .then(() => displayToast("Token copied to clipboard!"))
-      .catch(() => displayToast("Error copying token."));
+      .then(() => displayToast("Token copiado para o clipboard!"))
+      .catch(() => displayToast("Erro ao copiar token."));
 
   useEffect(() => {
     return () => {
@@ -80,31 +80,31 @@ const AccountInfo = (props) => {
         <DialogTitle>
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="h6" component="div">
-              User Info
+              Info
             </Typography>
           </Box>
         </DialogTitle>
         <DialogContent>
           <Typography variant="body1" gutterBottom>
-            Your session token (don't share it with anyone!):
+            O teu token de sessão (Não o partilhes com ninguém!):
           </Typography>
           <Box sx={CopySx}>
             <Typography variant="body2" sx={ToggleSx} onClick={toggleHidden}>
-              {isHidden ? `${"*".repeat(sessionToken.length)} (click to reveal)` : sessionToken}
+              {isHidden ? `${"*".repeat(sessionToken.length)} (clica para ver)` : sessionToken}
             </Typography>
             <Button onClick={copyToken} size="small" variant="contained" color="primary">
-              Copy
+              Copiar
             </Button>
           </Box>
           <Box mt={2}>
             <Typography variant="h6" component="div" gutterBottom>
-              Import session token
+              Importar token de sessão
             </Typography>
             <OutlinedInput
               fullWidth
               size="small"
               type="text"
-              placeholder="Paste your token..."
+              placeholder="Cola o teu token..."
               value={importToken}
               onChange={changeInput}
               onKeyDown={handleKeys}

@@ -7,7 +7,7 @@ import ChatActionsManager from "../../../managers/ChatActionsManager";
 const Moderators = (props) => {
   return (
     <GenericActionList
-      title="Moderators"
+      title="Moderadores"
       getItems={AdminActionsManager.ListMods}
       removeItem={ChatActionsManager.ToggleModStatus}
       icon={SecurityIcon}

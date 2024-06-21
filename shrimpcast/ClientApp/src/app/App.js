@@ -154,7 +154,7 @@ const App = () => {
       {connectionDataState?.version && connectionDataState?.FRONTEND_NEEDS_UPDATE && (
         <Snackbar open={true}>
           <Alert severity={"error"} variant="filled" sx={{ width: "100%" }}>
-            You are using an outdated version. Please perform a hard refresh or clear your cache and reload the page.
+            Estás a usar uma versão antiga. Por favor faz ctrl+f5 ou limpa o cache e refresca a página.
           </Alert>
         </Snackbar>
       )}

@@ -63,7 +63,7 @@ const GenericActionList = (props) => {
           ) : (
             <List sx={{ width: "100%", bgcolor: "background.paper" }}>
               {!items.length ? (
-                <Typography ml={1}>No entries found</Typography>
+                <Typography ml={1}>Sem entradas</Typography>
               ) : (
                 items.map((item) => (
                   <ListItem

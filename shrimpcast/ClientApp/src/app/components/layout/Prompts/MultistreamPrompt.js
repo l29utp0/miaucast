@@ -21,7 +21,7 @@ const MultistreamPrompt = (props) => {
   return (
     <NotificationBar
       onClick={toggleSource}
-      text={`Multistreams: click here to watch ${sourceName}`}
+      text={`Multistream: clica aqui para ver ${sourceName}`}
       icon={LiveTvIcon}
       palette={red}
       skipCloseButton={true}

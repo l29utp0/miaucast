@@ -46,7 +46,7 @@ const ConnectedUsersCount = (props) => {
       </Box>
       <Typography ml="5px" mt="2px">
         {isConnected
-          ? `${connectedUsers.byIp ?? "-"} connected ${
+          ? `${connectedUsers.byIp ?? "-"} online ${
               props.isAdmin ? ` (${connectedUsers.byConnection ?? "-"} total)` : ""
             }`
           : props.connectionStatus}

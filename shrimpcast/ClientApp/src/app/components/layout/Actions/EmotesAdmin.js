@@ -40,9 +40,9 @@ const EmotesAdmin = (props) => {
         <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth>
           <DialogTitle sx={{ fontSize: "24px", paddingBottom: "7.5px" }}>
             <Box display="flex" width="100%" marginBottom={"10px"}>
-              Manage emotes
+              Gerir emotes
               <Button onClick={openAddEmotes} sx={{ marginLeft: "auto" }} variant="contained" color="success">
-                Add
+                Adicionar
               </Button>
               {addEmoteOpened && (
                 <AddEmoteDialog

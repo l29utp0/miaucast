@@ -11,7 +11,7 @@ const Centered = {
 
 const ErrorAlert = (props) => {
   const { disconnectMessage } = props,
-    isCountdown = disconnectMessage && new Date(disconnectMessage).toString() !== "Invalid Date";
+    isCountdown = disconnectMessage && new Date(disconnectMessage).toString() !== "Data Inválida";
 
   return (
     <Container sx={Centered}>
@@ -21,7 +21,7 @@ const ErrorAlert = (props) => {
         ) : disconnectMessage ? (
           disconnectMessage
         ) : (
-          "Could not establish a connection with the server. Refresh to try again."
+          "Não foi possível estabelecer uma ligação com o servidor. Refresca para tentar outra vez."
         )}
       </Alert>
     </Container>

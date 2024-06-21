@@ -87,9 +87,9 @@ const ConfigUserDialog = (props) => {
         <Dialog open={open} onClose={setClosed} maxWidth={"md"} fullWidth>
           <DialogTitle sx={{ fontSize: "24px", pb: "7.5px" }}>
             <Box display="flex" width="100%" mb={"10px"}>
-              Configuration
+              Configuração
               <Button onClick={saveConfig} sx={{ marginLeft: "auto" }} variant="contained" color="success">
-                Save
+                Guardar
               </Button>
             </Box>
             <Divider />

@@ -2,7 +2,7 @@ import LocalStorageManager from "./LocalStorageManager";
 
 class ChatActionsManager {
   static public_actions = {
-    ignore: "Ignore",
+    ignore: "Ignorar",
   };
 
   static mod_actions = {
@@ -13,14 +13,14 @@ class ChatActionsManager {
   static admin_actions = {
     ...this.mod_actions,
     ban: "Ban",
-    silentBan: "Silent ban",
-    silentBanAndDelete: "Silent ban and delete",
-    filterBan: "Filter and ban",
+    silentBan: "Ban silencioso",
+    silentBanAndDelete: "Ban silencioso e apagar",
+    filterBan: "Filtrar e banir",
   };
 
   static actions = {
     mod: (isMod) => (isMod ? "Unmod" : "Mod"),
-    verify: (isVerified) => (isVerified ? "Unverify" : "Verify"),
+    verify: (isVerified) => (isVerified ? "Remover V" : "Verificar"),
     ...this.admin_actions,
   };
 

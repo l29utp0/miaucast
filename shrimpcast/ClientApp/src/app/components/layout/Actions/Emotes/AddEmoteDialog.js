@@ -39,22 +39,22 @@ const AddEmoteDialog = (props) => {
     },
     handleFileChange = (e) => {
       const file = e.target.files[0];
-      const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
+      const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"];
       if (!file) {
         handleClose();
         return;
       }
 
       if (!validImageTypes.includes(file.type)) {
-        displayToast("Error: select a valid image file (JPG, PNG, or GIF).");
+        displayToast("Erro: seleciona um tipo de imagem válido (JPG, PNG, GIF, WEBP, AVIF).");
         handleClose();
         return;
       }
 
       const img = new Image();
       img.onload = () => {
-        if (img.width > 36 || img.height > 36) {
-          displayToast("Error: image resolution cannot exceed 36x36 pixels.");
+        if (img.width > 70 || img.height > 70) {
+          displayToast("Erro: resolução não pode exceder 70x70 pixels.");
           setEmote(null);
         } else {
           setEmote(file);
@@ -68,7 +68,7 @@ const AddEmoteDialog = (props) => {
       const response = await EmoteManager.Add(emote, name);
       setLoading(false);
       if (!response) {
-        displayToast("Error: Could not add emote.");
+        displayToast("Erro: Não foi possível adicionar o emote.");
         return;
       }
 
@@ -84,7 +84,7 @@ const AddEmoteDialog = (props) => {
         <TextField
           autoFocus
           margin="dense"
-          label="Emote name"
+          label="Nome emote"
           value={name}
           onChange={(e) => setName(e.target.value)}
           fullWidth
@@ -98,11 +98,11 @@ const AddEmoteDialog = (props) => {
           startIcon={<CloudUploadIcon />}
         >
           Upload file {emote?.name && `(${emote.name})`}
-          <VisuallyHiddenInput accept="image/jpeg, image/png, image/gif" onChange={handleFileChange} type="file" />
+          <VisuallyHiddenInput accept="image/jpeg, image/png, image/gif, image/webp, image/avif" onChange={handleFileChange} type="file" />
         </Button>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.close}>Cancel</Button>
+        <Button onClick={props.close}>Cancelar</Button>
         {loading ? (
           <CircularProgress size={24} />
         ) : (

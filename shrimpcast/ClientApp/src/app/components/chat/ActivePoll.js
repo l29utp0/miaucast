@@ -42,7 +42,7 @@ const ActivePoll = (props) => {
           endIcon={<PollIcon />}
           onClick={toggleStatus}
         >
-          <Box marginTop="2.5px">{show ? "Hide" : "Show"} poll</Box>
+          <Box marginTop="2.5px">{show ? "Esconder" : "Mostrar"} poll</Box>
         </Button>
       </Paper>
       <Slide direction="left" in={show}>
