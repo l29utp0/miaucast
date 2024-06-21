@@ -28,7 +28,7 @@ const ShowPing = (props) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">
-          Close
+          Fechar
         </Button>
       </DialogActions>
     </Dialog>

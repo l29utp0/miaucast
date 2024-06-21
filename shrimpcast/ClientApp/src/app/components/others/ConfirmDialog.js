@@ -22,10 +22,10 @@ const ConfirmDialog = (props) => {
         </DialogContent>
       )}
       <DialogActions>
-        <Button onClick={props.cancel}>Cancel</Button>
+        <Button onClick={props.cancel}>Cancelar</Button>
         {!props.isLoading ? (
           <Button onClick={props.confirm} autoFocus>
-            Confirm
+            Confirmar
           </Button>
         ) : (
           <CircularProgress size={24} />
