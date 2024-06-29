@@ -1,5 +1,5 @@
 ﻿body {
-    background-color: #1d1f21!important;
+    background-color: #0F1214!important;
 }
 
 #loading-screen {
@@ -8,7 +8,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #1d1f21!important;
+    background-color: #0F1214!important;
     display: flex;
     justify-content: center;
     align-items: center;

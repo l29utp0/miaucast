@@ -74,7 +74,7 @@ self.addEventListener('push', (event) => {
   console.log('Received push event.');
   const options = {
     body: 'Stream começou!',
-    icon: 'favicon.ico',
+    icon: 'images/favicon.ico',
   };
 
   // Show the notification
