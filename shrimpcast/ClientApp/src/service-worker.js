@@ -50,13 +50,13 @@ registerRoute(
 // precache, in this case same-origin .png requests like those from in public/
 registerRoute(
   // Add in any other file extensions or routing criteria as needed.
-  ({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.png'), // Customize this strategy as needed, e.g., by changing to CacheFirst.
+  ({ url }) => url.origin === self.location.origin && /\.(png|gif|webp)$/.test(url.pathname), // Customize this strategy as needed, e.g., by changing to CacheFirst.
   new StaleWhileRevalidate({
     cacheName: 'images',
     plugins: [
       // Ensure that once this runtime cache reaches a maximum size the
       // least-recently used images are removed.
-      new ExpirationPlugin({ maxEntries: 50 }),
+      new ExpirationPlugin({ maxEntries: 100 }),
     ],
   })
 );
@@ -73,13 +73,13 @@ self.addEventListener('message', (event) => {
 self.addEventListener('push', (event) => {
   console.log('Received push event.');
   const options = {
-    body: 'Come join the stream!',
+    body: 'Stream começou!',
     icon: 'favicon.ico',
   };
 
   // Show the notification
   event.waitUntil(
-    self.registration.showNotification('Stream is on!', options)
+    self.registration.showNotification('Stream começou!', options)
   );
 });
 
