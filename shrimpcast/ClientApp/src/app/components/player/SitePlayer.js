@@ -88,7 +88,7 @@ const SitePlayer = (props) => {
   ) : (
     <Box sx={WrapperSx}>
       <Typography className="noselect" textAlign="center" variant="h2">
-        Nothing playing right now
+        Nada a tocar de momento ;_;
       </Typography>
     </Box>
   );
