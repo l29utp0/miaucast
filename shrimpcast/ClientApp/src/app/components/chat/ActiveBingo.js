@@ -36,7 +36,7 @@ const ActiveBingo = (props) => {
         {bingoButtonExpanded ? (
           <>
             <Button sx={{ width: "100%" }} color="secondary" endIcon={<GridOnOutlinedIcon />} onClick={openBingo}>
-              <Box marginTop="2.5px">Show bingo</Box>
+              <Box marginTop="2.5px">Mostrar Bingo</Box>
             </Button>
             <IconButton onClick={toggleExpanded} color="secondary">
               <CloseIcon />

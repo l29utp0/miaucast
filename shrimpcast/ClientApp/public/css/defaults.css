@@ -19,13 +19,9 @@ html {
 
 }
 
-
 .mod-glow {
   color: #00e5ff !important;
 }
-
-
-
 
 .noselect {
   -webkit-touch-callout: none;
@@ -248,3 +244,24 @@ html {
   background-image: none!important;
   background-color: rgb(25, 27, 31)!important;
 }
+
+.css-153lwdx {
+    background-color: #0F1214!important;
+}
+
+.css-7alr45 {
+  background-color: #0F1214!important;
+}
+
+.css-1d4b2rt:hover {
+  background-color: none!important;
+}
+
+.css-1d4b2rt {
+  color: #c5c8c6!important;
+  background-color: #191B1F!important;
+}
+
+.css-4i21zu {
+  background-image: none!important;
+ }

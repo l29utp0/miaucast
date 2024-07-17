@@ -546,7 +546,7 @@ namespace shrimpcast.Hubs
             var Session = GetCurrentConnection().Session;
             if (!Session.IsMod && !Session.IsAdmin)
             {
-                if (!existingOption.IsChecked) await NewMessage($"[BINGO]: I suggest marking [{existingOption.Content}].");
+                if (!existingOption.IsChecked) await NewMessage($"[BINGO]: Sugeriu marcar [{existingOption.Content}].");
                 return true;
             }
 
@@ -556,7 +556,7 @@ namespace shrimpcast.Hubs
                 BingoOptionId,
                 isChecked,
             });
-            if (isChecked) await DispatchSystemMessage($"[BINGO]: marked [{existingOption.Content}].", true, true);
+            if (isChecked) await DispatchSystemMessage($"[BINGO]: marcou [{existingOption.Content}].", true, true);
             if (await _bingoRepository.IsBingo()) await DispatchSystemMessage($"BINGO!", true, true);
             return true;
         }
