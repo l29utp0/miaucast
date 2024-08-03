@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using shrimpcast.Data;
@@ -11,9 +12,11 @@ using shrimpcast.Data;
 namespace shrimpcast.Migrations
 {
     [DbContext(typeof(APPContext))]
-    partial class APPContextModelSnapshot : ModelSnapshot
+    [Migration("20240717104714_AddUrlIdentifiers")]
+    partial class AddUrlIdentifiers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,10 +109,7 @@ namespace shrimpcast.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("ChatBlockTORConnections")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("ChatBlockVPNConnections")
+                    b.Property<bool>("BlockTORConnections")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("ChatEnabled")
@@ -133,9 +133,6 @@ namespace shrimpcast.Migrations
 
                     b.Property<bool>("HideStreamTitle")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("IPServiceApiKey")
-                        .HasColumnType("text");
 
                     b.Property<int>("MaxABTimeInMs")
                         .HasColumnType("integer");
@@ -215,12 +212,6 @@ namespace shrimpcast.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<bool>("ShowVotes")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("SiteBlockTORConnections")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("SiteBlockVPNConnections")
                         .HasColumnType("boolean");
 
                     b.Property<int>("SnowflakeCount")
@@ -567,29 +558,6 @@ namespace shrimpcast.Migrations
                     b.HasKey("TorExitNodeId");
 
                     b.ToTable("TorExitNode", (string)null);
-                });
-
-            modelBuilder.Entity("shrimpcast.Entities.DB.VpnAddress", b =>
-                {
-                    b.Property<int>("VpnAddressId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("VpnAddressId"));
-
-                    b.Property<bool>("IsVPN")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("RemoteAddress")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("VpnAddressId");
-
-                    b.HasIndex("RemoteAddress")
-                        .IsUnique();
-
-                    b.ToTable("VpnAddress", (string)null);
                 });
 
             modelBuilder.Entity("shrimpcast.Entities.DB.Ban", b =>

@@ -53,9 +53,16 @@ const App = () => {
 
     const fetchLatestData = async () => {
       const updatedData = await TokenManager.EnsureTokenExists(null);
+      if (updatedData.message) {
+        setDisconnectMessage(updatedData.message);
+        return;
+      }
+
       setConnectionDataState((state) => ({
         ...state,
         ...updatedData,
+        // Refresh this property in case the server updates in real time
+        FRONTEND_NEEDS_UPDATE: process.env.REACT_APP_VERSION !== updatedData.version,
       }));
     };
 
