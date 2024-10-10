@@ -39,6 +39,7 @@ builder.Services.AddSignalR(hubOptions =>
 });
 builder.Services.AddSingleton(typeof(Connections<>));
 builder.Services.AddSingleton(typeof(Pings<>));
+builder.Services.AddSingleton(typeof(BingoSuggestions<>));
 builder.Services.AddSingleton(typeof(ConfigurationSingleton));
 builder.Services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
@@ -53,6 +54,7 @@ builder.Services.AddScoped<IAutoModFilterRepository, AutoModFilterRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IEmoteRepository, EmoteRepository>();
 builder.Services.AddScoped<IBingoRepository, BingoRepository>();
+builder.Services.AddScoped<IBTCServerRepository, BTCServerRepository>();
 builder.Services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                 .UseSimpleAssemblyNameTypeSerializer()

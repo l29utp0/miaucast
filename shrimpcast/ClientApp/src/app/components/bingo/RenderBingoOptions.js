@@ -16,6 +16,16 @@ const RenderBingoOptions = (props) => {
         })
       );
 
+      signalR.on(SignalRManager.events.bingoReset, () =>
+        setOptions((existingOptions) => {
+          const newOptions = existingOptions.map((existingOption) => ({
+            ...existingOption,
+            isChecked: false,
+          }));
+          return newOptions;
+        })
+      );
+
       signalR.on(SignalRManager.events.bingoOptionAdded, (option) =>
         setOptions((existingOptions) => existingOptions.concat(option))
       );
@@ -28,6 +38,7 @@ const RenderBingoOptions = (props) => {
       signalR.off(SignalRManager.events.bingoOptionUpdate);
       signalR.off(SignalRManager.events.bingoOptionAdded);
       signalR.off(SignalRManager.events.bingoOptionRemoved);
+      signalR.off(SignalRManager.events.bingoReset);
     };
 
   useEffect(() => {
