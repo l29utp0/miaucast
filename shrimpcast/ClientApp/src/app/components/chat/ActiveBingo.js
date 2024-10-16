@@ -7,7 +7,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import Bingo from "../bingo/Bingo";
 
 const BingoButtonSx = (height) => ({
-    bgcolor: "primary.800",
+    bgcolor: "primary.900",
     borderRadius: "0px",
     width: "100%",
     textAlign: "center",

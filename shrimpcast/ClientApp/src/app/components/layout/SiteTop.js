@@ -6,13 +6,14 @@ import CloseIcon from "@mui/icons-material/Close";
 import TokenManager from "../../managers/TokenManager";
 import LocalStorageManager from "../../managers/LocalStorageManager";
 import Grid from "@mui/material/Unstable_Grid2";
-import Colours from "../chat/Colours/Colours";
 import Actions from "./Actions/Actions";
+import ColourPicker from "../others/ColourPicker";
+import ChatActionsManager from "../../managers/ChatActionsManager";
 
 const SiteTopSx = {
     width: "100%",
     height: 35,
-    backgroundColor: "primary.800",
+    backgroundColor: "primary.900",
     zIndex: 1,
     display: "flex",
   },
@@ -21,6 +22,8 @@ const SiteTopSx = {
   },
   ButtonSx = (isAdmin) => ({
     height: "35px",
+    backgroundColor: "primary.900",
+    color: "secondary.main",
     borderRadius: "0px",
     width: `calc(100% - ${isAdmin ? "0px" : "34px"})`,
     textTransform: "none",
@@ -33,7 +36,7 @@ const SiteTopSx = {
   };
 
 const SiteTop = (props) => {
-  const { isAdmin, isMod, isGolden, signalR } = props,
+  const { isAdmin, isMod, isGolden, signalR, userDisplayColor, colours } = props,
     [registeredName, setRegisteredName] = useState(props.name),
     [newName, setNewName] = useState(registeredName),
     [editMode, setEditMode] = useState(false),
@@ -81,7 +84,15 @@ const SiteTop = (props) => {
             >
               <Box sx={ButtonTextSx}>{registeredName}</Box>
             </Button>
-            {!isAdmin && !isMod && !isGolden && <Colours {...props} />}
+            {!isAdmin && !isMod && !isGolden && (
+              <ColourPicker
+                userDisplayColor={userDisplayColor}
+                colours={colours}
+                executeCallback={async (nameColourId) =>
+                  await ChatActionsManager.ChangeColour(props.signalR, nameColourId)
+                }
+              />
+            )}
           </>
         ) : (
           <>

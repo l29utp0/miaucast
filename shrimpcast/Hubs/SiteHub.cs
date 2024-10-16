@@ -92,7 +92,7 @@ namespace shrimpcast.Hubs
                 var connectionsToRemove = ExistingConnectionsPerIP.OrderBy(ac => ac.Value.ConnectedAt)
                                                                   .Take(ExistingConnectionsPerIP.Count() - MAX_CONNECTIONS_PER_IP)
                                                                   .Select(connection => connection.Key);
-                await ForceDisconnect(connectionsToRemove, "You have exceeded the maximum amount of permitted simultaneous connections. Refresh to try again.");
+                await ForceDisconnect(connectionsToRemove, "Excedeste o número máximo de conecções simultâneas. Refresca para tentar outra vez.");
             }
 
             await TriggerUserCountChange(false, Session, null);
@@ -126,7 +126,7 @@ namespace shrimpcast.Hubs
             var currentName = await _sessionRepository.GetCurrentName(Session.SessionId);
             if (newName.Trim() == currentName || string.IsNullOrEmpty(newName.Trim()))
             {
-                await DispatchSystemMessage("You are already using that name.");
+                await DispatchSystemMessage("Já estás a usar este nome.");
                 return currentName;
             }
 
@@ -136,7 +136,7 @@ namespace shrimpcast.Hubs
                 connection.Value.Session.SessionNames.Add(addedName);
             }
 
-            string Content = $"{currentName} changed his name to {newName}.",
+            string Content = $"{currentName} mudou nome para {newName}.",
                    MessageType = "NameChange";
 
             var addedMessage = await _messageRepository.Add(Session.SessionId, RemoteAddress, Content, MessageType);
@@ -162,7 +162,7 @@ namespace shrimpcast.Hubs
             message = message.Trim();
             if (string.IsNullOrEmpty(message))
             {
-                await DispatchSystemMessage("Your message can not be empty.");
+                await DispatchSystemMessage("Mensagem não pode estar vazia.");
                 return 0;
             }
 
@@ -288,7 +288,7 @@ namespace shrimpcast.Hubs
             if (VerificationToken != Constants.FIREANDFORGET_TOKEN) return;
             await Task.Delay(new Random().Next(Configuration.MinABTimeInMs, Configuration.MaxABTimeInMs));
             await PerformBan(SessionId, true, true, -1);
-            await DispatchSystemMessage($"[{sentBy}] has been banned by the auto-mod", true, false, GetAdminSessions());
+            await DispatchSystemMessage($"[{sentBy}] banido pelo automod", true, false, GetAdminSessions());
         }
 
         public async Task<List<Ban>> ListBans()
@@ -319,7 +319,7 @@ namespace shrimpcast.Hubs
             if (session.IsMod) 
             {
                 var name = await _sessionRepository.GetCurrentName(SessionId);
-                var message = $"{session.SessionNames.Last().Name} muted {name}";
+                var message = $"{session.SessionNames.Last().Name} silenciou {name}";
                 await DispatchSystemMessage(message, true, false, GetAdminSessions());
             } 
             return true;
@@ -351,7 +351,7 @@ namespace shrimpcast.Hubs
             var connections = ActiveConnections.Where(ac => ac.Value.Session.SessionId == SessionId);
             foreach (var connection in connections) connection.Value.Session.IsMod = ShouldAdd;
             await Clients.Clients(connections.Select(c => c.Key)).SendAsync("ModStatusUpdate", ShouldAdd);
-            if (ShouldAdd) await DispatchSystemMessage("You are now a janny", true, false, connections.Select(c => c.Key));
+            if (ShouldAdd) await DispatchSystemMessage("És agora um janny", true, false, connections.Select(c => c.Key));
             await Task.Delay(100);
             await NotifyNewMessage(new Message
             {
@@ -395,7 +395,7 @@ namespace shrimpcast.Hubs
             Content = Content.Trim();
             if (string.IsNullOrEmpty(Content) || Content.Length < 5)
             {
-                await DispatchSystemMessage("Content length must be at least 5.");
+                await DispatchSystemMessage("Tem que ter 5 caracteres.");
                 return null;
             }
             return await _autoModFilterRepository.Add(Content);
@@ -428,13 +428,13 @@ namespace shrimpcast.Hubs
             var existingVote = Session.IsAdmin ? null : await _pollRepository.CanAddVote(Connection.RemoteAdress, Session.SessionId);
             if (existingVote != null)
             {
-                await DispatchSystemMessage("You already voted on this poll.");
+                await DispatchSystemMessage("Já votaste.");
                 return 0;
             }
 
             if (!Session.IsAdmin && !Configuration.AcceptNewOptions)
             {
-                await DispatchSystemMessage("Currently not accepting new options.");
+                await DispatchSystemMessage("Não está a aceitar novas opções.");
                 return 0;
             }
 
@@ -470,13 +470,13 @@ namespace shrimpcast.Hubs
 
             if (!Session.IsAdmin && !Configuration.AcceptNewVotes)
             {
-                await DispatchSystemMessage("Currently not accepting new votes.");
+                await DispatchSystemMessage("Não está a aceitar votos.");
                 return 0;
             }
 
             if (!await _pollRepository.IsOptionEnabled(pollOptionId))
             {
-                await DispatchSystemMessage("Option does not exist.");
+                await DispatchSystemMessage("Opção não existe.");
                 return 0;
             }
 
@@ -503,8 +503,8 @@ namespace shrimpcast.Hubs
 
             if (!Session.IsAdmin && !Configuration.ShowVotes)
             {
-                await DispatchSystemMessage("Permission denied.");
-                throw new Exception("Access denied.");
+                await DispatchSystemMessage("Permissão negada.");
+                throw new Exception("Acesso negado.");
             }
 
             return await _pollRepository.GetOptionVotes(pollOptionId);
@@ -520,7 +520,7 @@ namespace shrimpcast.Hubs
             Content = Content.Trim();
             if (string.IsNullOrEmpty(Content))
             {
-                await DispatchSystemMessage("Option content can not be empty.");
+                await DispatchSystemMessage("Opção não pode estar vazia.");
                 return null;
             }
 
@@ -541,14 +541,14 @@ namespace shrimpcast.Hubs
         {
             if (!Configuration.ShowBingo)
             {
-                await DispatchSystemMessage("Bingo is currently disabled.");
+                await DispatchSystemMessage("Bingo está desligado.");
                 return false;
             }
 
             var existingOption = await _bingoRepository.ExistsById(BingoOptionId);
             if (existingOption == null)
             {
-                await DispatchSystemMessage("This option has been removed.");
+                await DispatchSystemMessage("Esta opção foi removida.");
                 return false;
             }
 
@@ -607,7 +607,12 @@ namespace shrimpcast.Hubs
             {
                 OrderedConfig = Configuration.BuildJSONConfiguration(),
                 UnorderedConfig = unorderedConfig,
-                OpenKey = nameof(unorderedConfig.OpenAt).ToLower()
+                OpenKey = nameof(unorderedConfig.OpenAt).ToLower(),
+                ColorPickerKeys = new string[]
+                {
+                    nameof(unorderedConfig.PalettePrimary).ToLower(),
+                    nameof(unorderedConfig.PaletteSecondary).ToLower()
+                }
             };
         }
 
@@ -689,8 +694,8 @@ namespace shrimpcast.Hubs
             var session = GetCurrentConnection().Session;
             if (!session.IsAdmin && (!session.IsMod || !modActionAllowed))
             {
-                await DispatchSystemMessage("Permission denied.");
-                throw new Exception("Access denied.");
+                await DispatchSystemMessage("Permissão negada.");
+                throw new Exception("Acesso negado.");
             }
 
             return true;
@@ -737,7 +742,7 @@ namespace shrimpcast.Hubs
             if (connection.Session.IsAdmin) return null;
             if (!Configuration.ChatEnabled)
             {
-                return "Chat is temporarily disabled.";
+                return "Chat desligado.";
             }
 
             var MutedUntil = connection.Session.MutedUntil.GetValueOrDefault();
@@ -746,14 +751,14 @@ namespace shrimpcast.Hubs
             {
                 var timeDifference = MutedUntil.Subtract(DateTime.UtcNow);
                 var minuteDifference = Math.Ceiling(timeDifference.TotalMinutes);
-                return $"You have been muted for {minuteDifference} {(minuteDifference == 1 ? "minute" : "minutes")}.";
+                return $"Foste silenciado por {minuteDifference} {(minuteDifference == 1 ? "minuto" : "minutos")}.";
             }
 
             if (connection.Session.IsGolden) return null;
 
             if (Configuration.EnableVerifiedMode && !connection.Session.IsVerified)
             {
-                return "Error: Chat is currently restricted to verified users only.";
+                return "Erro: Chat apenas para utilizadores verificados.";
             }
 
             int requiredSessionTime = Configuration.RequiredTokenTimeInMinutes;
@@ -761,7 +766,7 @@ namespace shrimpcast.Hubs
             if (minutesDifference < requiredSessionTime)
             {
                 var diff = Math.Ceiling(requiredSessionTime - minutesDifference);
-                return $"You account is too new to post. You need to wait {diff} more {(diff == 1 ? "minute" : "minutes")}.";
+                return $"A tua sessão é demasiado nova para participar. Tens que esperar mais {diff} {(diff == 1 ? "minuto" : "minutos")}.";
             }
 
             var lastSent = await _messageRepository.GetLastSentTime(connection.RemoteAdress);
@@ -770,19 +775,19 @@ namespace shrimpcast.Hubs
             if (secondsDifference < requiredTime)
             {
                 var diff = Math.Ceiling(requiredTime - secondsDifference);
-                return $"You need to wait {diff} more {(diff == 1 ? "second" : "seconds")}.";
+                return $"Tens que esperar mais {diff} {(diff == 1 ? "segundo" : "segundos")}.";
             }
 
             if (connection.Session.IsVerified) return null;
 
             if (Configuration.ChatBlockTORConnections && await _torExitNodeRepository.IsTorExitNode(connection.RemoteAdress))
             {
-                return $"Error: {Constants.TOR_DISABLED_MESSAGE}";
+                return $"Erro: {Constants.TOR_DISABLED_MESSAGE}";
             }
 
             if (Configuration.ChatBlockVPNConnections && await _vpnAddressRepository.IsVpnAddress(connection.RemoteAdress))
             {
-                return $"Error: {Constants.VPN_DISABLED_MESSAGE}";
+                return $"Erro: {Constants.VPN_DISABLED_MESSAGE}";
             }
 
             return null;
@@ -807,7 +812,7 @@ namespace shrimpcast.Hubs
             var MinCount = Configuration.MinSentToParticipate;
             if (!await _messageRepository.HasEnoughCountBySessionId(Session.SessionId, MinCount))
             {
-                return $"You need to have sent at least {MinCount} messages in total to use this feature.";
+                return $"Tens que ter enviado pelo menos {MinCount} mensagens para usar esta função.";
             }
 
             return null;
@@ -864,12 +869,12 @@ namespace shrimpcast.Hubs
             if (result == null) return false;
             var connectionsToRemove = ActiveConnections.Where(ac => result.SessionIPs.Any(SessionIP => SessionIP.RemoteAddress == ac.Value.RemoteAdress) && !ac.Value.Session.IsAdmin)
                                                        .Select(ac => ac.Key);
-            await ForceDisconnect(connectionsToRemove, "You have been banned.");
+            await ForceDisconnect(connectionsToRemove, "Banido ;_;");
             if (!IsSilent || (IsSilent && SilentDelete))
             {
                 await NotifyNewMessage(new Message
                 {
-                    Content = SilentDelete ? "" : $"{result.SessionNames.Last().Name} was removed from chat",
+                    Content = SilentDelete ? "" : $"{result.SessionNames.Last().Name} foi removido do chat.",
                     CreatedAt = DateTime.UtcNow,
                     MessageType = "UserBanned",
                     SessionId = SessionId,
@@ -921,7 +926,7 @@ namespace shrimpcast.Hubs
             }
             catch (Exception ex)
             {
-                await DispatchSystemMessage($"Could not dispatch command: {ex.Message}");
+                await DispatchSystemMessage($"Não foi possível enviar comando: {ex.Message}");
                 return true;
             }
         }
@@ -957,24 +962,24 @@ namespace shrimpcast.Hubs
             {
                 url = matches[0].Value.Trim();
                 bool result = Uri.TryCreate(url, UriKind.Absolute, out var uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-                if (!result) throw new Exception("Invalid url.");
+                if (!result) throw new Exception("URL inválido.");
             }
             switch (message)
             {
                 case string _message when _message.StartsWith(Constants.PLAY_MAIN_COMMAND):
-                    await DispatchSystemMessage($"Executing {Constants.PLAY_MAIN_COMMAND} command...");
+                    await DispatchSystemMessage($"A executar {Constants.PLAY_MAIN_COMMAND} ...");
                     await _obsCommandsRepository.PlayMain(url);
-                    await DispatchSystemMessage($"Successfully executed {Constants.PLAY_MAIN_COMMAND}.");
+                    await DispatchSystemMessage($"Executado com sucesso {Constants.PLAY_MAIN_COMMAND}.");
                     break;
                 case string _message when _message.StartsWith(Constants.PLAY_KINO_COMMAND):
-                    await DispatchSystemMessage($"Executing {Constants.PLAY_KINO_COMMAND} command...");
+                    await DispatchSystemMessage($"A executar {Constants.PLAY_KINO_COMMAND} ...");
                     await _obsCommandsRepository.PlayKino(url);
-                    await DispatchSystemMessage($"Successfully executed {Constants.PLAY_KINO_COMMAND}.");
+                    await DispatchSystemMessage($"Executado com sucesso {Constants.PLAY_KINO_COMMAND}.");
                     break;
                 case string _message when _message.StartsWith(Constants.PLAY_MUSIC_MAIN_MUTED):
-                    await DispatchSystemMessage($"Executing {Constants.PLAY_MUSIC_MAIN_MUTED} command...");
+                    await DispatchSystemMessage($"A executar {Constants.PLAY_MUSIC_MAIN_MUTED} ...");
                     await _obsCommandsRepository.PlayMusic(url);
-                    await DispatchSystemMessage($"Successfully executed {Constants.PLAY_MUSIC_MAIN_MUTED}.");
+                    await DispatchSystemMessage($"Executado com sucesso {Constants.PLAY_MUSIC_MAIN_MUTED}.");
                     break;
                 default: throw new NotImplementedException();
             }

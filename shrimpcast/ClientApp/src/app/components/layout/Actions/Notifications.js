@@ -26,7 +26,7 @@ const Notifications = (props) => {
   return (
     <>
       <IconButton onClick={setOpened} type="button" size="small" sx={{ borderRadius: "0px" }}>
-        <NotificationsIcon sx={{ color: "primary.500" }} />
+        <NotificationsIcon sx={{ color: "secondary.main" }} />
       </IconButton>
       {open && (
         <ConfirmDialog

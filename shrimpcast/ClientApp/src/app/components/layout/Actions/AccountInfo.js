@@ -73,14 +73,14 @@ const AccountInfo = (props) => {
 
   return (
     <>
-      <IconButton onClick={handleOpen} size="small" color="primary">
+      <IconButton onClick={handleOpen} size="small" color="secondary">
         <AccountCircleIcon />
       </IconButton>
-      <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
+      <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
         <DialogTitle>
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="h6" component="div">
-              Info
+              Sessão
             </Typography>
           </Box>
         </DialogTitle>

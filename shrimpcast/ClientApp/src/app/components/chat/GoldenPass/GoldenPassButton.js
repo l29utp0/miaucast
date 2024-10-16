@@ -8,7 +8,7 @@ const GoldenPassSx = {
     height: "20px",
     overflow: "hidden",
     position: "relative",
-    backgroundColor: "secondary.900",
+    backgroundColor: "secondary",
     textAlign: "center",
     borderRadius: "1px",
     borderBottomRightRadius: "5px",
@@ -49,10 +49,7 @@ const GoldenPassButton = (props) => {
     <>
       <Box sx={GoldenPassSx} onClick={openDialog} className="animated-background">
         <Typography className="noselect" variant="caption" sx={TextSx}>
-          GET THE {goldenPassTitle}{" "}
-          <Typography variant="span" color="secondary.300">
-            GOLDEN PASS
-          </Typography>
+          ADQUIRE {goldenPassTitle}{" "}
         </Typography>
         <IconButton onClick={closeButton} type="button" size="small" sx={CloseIconSx}>
           <CloseIcon sx={{ fontSize: "16px" }} />

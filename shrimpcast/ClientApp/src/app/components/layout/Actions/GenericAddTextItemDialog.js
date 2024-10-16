@@ -25,7 +25,7 @@ const GenericAddTextItemDialog = (props) => {
     };
 
   return (
-    <Dialog open={true} maxWidth={"sm"} fullWidth onClose={closeDialog}>
+    <Dialog open={true} maxWidth={"sm"} fullWidth onClose={closeDialog} PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
       <DialogTitle>{gad_title}</DialogTitle>
       <DialogContent>
         <TextField

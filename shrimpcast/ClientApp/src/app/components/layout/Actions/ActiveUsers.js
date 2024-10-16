@@ -40,10 +40,10 @@ const ActiveUsers = (props) => {
   return (
     <>
       <IconButton onClick={setOpened} type="button" size="small" sx={{ borderRadius: "0px" }}>
-        <PeopleAltIcon sx={{ color: "primary.500" }} />
+        <PeopleAltIcon sx={{ color: "secondary.main" }} />
       </IconButton>
       {open && (
-        <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth>
+        <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
           <DialogTitle sx={{ fontSize: "24px", pb: "7.5px" }}>
             <Box display="flex" width="100%" mb={"10px"}>
               Active users list

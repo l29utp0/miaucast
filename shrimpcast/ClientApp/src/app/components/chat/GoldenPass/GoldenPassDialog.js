@@ -16,14 +16,15 @@ const DialogSx = {
     pb: "10px",
     fontWeight: "bold",
     color: "#fff",
+    bgcolor: "primary.800",
   },
   DialogContentSx = {
     padding: "20px",
-    bgcolor: "#303030",
+    bgcolor: "primary.900",
     borderRadius: "5px",
   },
   BuyButtonSx = {
-    bgcolor: "#ff9800",
+    bgcolor: "#ffca28",
     color: "#fff",
     padding: "10px 20px",
     borderRadius: "20px",
@@ -55,7 +56,7 @@ const GoldenPassDialog = (props) => {
       const response = await TokenManager.BeginGoldenPassPurchase(signalR);
       setLoading(false);
       if (!response || response.includes("Error")) {
-        setToastMessage(response || "Error: could not complete purchase.");
+        setToastMessage(response || "Erro: não foi possível completar.");
         setShowToast(true);
         return;
       }
@@ -73,28 +74,28 @@ const GoldenPassDialog = (props) => {
     <>
       <Dialog open={true} onClose={closeDialog} maxWidth={"sm"} fullWidth PaperProps={{ sx: DialogSx }}>
         <DialogTitle sx={DialogTitleSx}>
-          GET YOUR {goldenPassTitle}{" "}
-          <Typography variant="span" color="secondary.400">
-            GOLDEN PASS
+          ADQUIRE O TEU {goldenPassTitle}{" "}
+          <Typography variant="span" color="#ffca28">
             <WorkspacePremiumIcon sx={{ position: "relative", top: "5px" }} />
           </Typography>
           <Divider color="#FFF" />
         </DialogTitle>
         <DialogContent sx={DialogContentSx}>
           <Typography variant="body1" marginTop="5px">
-            Buy the {goldenPassTitle} golden pass if you wish to support the site, and enjoy complimentary benefits such
-            as:
+            Faz uma doação e adquire o teu {goldenPassTitle} se quiseres apoiar o stream e desfruta de benefícios como:
           </Typography>
           <Box marginTop="10px" mb={3}>
             <Typography variant="body2" className="golden-glow">
-              - Glowie username
+              - Nome de OURO.
             </Typography>
-            <Typography variant="body2">- Unlimited duration </Typography>
-            <Typography variant="body2">- 100% anonymous via crypto</Typography>
+            <Typography variant="body2">- Duração iliminata, sem subscrições, wow! </Typography>
+            <Typography variant="body2">- Uma certa resistência a bans.</Typography>
+            <Typography variant="body2">- Um abraço virtual!</Typography>
+            <Typography variant="body2">- Lembra-te de guardar o teu token de sessão (canto superior esquerdo).</Typography>
           </Box>
           <Box justifyContent="center" display="flex">
             <Button disabled={loading} onClick={beginPurchase} variant="contained" sx={BuyButtonSx}>
-              Buy Golden Pass (USD ${configuration.goldenPassValue}){" "}
+              Adquire (USD ${configuration.goldenPassValue}){" "}
               {loading && <CircularProgress color="primary" sx={{ ml: "10px" }} size={14} />}
             </Button>
           </Box>

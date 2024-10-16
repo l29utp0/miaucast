@@ -49,10 +49,10 @@ const GenericActionList = (props) => {
     <>
       {!props.skipButton && (
         <IconButton onClick={setOpened} type="button" size="small" sx={{ borderRadius: "0px" }}>
-          <Icon sx={{ color: "primary.500" }} />
+          <Icon sx={{ color: "secondary.main" }} />
         </IconButton>
       )}
-      <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth>
+      <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
         <DialogTitle sx={{ fontSize: "24px", paddingBottom: "7.5px" }}>
           <Box display="flex" width="100%" marginBottom={"10px"}>
             {props.title}
@@ -72,7 +72,7 @@ const GenericActionList = (props) => {
           ) : (
             <List sx={{ width: "100%", bgcolor: "background.paper" }}>
               {!items.length ? (
-                <Typography ml={1}>Sem entradas</Typography>
+                <Typography ml={1}>Sem entradas.</Typography>
               ) : (
                 items.map((item) => (
                   <ListItem

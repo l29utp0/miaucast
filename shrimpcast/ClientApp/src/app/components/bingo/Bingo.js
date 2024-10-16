@@ -37,7 +37,7 @@ const Bingo = (props) => {
 
   return (
     <>
-      <Dialog open={displayBingo} onClose={closeBingo} maxWidth={"sm"} fullWidth>
+      <Dialog open={displayBingo} onClose={closeBingo} maxWidth={"sm"} fullWidth PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
         <DialogTitle sx={{ fontSize: "24px", paddingBottom: "7.5px" }}>
           <Box display="flex" width="100%" marginBottom={"10px"}>
             {bingoTitle}

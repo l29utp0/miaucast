@@ -107,9 +107,9 @@ const ManageUserDialog = (props) => {
         )}
       </IconButton>
       {open && (
-        <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth>
+        <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth PaperProps={{ sx: { backgroundColor:"primary.900" }}} >
           <DialogTitle sx={{ fontSize: "24px", paddingBottom: "7.5px" }}>
-            {targetUserPublic ? `Manage` : `Details`}
+            {targetUserPublic ? `Gerir` : `Detalhes`}
             <Divider />
           </DialogTitle>
           <DialogContent>
@@ -122,18 +122,18 @@ const ManageUserDialog = (props) => {
                 <Grid container alignItems="center">
                   <Grid xs={12} sm={targetUserPublic ? 10 : 12}>
                     <Typography>
-                      User first joined on {new Date(userInfo.basicResponse.createdAt).toLocaleString()}
+                      Visto pela primeira vez {new Date(userInfo.basicResponse.createdAt).toLocaleString('en-GB')}
                       {siteAdmin && ` with ID ${sessionId}`}{" "}
                     </Typography>
                     {props.createdAt && (
-                      <Typography>Message sent at {new Date(props.createdAt).toLocaleString()}</Typography>
+                      <Typography>Mensagem enviada {new Date(props.createdAt).toLocaleString('en-GB')}</Typography>
                     )}
                     {userInfo.mutedUntil && (
-                      <Typography>Muted until {new Date(userInfo.mutedUntil).toLocaleString()}</Typography>
+                      <Typography>Silenciado até {new Date(userInfo.mutedUntil).toLocaleString('en-GB')}</Typography>
                     )}
                     {siteAdmin && userInfo.ip && (
                       <Typography>
-                        Message was sent from{" "}
+                        Mensagem enviada de{" "}
                         <Link
                           sx={{ wordWrap: "break-word" }}
                           href={`https://whatismyipaddress.com/ip/${userInfo.ip}`}
@@ -168,19 +168,19 @@ const ManageUserDialog = (props) => {
                 <Divider />
                 <Grid container spacing={2} mt="2px">
                   <Grid xs={12} sm={siteAdmin || showActionsPanel ? 6 : 12}>
-                    <Typography>Previous names:</Typography>
+                    <Typography>Nomes anteriores:</Typography>
                     <VirtualizedList list={userInfo.basicResponse.previousNames} />
                   </Grid>
                   {siteAdmin && (
                     <>
                       <Grid xs={12} sm={6}>
-                        <Typography>All token IPs:</Typography>
+                        <Typography>Tokens IPs:</Typography>
                         <VirtualizedList list={userInfo.iPs} />
                       </Grid>
                       <Grid xs={12} sm={isAdmin ? 12 : 6}>
-                        <Typography sx={MessageIPSx}>Active sessions{userInfo.ip && ` on ${userInfo.ip}`}:</Typography>
+                        <Typography sx={MessageIPSx}>Sessões ativas{userInfo.ip && ` on ${userInfo.ip}`}:</Typography>
                         {!userInfo.activeSessions?.length ? (
-                          <Typography>IP not connected.</Typography>
+                          <Typography>IP não conectado.</Typography>
                         ) : (
                           <VirtualizedList list={userInfo.activeSessions} />
                         )}
@@ -189,7 +189,7 @@ const ManageUserDialog = (props) => {
                   )}
                   {showActionsPanel && (
                     <Grid xs={12} sm={6} pb={2}>
-                      <Typography>Moderate</Typography>
+                      <Typography>Moderar</Typography>
                       <Divider />
                       <Box height="200px">
                         {actionKeys.map((actionKey) => (
@@ -206,7 +206,7 @@ const ManageUserDialog = (props) => {
 
                         {showPromptDialog.open && (
                           <ConfirmDialog
-                            title={`Confirm ${showPromptDialog.type.toLowerCase()} for ${sentBy}?`}
+                            title={`Confirmar ${showPromptDialog.type.toLowerCase()} para ${sentBy}?`}
                             confirm={executeAction}
                             cancel={closeConfirmPrompt}
                           />

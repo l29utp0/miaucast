@@ -9,7 +9,7 @@ const RTTSx = {
     position: "absolute",
     top: "1px",
     left: "1px",
-    backgroundColor: "primary.800",
+    backgroundColor: "primary.900",
     height: "13.5px",
     display: "flex",
     borderTopLeftRadius: "2px",

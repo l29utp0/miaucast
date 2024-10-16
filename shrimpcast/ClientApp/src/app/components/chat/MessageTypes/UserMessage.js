@@ -1,6 +1,7 @@
 import { Box, IconButton, Link, Typography } from "@mui/material";
 import React, { useState } from "react";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import LocalStorageManager from "../../../managers/LocalStorageManager";
 import reactStringReplace from "react-string-replace";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -51,7 +52,7 @@ const WrapperTextBoxSx = {
   },
   OverlayButtonSx = {
     color: "white",
-    backgroundColor: "primary.500",
+    backgroundColor: "primary.800",
     fontSize: "16px",
     width: "20px",
     height: "20px",
@@ -93,7 +94,7 @@ const UserMessage = React.memo((props) => {
                 <DeleteIcon sx={{ fontSize: "16px" }} />
               </IconButton>
               {showPromptDialog && (
-                <ConfirmDialog title="Remove message?" confirm={removeMessage} cancel={closeConfirmPrompt} />
+                <ConfirmDialog title="Apagar mensagem?" confirm={removeMessage} cancel={closeConfirmPrompt} />
               )}
             </>
           )}
@@ -106,6 +107,8 @@ const UserMessage = React.memo((props) => {
             }`}
           >
             {isAdmin && <VerifiedUserIcon sx={VerifiedUserIconSx} />}
+            {isMod && <VerifiedUserIcon sx={VerifiedUserIconSx} />}
+            {isGolden && <WorkspacePremiumIcon sx={VerifiedUserIconSx} />}
             {props.sentBy}
           </Typography>
         </Box>

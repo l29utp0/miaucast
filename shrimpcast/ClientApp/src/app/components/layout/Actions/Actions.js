@@ -45,7 +45,7 @@ const Actions = (props) => {
         aria-expanded={open ? "true" : undefined}
         onClick={handleClick}
         size="small"
-        color="primary"
+        color="secondary"
         id="menu-button"
       >
         <MenuIcon />
@@ -54,6 +54,7 @@ const Actions = (props) => {
         id="menu"
         anchorEl={anchorEl}
         open={open}
+        PaperProps={{ sx: { backgroundColor:"primary.900" }}}
         onClose={handleClose}
         MenuListProps={{
           "aria-labelledby": "menu-button",

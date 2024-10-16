@@ -14,6 +14,7 @@ const ConfirmDialog = (props) => {
       onClose={props.cancel}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+      PaperProps={{ sx: { backgroundColor:"primary.900" }}}
     >
       <DialogTitle id="alert-dialog-title">{props.title}</DialogTitle>
       {props.content && (

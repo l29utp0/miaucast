@@ -6,15 +6,14 @@ const EmotesWrapperSx = {
     position: "absolute",
     bottom: "65px",
     width: "100%",
-    padding: "2px",
-    paddingLeft: "7.5px",
-    paddingTop: "5px",
+    bgcolor: "primary.900",
     zIndex: 1,
   },
   EmotesSx = {
-    marginTop: "5px",
-    marginBottom: "5px",
+    marginTop: "3px",
     maxHeight: "200px",
+    bgcolor: "primary.900",
+    padding: "7.5px",
     overflowY: "scroll",
   };
 

@@ -34,10 +34,10 @@ const EmotesAdmin = (props) => {
   return (
     <>
       <IconButton onClick={setOpened} type="button" size="small" sx={{ borderRadius: "0px" }}>
-        <InsertEmoticonIcon sx={{ color: "primary.500" }} />
+        <InsertEmoticonIcon sx={{ color: "secondary.main" }} />
       </IconButton>
       {open && (
-        <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth>
+        <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
           <DialogTitle sx={{ fontSize: "24px", paddingBottom: "7.5px" }}>
             <Box display="flex" width="100%" marginBottom={"10px"}>
               Gerir emotes

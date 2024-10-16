@@ -78,7 +78,7 @@ const AddEmoteDialog = (props) => {
     };
 
   return (
-    <Dialog open={props.open} onClose={props.close}>
+    <Dialog open={props.open} onClose={props.close} PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
       <DialogTitle>Add new emote</DialogTitle>
       <DialogContent>
         <TextField

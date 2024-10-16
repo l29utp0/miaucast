@@ -5,7 +5,7 @@ import PollIcon from "@mui/icons-material/Poll";
 import Poll from "../polls/Poll";
 
 const PollButtonSx = {
-    bgcolor: "primary.800",
+    bgcolor: "primary.900",
     borderRadius: "0px",
     width: "100%",
     textAlign: "center",
@@ -16,7 +16,7 @@ const PollButtonSx = {
   },
   DrawerSx = (bottomHeight) => ({
     maxHeight: `min(calc(100% - 63px - ${bottomHeight}px), 225px)`,
-    backgroundColor: "primary.800",
+    backgroundColor: "primary.900",
     position: "absolute",
     width: "100%",
     zIndex: 2,

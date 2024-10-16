@@ -42,9 +42,9 @@ const InvoiceTable = ({ invoices, setCheckoutUrl }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Status</TableCell>
+                <TableCell>Estado</TableCell>
                 <TableCell>Checkout</TableCell>
-                <TableCell>Created at</TableCell>
+                <TableCell>Criado a</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -59,13 +59,13 @@ const InvoiceTable = ({ invoices, setCheckoutUrl }) => {
                   <TableCell>
                     <Button onClick={() => setCheckoutUrl(invoice.checkoutLink)}>open</Button>
                   </TableCell>
-                  <TableCell>{new Date(invoice.createdTime * 1000).toLocaleString()}</TableCell>
+                  <TableCell>{new Date(invoice.createdTime * 1000).toLocaleString('en-GB')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         ) : (
-          <Typography mt="5px">No records found</Typography>
+          <Typography mt="5px">Sem nada encontrado.</Typography>
         )
       ) : (
         <Box sx={InvoicesLoaderSx}>
