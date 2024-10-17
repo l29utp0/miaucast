@@ -34,6 +34,7 @@ const SendInputSx = {
     height: "13.5px",
     borderRadius: "1px",
     borderTopRightRadius: "5px",
+    visibility: "hidden",
   }),
   CheckBoxSx = {
     color: "white",

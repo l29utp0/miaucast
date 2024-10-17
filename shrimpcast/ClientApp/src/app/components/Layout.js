@@ -30,8 +30,22 @@ const MainGridSx = {
   ChatBoxSx = (theme) => ({
     height: "calc(100% - 35px)",
     backgroundColor: "primary.900",
+    position: "relative",
     [theme.breakpoints.down("md")]: {
       height: "60%",
+    },
+    "&::after": {
+      content: "''",
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundImage: "url('/images/martahalloween.png')",
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "bottom right",
+      backgroundSize: "160px",
+      filter: "opacity(0.6)",
     },
   }),
   PlayerContainerSx = {

@@ -22,7 +22,7 @@ const ShowPing = (props) => {
 
   return (
     <Dialog open={message?.text ? true : false} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
-      <DialogTitle>{message?.name} diz:</DialogTitle>
+      <DialogTitle>{message?.name} enviou-te:</DialogTitle>
       <DialogContent>
         <DialogContentText>{message?.text}</DialogContentText>
       </DialogContent>

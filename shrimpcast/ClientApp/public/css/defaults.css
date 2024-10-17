@@ -15,7 +15,7 @@ html {
 }
 
 .admin-glow {
-  color: #b23c17 !important;
+  color: #C60601!important
 
 }
 
@@ -135,8 +135,4 @@ html {
   to {
     text-shadow: 0 0 20px #ffca28, 0 0 20px #ffb300;
   }
-}
-
-.css-12yoc95 {
-  display:none;
 }

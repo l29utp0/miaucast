@@ -37,13 +37,13 @@ const ActivePoll = (props) => {
     <Box hidden={!showPoll}>
       <Paper sx={PollButtonSx}>
         <Button
-          sx={{ width: "100%" }}
+          sx={{ width: "100%", position: "relative", zIndex: 1 }}
           color="secondary"
           variant="outlined"
           endIcon={<PollIcon />}
           onClick={toggleStatus}
         >
-          <Box marginTop="2.5px">{show ? "Esconder" : "Mostrar"} poll</Box>
+          <Box marginTop="2.5px">{show ? "Esconder" : "Mostrar"} votação</Box>
         </Button>
       </Paper>
       <Slide direction="left" in={show}>

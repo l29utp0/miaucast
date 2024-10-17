@@ -14,6 +14,7 @@ const GoldenPassSx = {
     borderBottomRightRadius: "5px",
     borderBottomLeftRadius: "5px",
     cursor: "pointer",
+    zIndex: 1,
   },
   TextSx = {
     height: "15px",

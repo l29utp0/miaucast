@@ -7,7 +7,7 @@ class ChatActionsManager {
 
   static mod_actions = {
     ...this.public_actions,
-    mute: "Mute",
+    mute: "Silenciar",
   };
 
   static admin_actions = {

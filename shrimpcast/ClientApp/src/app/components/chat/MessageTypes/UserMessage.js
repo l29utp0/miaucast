@@ -15,6 +15,7 @@ const WrapperTextBoxSx = {
     wordWrap: "break-word",
     padding: "2px",
     position: "relative",
+    zIndex: 1,
     "&:hover": {
       backgroundColor: "primary.800",
     },

@@ -21,7 +21,7 @@ const ColorButtonSx = {
     fontSize: "14px",
   },
   CloseIconSx = (palette) => ({
-    zIndex: "2",
+    zIndex: 2,
     backgroundColor: palette["A700"],
     height: "20px",
     width: "20px",
