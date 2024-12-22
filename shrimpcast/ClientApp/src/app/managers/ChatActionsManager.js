@@ -20,7 +20,7 @@ class ChatActionsManager {
 
   static actions = {
     mod: (isMod) => (isMod ? "Unmod" : "Mod"),
-    verify: (isVerified) => (isVerified ? "Remover V" : "Verificar"),
+    verify: (isVerified) => (isVerified ? "Remover Verificação" : "Verificar"),
     ...this.admin_actions,
   };
 

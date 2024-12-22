@@ -203,7 +203,7 @@ namespace shrimpcast.Entities.DB
                     values = new object[]
                     {
                         new { name = nameof(config.ChatEnabled).ToLower(), label = "Ligar chat", value = config.ChatEnabled },
-                        new { name = nameof(config.EnableVerifiedMode).ToLower(), label = "permitir apenas verificados", value = config.EnableVerifiedMode },
+                        new { name = nameof(config.EnableVerifiedMode).ToLower(), label = "Permitir apenas verificados", value = config.EnableVerifiedMode },
                         new { name = nameof(config.MaxMessagesToShow).ToLower(), label = "Máx. mensagens visíveis", value = config.MaxMessagesToShow },
                         new { name = nameof(config.OffsetDateTimeInMinutes).ToLower(), label = "Teporizador mensagens (minutos)", value = config.OffsetDateTimeInMinutes },
                         new { name = nameof(config.RequiredTokenTimeInMinutes).ToLower(), label = "Tempo para novos utilizadores participarem (mimnutos)", value = config.RequiredTokenTimeInMinutes },
