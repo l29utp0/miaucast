@@ -103,9 +103,9 @@ const UserMessage = React.memo((props) => {
         <Box display="inline-block">
           <Typography
             sx={TextSx(props.userColorDisplay, true)}
-            className={`${props.enableChristmasTheme ? "santa-hat" : null} ${
-              isAdmin ? "admin-glow" : isMod ? "mod-glow" : isGolden ? "golden-glow" : null
-            }`}
+            className={`${
+              props.enableChristmasTheme ? "santa-hat" : props.enableHalloweenTheme ? "halloween-hat" : null
+            } ${isAdmin ? "admin-glow" : isMod ? "mod-glow" : isGolden ? "golden-glow" : null}`}
           >
             {isAdmin && <VerifiedUserIcon sx={VerifiedUserIconSx} />}
             {isMod && <VerifiedUserIcon sx={VerifiedUserIconSx} />}
