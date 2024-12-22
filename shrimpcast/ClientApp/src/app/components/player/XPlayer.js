@@ -49,6 +49,7 @@ const XPlayer = (props) => {
       lang: "en",
       playbackRate: false,
       cssFullscreen: false,
+      pip: true,
       screenShot: {
         disable: false,
         width: 1920,
