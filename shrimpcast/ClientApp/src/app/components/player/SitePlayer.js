@@ -51,16 +51,10 @@ const SitePlayer = (props) => {
         player.playVideo();
       }
     },
-    isFLV = url.endsWith(".flv"),
-    forceM3U8 = isFLV && !window.MediaSource;
-
-  if (isFLV && forceM3U8) {
-    videoJsOptions.sources[0].src = url.substr(0, url.lastIndexOf(".")) + ".m3u8";
-    console.log("Forcing M3U8 because FLV is not supported.");
-  }
+    isHLS = url.endsWith(".m3u8");
 
   return streamEnabled ? (
-    isFLV && !forceM3U8 ? (
+    isHLS ? (
       <XPlayer url={url} />
     ) : useRTCEmbed ? (
       <iframe
