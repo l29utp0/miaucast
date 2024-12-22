@@ -4,7 +4,7 @@ namespace shrimpcast.Entities
 {
     public class Constants
     {
-        public const string BACKEND_VERSION = "1.1.3";
+        public const string BACKEND_VERSION = "1.1.4";
 
         public const string PING_COMMAND = "!ping";
 
@@ -16,15 +16,17 @@ namespace shrimpcast.Entities
 
         public const string PLAY_MUSIC_MAIN_MUTED = $"{PLAY_COMMAND}music";
 
+        public const string TRY_IP_SERVICE_COMMAND = $"!tryipservice";
+
         public const string FILTERS = "filters.json";
 
         public static readonly string FIREANDFORGET_TOKEN = SecureToken.GenerateTokenThreadSafe();
 
-        public const string BANNED_MESSAGE = "You are banned.";
+        public const string BANNED_MESSAGE = "Banido ;_;";
 
-        public const string TOR_DISABLED_MESSAGE = "Tor connections are temporarily disabled.";
+        public const string TOR_DISABLED_MESSAGE = "Acesso TOR está temporáriamente desligado.";
 
-        public const string VPN_DISABLED_MESSAGE = "VPN connections are temporarily disabled.";
+        public const string VPN_DISABLED_MESSAGE = " Acesso VPN está temporáriamente desligado.";
 
         public static string EMOTE_GET (string name) => $"/api/emote/get/{name}";
 

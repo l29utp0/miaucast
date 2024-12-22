@@ -89,12 +89,18 @@ namespace shrimpcast.Entities.DB
 
         public required bool ChatBlockVPNConnections { get; set; }
 
+        public required string IPServiceApiURL { get; set; }
+
         [JsonIgnore]
         public string? IPServiceApiKey { get; set; } = string.Empty;
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [NotMapped]
         public string? IPServiceApiKeyNotMapped { get; set; }
+
+        public required string OptionalApiKeyHeader { get; set; }
+
+        public required string VPNDetectionMatchCriteria { get; set; }
 
         [JsonIgnore]
         public string? OBSHost { get; set; } = string.Empty;
@@ -182,13 +188,13 @@ namespace shrimpcast.Entities.DB
                     name = "Site",
                     values = new object[]
                     {
-                        new { name = nameof(config.HideStreamTitle).ToLower(), label = "Hide stream title", value = config.HideStreamTitle },
-                        new { name = nameof(config.MaxConnectionsPerIP).ToLower(), label = "Max connections per IP", value = config.MaxConnectionsPerIP },
-                        new { name = nameof(config.MinABTimeInMs).ToLower(), label = "Min auto-mod time (ms)", value = config.MinABTimeInMs },
-                        new { name = nameof(config.MaxABTimeInMs).ToLower(), label = "Max auto-mod time (ms)", value = config.MaxABTimeInMs },
-                        new { name = nameof(config.OpenAt).ToLower(), label = "Open site at", value = config.OpenAt },
-                        new { name = nameof(config.StreamTitle).ToLower(), label = "Stream title", value = config.StreamTitle },
-                        new { name = nameof(config.StreamDescription).ToLower(), label = "Stream description", value = config.StreamDescription },
+                        new { name = nameof(config.HideStreamTitle).ToLower(), label = "Esconder título do stream", value = config.HideStreamTitle },
+                        new { name = nameof(config.MaxConnectionsPerIP).ToLower(), label = "Máx. de conexões por IP", value = config.MaxConnectionsPerIP },
+                        new { name = nameof(config.MinABTimeInMs).ToLower(), label = "Min.tempo automod (ms)", value = config.MinABTimeInMs },
+                        new { name = nameof(config.MaxABTimeInMs).ToLower(), label = "Máx. tempo automod (ms)", value = config.MaxABTimeInMs },
+                        new { name = nameof(config.OpenAt).ToLower(), label = "Abrir site a", value = config.OpenAt },
+                        new { name = nameof(config.StreamTitle).ToLower(), label = "Título stream", value = config.StreamTitle },
+                        new { name = nameof(config.StreamDescription).ToLower(), label = "Descrição stream", value = config.StreamDescription },
                     }
                 },
                 new
@@ -196,15 +202,15 @@ namespace shrimpcast.Entities.DB
                     name = "Chat",
                     values = new object[]
                     {
-                        new { name = nameof(config.ChatEnabled).ToLower(), label = "Enable chat", value = config.ChatEnabled },
-                        new { name = nameof(config.EnableVerifiedMode).ToLower(), label = "Allow verified users only", value = config.EnableVerifiedMode },
-                        new { name = nameof(config.MaxMessagesToShow).ToLower(), label = "Max visible messages", value = config.MaxMessagesToShow },
-                        new { name = nameof(config.OffsetDateTimeInMinutes).ToLower(), label = "Message age limit (mins)", value = config.OffsetDateTimeInMinutes },
-                        new { name = nameof(config.RequiredTokenTimeInMinutes).ToLower(), label = "Required time for new users (mins)", value = config.RequiredTokenTimeInMinutes },
+                        new { name = nameof(config.ChatEnabled).ToLower(), label = "Ligar chat", value = config.ChatEnabled },
+                        new { name = nameof(config.EnableVerifiedMode).ToLower(), label = "permitir apenas verificados", value = config.EnableVerifiedMode },
+                        new { name = nameof(config.MaxMessagesToShow).ToLower(), label = "Máx. mensagens visíveis", value = config.MaxMessagesToShow },
+                        new { name = nameof(config.OffsetDateTimeInMinutes).ToLower(), label = "Teporizador mensagens (minutos)", value = config.OffsetDateTimeInMinutes },
+                        new { name = nameof(config.RequiredTokenTimeInMinutes).ToLower(), label = "Tempo para novos utilizadores participarem (mimnutos)", value = config.RequiredTokenTimeInMinutes },
                         new { name = nameof(config.MessageDelayTime).ToLower(), label = "Cooldown between messages", value = config.MessageDelayTime },
-                        new { name = nameof(config.MuteLenghtInMinutes).ToLower(), label = "Mute time in minutes", value = config.MuteLenghtInMinutes },
-                        new { name = nameof(config.MaxLengthTruncation).ToLower(), label = "Message length before truncation", value = config.MaxLengthTruncation },
-                        new { name = nameof(config.DefaultName).ToLower(), label = "Default name for new users", value = config.DefaultName },
+                        new { name = nameof(config.MuteLenghtInMinutes).ToLower(), label = "Tempo de silenciar", value = config.MuteLenghtInMinutes },
+                        new { name = nameof(config.MaxLengthTruncation).ToLower(), label = "Tamanho da mensagem antes de truncar", value = config.MaxLengthTruncation },
+                        new { name = nameof(config.DefaultName).ToLower(), label = "Nome padrão para novos utilizadores", value = config.DefaultName },
                     }
                 },
                 new
@@ -212,15 +218,15 @@ namespace shrimpcast.Entities.DB
                     name = "Stream",
                     values = new object[]
                     {
-                        new { name = nameof(config.StreamEnabled).ToLower(), label = "Enable stream", value = config.StreamEnabled },
-                        new { name = nameof(config.UsePrimarySource).ToLower(), label = "Use primary source", value = config.UsePrimarySource },
-                        new { name = nameof(config.UseLegacyPlayer).ToLower(), label = "Use native player", value = config.UseLegacyPlayer },
-                        new { name = nameof(config.UseRTCEmbed).ToLower(), label = "Treat URL as embed", value = config.UseRTCEmbed },
-                        new { name = nameof(config.EnableMultistreams).ToLower(), label = "Enable multistreams", value = config.EnableMultistreams },
-                        new { name = nameof(config.PrimaryStreamUrl).ToLower(), label = "Primary stream URL", value = config.PrimaryStreamUrl },
-                        new { name = nameof(config.PrimaryUrlName).ToLower(), label = " (optional) Primary URL custom name", value = config.PrimaryUrlName },
-                        new { name = nameof(config.SecondaryStreamUrl).ToLower(), label = "Secondary stream URL", value = config.SecondaryStreamUrl },
-                        new { name = nameof(config.SecondaryUrlName).ToLower(), label = "(optional) Secondary URL custom name", value = config.SecondaryUrlName },
+                        new { name = nameof(config.StreamEnabled).ToLower(), label = "Ligar stream", value = config.StreamEnabled },
+                        new { name = nameof(config.UsePrimarySource).ToLower(), label = "Usar primeira fonte", value = config.UsePrimarySource },
+                        new { name = nameof(config.UseLegacyPlayer).ToLower(), label = "Usar player nativo", value = config.UseLegacyPlayer },
+                        new { name = nameof(config.UseRTCEmbed).ToLower(), label = "Tratar URL como embutido", value = config.UseRTCEmbed },
+                        new { name = nameof(config.EnableMultistreams).ToLower(), label = "Ligar multistreams", value = config.EnableMultistreams },
+                        new { name = nameof(config.PrimaryStreamUrl).ToLower(), label = "URL primário", value = config.PrimaryStreamUrl },
+                        new { name = nameof(config.PrimaryUrlName).ToLower(), label = " (opcional) Nome para primeiro URL", value = config.PrimaryUrlName },
+                        new { name = nameof(config.SecondaryStreamUrl).ToLower(), label = "URL secundário", value = config.SecondaryStreamUrl },
+                        new { name = nameof(config.SecondaryUrlName).ToLower(), label = "(opcional) Nome para segundo URL", value = config.SecondaryUrlName },
                     }
                 },
                 new
@@ -228,12 +234,12 @@ namespace shrimpcast.Entities.DB
                     name = "Poll",
                     values = new object[]
                     {
-                        new { name = nameof(config.ShowPoll).ToLower(), label = "Show poll", value = config.ShowPoll },
-                        new { name = nameof(config.AcceptNewOptions).ToLower(), label = "Accept new options", value = config.AcceptNewOptions },
-                        new { name = nameof(config.AcceptNewVotes).ToLower(), label = "Accept new votes", value = config.AcceptNewVotes },
-                        new { name = nameof(config.ShowVotes).ToLower(), label = "Make votes public", value = config.ShowVotes },
-                        new { name = nameof(config.MinSentToParticipate).ToLower(), label = "Minimum sent to participate", value = config.MinSentToParticipate },
-                        new { name = nameof(config.PollTitle).ToLower(), label = "Poll title", value = config.PollTitle },
+                        new { name = nameof(config.ShowPoll).ToLower(), label = "Mostrar votação", value = config.ShowPoll },
+                        new { name = nameof(config.AcceptNewOptions).ToLower(), label = "Aceitar novas opções", value = config.AcceptNewOptions },
+                        new { name = nameof(config.AcceptNewVotes).ToLower(), label = "Aceitar novos votos", value = config.AcceptNewVotes },
+                        new { name = nameof(config.ShowVotes).ToLower(), label = "Tornar votos públicos", value = config.ShowVotes },
+                        new { name = nameof(config.MinSentToParticipate).ToLower(), label = "Mínimo de mensagens para participar", value = config.MinSentToParticipate },
+                        new { name = nameof(config.PollTitle).ToLower(), label = "Título da votação", value = config.PollTitle },
                     }
                 },
                 new
@@ -241,11 +247,14 @@ namespace shrimpcast.Entities.DB
                     name = "TOR & VPNs",
                     values = new object[]
                     {
-                        new { name = nameof(config.SiteBlockTORConnections).ToLower(), label = "Block TOR connections site-wide", value = config.SiteBlockTORConnections },
-                        new { name = nameof(config.ChatBlockTORConnections).ToLower(), label = "Block TOR connections for chat only", value = config.ChatBlockTORConnections },
-                        new { name = nameof(config.SiteBlockVPNConnections).ToLower(), label = "Block VPN connections site-wide", value = config.SiteBlockVPNConnections },
-                        new { name = nameof(config.ChatBlockVPNConnections).ToLower(), label = "Block VPN connections for chat only", value = config.ChatBlockVPNConnections },
-                        new { name = nameof(config.IPServiceApiKeyNotMapped).ToLower(), label = "API key for the VPN Detection Service (https://iphub.info)", value = config.IPServiceApiKey },
+                        new { name = nameof(config.SiteBlockTORConnections).ToLower(), label = "Bloquear TOR no site inteiro", value = config.SiteBlockTORConnections },
+                        new { name = nameof(config.ChatBlockTORConnections).ToLower(), label = "Bloquear TOR apenas no chat", value = config.ChatBlockTORConnections },
+                        new { name = nameof(config.SiteBlockVPNConnections).ToLower(), label = "Bloquear VPNs no site inteiro", value = config.SiteBlockVPNConnections },
+                        new { name = nameof(config.ChatBlockVPNConnections).ToLower(), label = "Bloquear VPNs apenas no chat", value = config.ChatBlockVPNConnections },
+                        new { name = nameof(config.IPServiceApiURL).ToLower(), label = "URL da API do serviço deteção de VPNs", value = config.IPServiceApiURL },
+                        new { name = nameof(config.IPServiceApiKeyNotMapped).ToLower(), label = "Chave API do serviço de deteção de VPNs", value = config.IPServiceApiKey },
+                        new { name = nameof(config.OptionalApiKeyHeader).ToLower(), label = "Header opcionar para enviar a chave API", value = config.OptionalApiKeyHeader },
+                        new { name = nameof(config.VPNDetectionMatchCriteria).ToLower(), label = "Critério de deteção", value = config.VPNDetectionMatchCriteria },
                     }
                 },
                 new
@@ -253,11 +262,11 @@ namespace shrimpcast.Entities.DB
                     name = "Bingo",
                     values = new object[]
                     {
-                        new { name = nameof(config.ShowBingo).ToLower(), label = "Show bingo", value = config.ShowBingo },
-                        new { name = nameof(config.EnableAutoBingoMarking).ToLower(), label = "Enable auto marking", value = config.EnableAutoBingoMarking },
-                        new { name = nameof(config.AutoMarkingSecondsThreshold).ToLower(), label = "Auto marking seconds threshold", value = config.AutoMarkingSecondsThreshold },
-                        new { name = nameof(config.AutoMarkingUserCountThreshold).ToLower(), label = "Auto marking user count threshold", value = config.AutoMarkingUserCountThreshold },
-                        new { name = nameof(config.BingoTitle).ToLower(), label = "Bingo title", value = config.BingoTitle },
+                        new { name = nameof(config.ShowBingo).ToLower(), label = "Mostrar bingo", value = config.ShowBingo },
+                        new { name = nameof(config.EnableAutoBingoMarking).ToLower(), label = "Ligar auto-marcação", value = config.EnableAutoBingoMarking },
+                        new { name = nameof(config.AutoMarkingSecondsThreshold).ToLower(), label = "Limiar de auto-marcação em segundos", value = config.AutoMarkingSecondsThreshold },
+                        new { name = nameof(config.AutoMarkingUserCountThreshold).ToLower(), label = "Limiar de utilizadores para auto-marcação", value = config.AutoMarkingUserCountThreshold },
+                        new { name = nameof(config.BingoTitle).ToLower(), label = "Título bingo", value = config.BingoTitle },
                     }
                 },
                 new
@@ -266,11 +275,11 @@ namespace shrimpcast.Entities.DB
                     values = new object[]
                     {
                         new { name = nameof(config.OBSHostNotMapped).ToLower(), label = "Host", value = config.OBSHost },
-                        new { name = nameof(config.OBSPasswordtNotMapped).ToLower(), label = "Password", value = config.OBSPassword },
-                        new { name = nameof(config.OBSMainScene).ToLower(), label = "Main scene", value = config.OBSMainScene },
-                        new { name = nameof(config.OBSMainSource).ToLower(), label = "Main source", value = config.OBSMainSource },
-                        new { name = nameof(config.OBSKinoSource).ToLower(), label = "Kino source", value = config.OBSKinoSource },
-                        new { name = nameof(config.OBSMusicSource).ToLower(), label = "Music source", value = config.OBSMusicSource },
+                        new { name = nameof(config.OBSPasswordtNotMapped).ToLower(), label = "Senha", value = config.OBSPassword },
+                        new { name = nameof(config.OBSMainScene).ToLower(), label = "Cena principal", value = config.OBSMainScene },
+                        new { name = nameof(config.OBSMainSource).ToLower(), label = "Cena principal", value = config.OBSMainSource },
+                        new { name = nameof(config.OBSKinoSource).ToLower(), label = "Fonte kino", value = config.OBSKinoSource },
+                        new { name = nameof(config.OBSMusicSource).ToLower(), label = "Fonte música", value = config.OBSMusicSource },
                     }
                 },
                 new
@@ -278,12 +287,12 @@ namespace shrimpcast.Entities.DB
                     name = "Theme",
                     values = new object[]
                     {
-                        new { name = nameof(config.EnableFireworks).ToLower(), label = "Enable fireworks", value = config.EnableFireworks },
-                        new { name = nameof(config.EnableChristmasTheme).ToLower(), label = "Enable christmas theme", value = config.EnableChristmasTheme },
-                        new { name = nameof(config.SnowflakeCount).ToLower(), label = "Christmas theme snowflake count", value = config.SnowflakeCount },
-                        new { name = nameof(config.UseDarkTheme).ToLower(), label = "Use dark contrast (recommended)", value = config.UseDarkTheme },
-                        new { name = nameof(config.PalettePrimary).ToLower(), label = "Primary color", value = config.PalettePrimary },
-                        new { name = nameof(config.PaletteSecondary).ToLower(), label = "Secondary color", value = config.PaletteSecondary },
+                        new { name = nameof(config.EnableFireworks).ToLower(), label = "Ligar fogo de artifício", value = config.EnableFireworks },
+                        new { name = nameof(config.EnableChristmasTheme).ToLower(), label = "Ligar tema de natal", value = config.EnableChristmasTheme },
+                        new { name = nameof(config.SnowflakeCount).ToLower(), label = "Número de flocos de neve de natal", value = config.SnowflakeCount },
+                        new { name = nameof(config.UseDarkTheme).ToLower(), label = "Usar contraste escuro (recomendado)", value = config.UseDarkTheme },
+                        new { name = nameof(config.PalettePrimary).ToLower(), label = "Cor primária", value = config.PalettePrimary },
+                        new { name = nameof(config.PaletteSecondary).ToLower(), label = "Cor secundária", value = config.PaletteSecondary },
                     }
                 },
                 new
@@ -291,8 +300,8 @@ namespace shrimpcast.Entities.DB
                     name = "Vapid",
                     values = new object[]
                     {
-                        new { name = nameof(config.VAPIDPublicKey).ToLower(), label = "VAPID Public key", value = config.VAPIDPublicKey },
-                        new { name = nameof(config.VAPIDPrivateKeyNotMapped).ToLower(), label = "VAPID Private key", value = config.VAPIDPrivateKey },
+                        new { name = nameof(config.VAPIDPublicKey).ToLower(), label = "Chave VAPID pública", value = config.VAPIDPublicKey },
+                        new { name = nameof(config.VAPIDPrivateKeyNotMapped).ToLower(), label = "Chave VAPID privada", value = config.VAPIDPrivateKey },
                         new { name = nameof(config.VAPIDMailNotMapped).ToLower(), label = "VAPID Mail", value = config.VAPIDMail },
                     }
                 },
@@ -301,13 +310,13 @@ namespace shrimpcast.Entities.DB
                     name = "Golden pass",
                     values = new object[]
                     {
-                        new { name = nameof(config.ShowGoldenPassButton).ToLower(), label = "Enable golden pass purchases", value = config.ShowGoldenPassButton },
-                        new { name = nameof(config.GoldenPassValue).ToLower(), label = "Golden pass value (USD)", value = config.GoldenPassValue },
-                        new { name = nameof(config.GoldenPassTitle).ToLower(), label = "Golden pass title", value = config.GoldenPassTitle },
-                        new { name = nameof(config.BTCServerInstanceURL).ToLower(), label = "BTCServer instance URL", value = config.BTCServerInstanceURL },
-                        new { name = nameof(config.BTCServerStoreId).ToLower(), label = "BTCServer store ID", value = config.BTCServerStoreId },
-                        new { name = nameof(config.BTCServerApiKeyNotMapped).ToLower(), label = "BTCServer API key", value = config.BTCServerApiKey },
-                        new { name = nameof(config.BTCServerWebhookSecretNotMapped).ToLower(), label = "BTCServer webhook secret", value = config.BTCServerWebhookSecret },
+                        new { name = nameof(config.ShowGoldenPassButton).ToLower(), label = "Ligar compra de OURO", value = config.ShowGoldenPassButton },
+                        new { name = nameof(config.GoldenPassValue).ToLower(), label = "Valor do OURO (USD)", value = config.GoldenPassValue },
+                        new { name = nameof(config.GoldenPassTitle).ToLower(), label = "Título do OURO", value = config.GoldenPassTitle },
+                        new { name = nameof(config.BTCServerInstanceURL).ToLower(), label = "URL da instância BTCPay server", value = config.BTCServerInstanceURL },
+                        new { name = nameof(config.BTCServerStoreId).ToLower(), label = "ID da loja BTCPay server", value = config.BTCServerStoreId },
+                        new { name = nameof(config.BTCServerApiKeyNotMapped).ToLower(), label = "Chave API BTCPay server", value = config.BTCServerApiKey },
+                        new { name = nameof(config.BTCServerWebhookSecretNotMapped).ToLower(), label = "Segredo webhook BTCPay server", value = config.BTCServerWebhookSecret },
                     }
                 }
             };

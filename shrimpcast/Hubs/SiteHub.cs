@@ -1,16 +1,17 @@
 using Hangfire;
-using System.Linq;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using shrimpcast.Data.Repositories.Interfaces;
 using shrimpcast.Entities;
 using shrimpcast.Entities.DB;
+using shrimpcast.Entities.DTO;
 using shrimpcast.Hubs.Dictionaries;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using Message = shrimpcast.Entities.DB.Message;
-using shrimpcast.Entities.DTO;
 
 namespace shrimpcast.Hubs
 {
@@ -144,6 +145,14 @@ namespace shrimpcast.Hubs
             addedMessage.RemoteAddress = string.Empty;
             addedMessage.UserColorDisplay = string.Empty;
             await NotifyNewMessage(addedMessage);
+            await Clients.Clients(GetAdminSessions()).SendAsync("NameChange", new
+            {
+                addedMessage.SessionId,
+                newName,
+            });
+
+            var shouldBan = await _autoModFilterRepository.Contains(newName);
+            if (shouldBan) BackgroundJob.Enqueue(() => PerformBackgroundBan(addedMessage.SentBy, addedMessage.SessionId, Constants.FIREANDFORGET_TOKEN));
             return newName;
         }
 
@@ -917,8 +926,11 @@ namespace shrimpcast.Hubs
                     case string _message when _message.StartsWith(Constants.PING_COMMAND):
                         await SendPing(message, connection);
                         return true;
-                    case string m when m.StartsWith(Constants.PLAY_COMMAND):
+                    case string _message when _message.StartsWith(Constants.PLAY_COMMAND):
                         await SendOBSCommand(message);
+                        return true;
+                    case string _message when _message.StartsWith(Constants.TRY_IP_SERVICE_COMMAND):
+                        await TryIPService(connection.RemoteAdress);
                         return true;
                     default:
                         return false;
@@ -961,8 +973,9 @@ namespace shrimpcast.Hubs
             if (matches.Count != 0)
             {
                 url = matches[0].Value.Trim();
-                bool result = Uri.TryCreate(url, UriKind.Absolute, out var uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-                if (!result) throw new Exception("URL inválido.");
+                bool result = Uri.TryCreate(url, UriKind.Absolute, out var uriResult)
+                    && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                if (!result) throw new Exception("Url inválido.");
             }
             switch (message)
             {
@@ -983,6 +996,22 @@ namespace shrimpcast.Hubs
                     break;
                 default: throw new NotImplementedException();
             }
+        }
+
+        private async Task TryIPService(string RemoteAddress)
+        {
+            await DispatchSystemMessage($"Executing {Constants.TRY_IP_SERVICE_COMMAND} command...");
+            string? result;
+            try
+            {
+                result = await _vpnAddressRepository.InvokeVerificationService(RemoteAddress);
+                result = JToken.Parse(result).ToString(Formatting.Indented);
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+            await DispatchSystemMessage(result);
         }
 
         [GeneratedRegex(@"(\d+) (.+)$")]
