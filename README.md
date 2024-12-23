@@ -1,22 +1,12 @@
-<h1 align="center">
-  Shrimpcast
-</h1>
-
-<p align="center">
-  <img src="https://github.com/shrimpcast/shrimpcast/assets/167498236/d3159e68-60dd-4e8f-a8ca-be0a99a759a1" alt="Logo">
-</p>
-
-![Minimalist-Showcase-Project-Presentation](https://github.com/shrimpcast/shrimpcast/assets/167498236/4262b7b5-b307-47e8-b358-1c9138f77026)
+## ptchinacast
 
 ## Introduction
 
-Shrimpcast is a highly customizable, flexible, battle-tested, fast, and secure self-hosted streaming platform.
+ptchinacast is a shrimpcast fork currently running on stream.ptchan.org, you should probably use the upstream shrimpcast version since this one is tailored for stream.ptchan.org.
 
 ## Table of Contents
 
-- [Features](#features)
 - [Installation](#installation)
-- [Media server](#media-server)
 - [Debug](#debug)
 - [Usage](#usage)
   - [Getting started](#getting-started)
@@ -38,73 +28,14 @@ Shrimpcast is a highly customizable, flexible, battle-tested, fast, and secure s
   - [Message and user management](#message-and-user-management)
   - [Cloud OBS](#cloud-obs)
   - [Whispers](#whispers)
-- [Update](#update)
 - [License](#license)
-
-## Features
-
-- **Secure**
-- **Strong anti-spam foundations**
-- **Fast and lightweight**
-- **Flexible and highly customizable**
-- **Battle-tested with hundreds of concurrent users**
-- **Out-of-the-box Cloudflare support**
 
 ## Installation
 
-To install Shrimpcast, follow these steps:
-
-> [!IMPORTANT]
-> You need a valid domain to run this script, with properly configured DNS records.
-
-> [!NOTE]
-> Recommended OS: Ubuntu x64 22.04 LTS
-
-1. On a fresh VPS, run:
-
-   ```bash
-   wget -O install.sh https://github.com/shrimpcast/shrimpcast/releases/latest/download/install.sh
-   chmod +x install.sh
-   ./install.sh -d [YOUR_DOMAIN_NAME]
-   ```
-
-   Make sure to replace `[YOUR_DOMAIN_NAME]` with your domain name.
-
-2. (Optional) If you're using Cloudflare as a reverse proxy, run:
-
-   ```bash
-   wget -O cloudflare_setup.sh https://github.com/shrimpcast/shrimpcast/releases/latest/download/cloudflare_setup.sh
-   chmod +x cloudflare_setup.sh
-   ./cloudflare_setup.sh
-   ```
-
-   This script will restrict traffic outside Cloudflare and apply a few required configuration tweaks.
-
-And that's it! Shrimpcast should now be up and running. You can now try to access your domain URL. Make sure to save the admin session that was generated during the installation, which you can find at `/root/shrimpcast/setup/GeneratedAdminToken.txt`, or at the end of step 1.
-
-## Media Server
-
-Shrimpcast doesn't come with its own built-in media server; instead, it relies on [srs-stack/5.12.21](https://github.com/ossrs/oryx/releases/tag/v5.12.21).
-
-You can access its panel by visiting {your_domain}:2053.
-
-If you're using Cloudflare, for RTMP broadcast, you'll need to bypass the domain proxy (but don't worry, it's already configured to allow 1935!) and stream directly to the VPS IP (e.g., rtmp://{your_vps_ip}/live/livestream).
-
-### Why [srs-stack/5.12.21](https://github.com/ossrs/oryx/releases/tag/v5.12.21)?
-
-Because it's entirely open-source, supports HTTP-FLV for low-latency streaming, and performs admirably.
-
-### Can I use another media server?
-
-Yes, while Shrimpcast defaults to [srs-stack/5.12.21](https://github.com/ossrs/oryx/releases/tag/v5.12.21), you're free to use any other option, such as:
-
-- [Mediamtx](https://github.com/bluenviron/mediamtx)
-- [AntMediaServer](https://github.com/ant-media/Ant-Media-Server)
-- etc
-
-Just remember, if you opt for a different media server, you'll need to install and configure it yourself.
-
-Although not recommended, you can even bypass the need for a media server entirely by using services like GCloud Streams.
+To build on linux:
+  ```bash
+  dotnet publish -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+  ```
 
 ## Debug
 
@@ -121,7 +52,7 @@ Make sure that your PostgreSQL instance is properly configured.
 
 ### Getting started
 
-Once you have Shrimpcast up and running, you will need to authenticate as an admin. To do this, use the token saved at `/root/shrimpcast/setup/GeneratedAdminToken.txt`, and follow these instructions:
+Once you have ptchinacast up and running, you will need to authenticate as an admin. To do this, use the token saved at `/root/shrimpcast/setup/GeneratedAdminToken.txt`, and follow these instructions:
 
 ![image](https://github.com/shrimpcast/shrimpcast/assets/167498236/2c62fc16-0f58-4147-b90b-3daa610642a1)
 
@@ -294,15 +225,6 @@ Admins can securely send private messages to users using the following chat comm
 - `!ping [SessionId] [Message]`
 
 Retrieve the SessionId from the [Message and User Management](#message-and-user-management) section.
-
-## Update
-If you want to update to the latest version of shrimpcast, you can do so by running
-   ```bash
-   wget -O update.sh https://github.com/shrimpcast/shrimpcast/releases/latest/download/update.sh
-   chmod +x update.sh
-   ./update.sh -d [YOUR_DOMAIN_NAME]
-   ```
-   Make sure to replace `[YOUR_DOMAIN_NAME]` with your domain name.
 
 ## License
 
