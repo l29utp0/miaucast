@@ -46,10 +46,15 @@ const XPlayer = (props) => {
       height: undefined,
       width: undefined,
       plugins: [window.HlsPlayer],
-      lang: "en",
+      hls: {
+        targetLatency: 5,
+        maxLatency: 10, 
+      },
+      lang: 'en',
       playbackRate: false,
       cssFullscreen: false,
       pip: true,
+      poster: '/images/poster.png',
       screenShot: {
         disable: false,
         width: 1920,
