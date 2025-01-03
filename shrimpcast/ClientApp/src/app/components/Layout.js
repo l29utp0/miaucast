@@ -41,7 +41,7 @@ const MainGridSx = {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundImage: "url('/images/martahalloween.png')",
+      backgroundImage: "url('/images/chatlogo.png')",
       backgroundRepeat: "no-repeat",
       backgroundPosition: "bottom right",
       backgroundSize: "160px",

@@ -1,13 +1,20 @@
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
-import { Box, Button, CircularProgress, DialogContent, Divider } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  DialogContent,
+  Divider,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import BingoManager from "../../managers/BingoManager";
 import RenderBingoOptions from "./RenderBingoOptions";
 import ConfirmDialog from "../others/ConfirmDialog";
 
 const Bingo = (props) => {
-  const { displayBingo, setDisplayBingo, configuration, signalR, isAdmin } = props,
+  const { displayBingo, setDisplayBingo, configuration, signalR, isAdmin } =
+      props,
     { bingoTitle } = configuration,
     closeBingo = () => {
       setOptions(null);
@@ -37,12 +44,23 @@ const Bingo = (props) => {
 
   return (
     <>
-      <Dialog open={displayBingo} onClose={closeBingo} maxWidth={"sm"} fullWidth PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
+      <Dialog
+        open={displayBingo}
+        onClose={closeBingo}
+        maxWidth={"sm"}
+        fullWidth
+        PaperProps={{ sx: { backgroundColor: "primary.900" } }}
+      >
         <DialogTitle sx={{ fontSize: "24px", paddingBottom: "7.5px" }}>
           <Box display="flex" width="100%" marginBottom={"10px"}>
             {bingoTitle}
             {isAdmin && (
-              <Button onClick={openResetDialog} sx={{ marginLeft: "auto" }} variant="contained" color="success">
+              <Button
+                onClick={openResetDialog}
+                sx={{ marginLeft: "auto" }}
+                variant="contained"
+                color="success"
+              >
                 Reset
               </Button>
             )}
@@ -55,7 +73,11 @@ const Bingo = (props) => {
               <CircularProgress color="secondary" />
             </Box>
           ) : (
-            <RenderBingoOptions options={options} setOptions={setOptions} {...props} />
+            <RenderBingoOptions
+              options={options}
+              setOptions={setOptions}
+              {...props}
+            />
           )}
         </DialogContent>
       </Dialog>

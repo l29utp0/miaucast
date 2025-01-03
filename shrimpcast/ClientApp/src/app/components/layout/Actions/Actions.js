@@ -1,4 +1,10 @@
-import { IconButton, Menu, MenuItem, useMediaQuery, useTheme } from "@mui/material";
+import {
+  IconButton,
+  Menu,
+  MenuItem,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import React, { useState } from "react";
 import ConfigUserDialog from "./ConfigUserDialog";
 import Bans from "./Bans";
@@ -12,6 +18,7 @@ import Mutes from "./Mutes";
 import Moderators from "./Moderators";
 import IgnoredUsers from "./IgnoredUsers";
 import BingoOptions from "./BingoOptions";
+import About from "./About";
 
 const Actions = (props) => {
   const theme = useTheme();
@@ -29,8 +36,13 @@ const Actions = (props) => {
         <BingoOptions {...props} />,
         <AccountInfo {...props} />,
         <IgnoredUsers {...props} />,
+        <About {...props} />,
       ]
-    : [<AccountInfo {...props} />, <IgnoredUsers {...props} />];
+    : [
+        <AccountInfo {...props} />,
+        <IgnoredUsers {...props} />,
+        <About {...props} />,
+      ];
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -54,7 +66,7 @@ const Actions = (props) => {
         id="menu"
         anchorEl={anchorEl}
         open={open}
-        PaperProps={{ sx: { backgroundColor:"primary.900" }}}
+        PaperProps={{ sx: { backgroundColor: "primary.900" } }}
         onClose={handleClose}
         MenuListProps={{
           "aria-labelledby": "menu-button",
