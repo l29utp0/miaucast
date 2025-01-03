@@ -21,17 +21,29 @@ const XPlayer = (props) => {
 
   useEffect(() => {
     if (!loadState.css)
-      postscribe("#player-xg-css", '<link rel="stylesheet" href="./lib/xg/index.min.css"/>', {
-        done: () => setLoadState((state) => ({ ...state, css: true })),
-      });
+      postscribe(
+        "#player-xg-css",
+        '<link rel="stylesheet" href="./lib/xg/index.min.css"/>',
+        {
+          done: () => setLoadState((state) => ({ ...state, css: true })),
+        },
+      );
     if (!loadState.player)
-      postscribe("#player-xg", '<script src="./lib/xg/player.xg.js"></script>', {
-        done: () => setLoadState((state) => ({ ...state, player: true })),
-      });
+      postscribe(
+        "#player-xg",
+        '<script src="./lib/xg/player.xg.js"></script>',
+        {
+          done: () => setLoadState((state) => ({ ...state, player: true })),
+        },
+      );
     if (!loadState.hls)
-      postscribe("#player-xg-hls", '<script src="./lib/xg/xg.hls.js"></script>', {
-        done: () => setLoadState((state) => ({ ...state, hls: true })),
-      });
+      postscribe(
+        "#player-xg-hls",
+        '<script src="./lib/xg/xg.hls.js"></script>',
+        {
+          done: () => setLoadState((state) => ({ ...state, hls: true })),
+        },
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -42,57 +54,62 @@ const XPlayer = (props) => {
       url: props.url,
       playsinline: true,
       autoplay: true,
+      autoplayMuted: true,
       isLive: true,
       height: undefined,
       width: undefined,
+      rotate: true,
       plugins: [window.HlsPlayer],
       hls: {
-        targetLatency: 5,
-        maxLatency: 10, 
+        targetLatency: 7,
+        maxLatency: 14,
       },
-      lang: 'en',
+      lang: "en",
       playbackRate: false,
       cssFullscreen: false,
       pip: true,
-      poster: '/images/poster.png',
+      poster: {
+        poster: "/images/poster.png",
+        hideCanplay: true,
+      },
       screenShot: {
         disable: false,
         width: 1920,
         height: 1080,
         quality: 1,
-        name: 'kino'
+        name: "kino",
       },
     });
 
-// Monitor errors, waiting, and stream end
-player.on("error", (err) => {
-  console.error("Playback error occurred:", err);
-  if (player.readyState <= 2) {
-    console.warn("Retrying playback...");
-    player.replay();
-  }
-});
-
-player.on("waiting", () => {
-  console.warn("Buffering... monitoring the situation.");
-  if (!window.bufferingTimeout) {
-    window.bufferingTimeout = setTimeout(() => {
-      if (player?.readyState <= 2) {
-        console.warn("Playback stuck. Attempting to restart...");
+    // Monitor errors, waiting, and stream end
+    player.on("error", (err) => {
+      console.error("Playback error occurred:", err);
+      if (player.readyState <= 2) {
+        console.warn("Retrying playback...");
         player.replay();
       }
-    }, 5000);
-  }
-});
+    });
 
-player.on("ended", () => {
-  console.info("The live stream appears to have ended.");
-});
+    player.on("waiting", () => {
+      console.warn("Buffering... monitoring the situation.");
+      if (!window.bufferingTimeout) {
+        window.bufferingTimeout = setTimeout(() => {
+          if (player?.readyState <= 2) {
+            console.warn("Playback stuck. Attempting to restart...");
+            player.replay();
+          }
+        }, 5000);
+      }
+    });
 
-if (window.bufferingTimeout) {
-  clearTimeout(window.bufferingTimeout);
-  delete window.bufferingTimeout;
-}
+    player.on("ended", () => {
+      console.info("The live stream appears to have ended.");
+    });
+
+    if (window.bufferingTimeout) {
+      clearTimeout(window.bufferingTimeout);
+      delete window.bufferingTimeout;
+    }
 
     return () => player.destroy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
