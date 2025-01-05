@@ -13,27 +13,78 @@ import {
   Button,
   Snackbar,
   Alert,
+  Tooltip,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EmailIcon from "@mui/icons-material/Email";
+import ChatIcon from "@mui/icons-material/Chat";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 const About = (props) => {
   const [open, setOpen] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
 
+  const emailAddress = "info@ptchan.org";
+  const sessionAddress =
+    "05fd1be0e9b6fd21954b1948442ba8f0382940aef9e4b5dc5da4f91635f8d05d0a";
+
   const setClosed = () => setOpen(false);
   const setOpened = () => setOpen(true);
   const closeToast = () => setShowCopyToast(false);
 
-  const emailAddress = "info@ptchan.org";
-
-  const copyEmail = () => {
-    navigator.clipboard
-      .writeText(emailAddress)
-      .then(() => setShowCopyToast(true))
-      .catch(() => console.error("Falha ao copiar email."));
+  const copyToClipboard = async (text, type) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setShowCopyToast(true);
+    } catch (error) {
+      console.error(`Falha ao copiar ${type}.`);
+    }
   };
+
+  const ContactBox = ({ icon: Icon, text, type, tooltip }) => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        backgroundColor: "primary.800",
+        padding: 2,
+        borderRadius: 1,
+        mb: 2,
+      }}
+    >
+      <Tooltip
+        title={tooltip}
+        placement="top"
+        enterDelay={200}
+        leaveDelay={200}
+        arrow
+      >
+        <Icon color="secondary" />
+      </Tooltip>
+      <Typography
+        variant="body1"
+        sx={{
+          flexGrow: 1,
+          fontFamily: "monospace",
+          letterSpacing: "0.5px",
+          wordBreak: "break-all",
+          fontSize: type === "endereço Session" ? "6pt" : "inherit",
+        }}
+      >
+        {text}
+      </Typography>
+      <Button
+        variant="contained"
+        color="secondary"
+        size="small"
+        startIcon={<ContentCopyIcon />}
+        onClick={() => copyToClipboard(text, type)}
+      >
+        Copiar
+      </Button>
+    </Box>
+  );
 
   return (
     <>
@@ -56,7 +107,7 @@ const About = (props) => {
         >
           <DialogTitle sx={{ fontSize: "24px", pb: "7.5px" }}>
             <Box display="flex" width="100%" mb={"10px"}>
-              Acerca do stream
+              Acerca
             </Box>
             <Divider />
           </DialogTitle>
@@ -65,12 +116,12 @@ const About = (props) => {
               {/* Logo/Image Section */}
               <Grid item xs={12} display="flex" justifyContent="center">
                 <Avatar
-                  src="/images/logo.png"
+                  src="/images/logo.webp"
                   alt="Logo"
                   sx={{
                     width: 150,
                     height: 150,
-                    mb: 2,
+                    mb: 1,
                     border: "2px solid",
                     borderColor: "secondary.main",
                   }}
@@ -134,37 +185,21 @@ const About = (props) => {
                 <Typography variant="h6" color="secondary.main" gutterBottom>
                   Contacto:
                 </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 2,
-                    backgroundColor: "primary.800",
-                    padding: 2,
-                    borderRadius: 1,
-                  }}
-                >
-                  <EmailIcon color="secondary" />
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      flexGrow: 1,
-                      fontFamily: "monospace",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
-                    {emailAddress}
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    size="small"
-                    startIcon={<ContentCopyIcon />}
-                    onClick={copyEmail}
-                  >
-                    Copiar
-                  </Button>
-                </Box>
+
+                <ContactBox
+                  icon={EmailIcon}
+                  text={emailAddress}
+                  type="Email"
+                  tooltip="Email"
+                />
+
+                <ContactBox
+                  icon={ChatIcon}
+                  text={sessionAddress}
+                  type="endereço Session"
+                  tooltip="Endereço Session"
+                />
+
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -186,7 +221,6 @@ const About = (props) => {
         </Dialog>
       )}
 
-      {/* Toast notification for email copy */}
       <Snackbar
         open={showCopyToast}
         autoHideDuration={3000}
@@ -199,7 +233,7 @@ const About = (props) => {
           variant="filled"
           sx={{ width: "100%" }}
         >
-          Email copiado!
+          Copiado!
         </Alert>
       </Snackbar>
     </>
