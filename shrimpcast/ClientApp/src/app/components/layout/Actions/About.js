@@ -116,7 +116,7 @@ const About = (props) => {
               {/* Logo/Image Section */}
               <Grid item xs={12} display="flex" justifyContent="center">
                 <Avatar
-                  src="/images/logo.webp"
+                  src="/images/logo.avif"
                   alt="Logo"
                   sx={{
                     width: 150,
