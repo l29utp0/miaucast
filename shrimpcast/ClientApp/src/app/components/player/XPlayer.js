@@ -69,7 +69,7 @@ const XPlayer = (props) => {
       cssFullscreen: false,
       pip: true,
       poster: {
-        poster: "/images/poster.png",
+        poster: "/images/poster.avif",
         hideCanplay: true,
       },
       screenShot: {
