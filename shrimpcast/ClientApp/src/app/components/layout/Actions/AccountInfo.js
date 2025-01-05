@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SendIcon from "@mui/icons-material/Send";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LocalStorageManager from "../../../managers/LocalStorageManager";
 import TokenManager from "../../../managers/TokenManager";
 
@@ -57,7 +58,8 @@ const AccountInfo = (props) => {
     if (!response) displayToast("Erro: token inválido.");
   };
 
-  const handleKeys = async (e) => e.key === "Enter" && (await submitTokenChange());
+  const handleKeys = async (e) =>
+    e.key === "Enter" && (await submitTokenChange());
   const copyToken = () =>
     navigator.clipboard
       .writeText(sessionToken)
@@ -76,7 +78,13 @@ const AccountInfo = (props) => {
       <IconButton onClick={handleOpen} size="small" color="secondary">
         <AccountCircleIcon />
       </IconButton>
-      <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ sx: { backgroundColor: "primary.900" } }}
+      >
         <DialogTitle>
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="h6" component="div">
@@ -90,9 +98,17 @@ const AccountInfo = (props) => {
           </Typography>
           <Box sx={CopySx}>
             <Typography variant="body2" sx={ToggleSx} onClick={toggleHidden}>
-              {isHidden ? `${"*".repeat(sessionToken.length)} (clica para ver)` : sessionToken}
+              {isHidden
+                ? `${"*".repeat(sessionToken.length)} (clica para ver)`
+                : sessionToken}
             </Typography>
-            <Button onClick={copyToken} size="small" variant="contained" color="primary">
+            <Button
+              onClick={copyToken}
+              size="small"
+              variant="contained"
+              color="secondary"
+              startIcon={<ContentCopyIcon />}
+            >
               Copiar
             </Button>
           </Box>
@@ -124,7 +140,11 @@ const AccountInfo = (props) => {
         </DialogContent>
       </Dialog>
       <Snackbar open={showToast} autoHideDuration={5000} onClose={closeToast}>
-        <Alert severity={toastMessage.includes("Error") ? "error" : "success"} variant="filled" p={2}>
+        <Alert
+          severity={toastMessage.includes("Error") ? "error" : "success"}
+          variant="filled"
+          p={2}
+        >
           <Typography variant="body2">{toastMessage}</Typography>
         </Alert>
       </Snackbar>
