@@ -11,8 +11,8 @@ namespace shrimpcast.Entities.DB
 
         public required bool ChatEnabled { get; set; }
 
-        public required bool EnableVerifiedMode { get;set; }
-        
+        public required bool EnableVerifiedMode { get; set; }
+
         public required int MaxConnectionsPerIP { get; set; }
 
         public required string DefaultName { get; set; }
@@ -35,7 +35,7 @@ namespace shrimpcast.Entities.DB
 
         public required string StreamTitle { get; set; }
 
-        public required string StreamDescription  { get; set; }
+        public required string StreamDescription { get; set; }
 
         public required int MessageDelayTime { get; set; }
 
@@ -207,10 +207,10 @@ namespace shrimpcast.Entities.DB
                         new { name = nameof(config.ChatEnabled).ToLower(), label = "Ligar chat", value = config.ChatEnabled },
                         new { name = nameof(config.EnableVerifiedMode).ToLower(), label = "Permitir apenas verificados", value = config.EnableVerifiedMode },
                         new { name = nameof(config.MaxMessagesToShow).ToLower(), label = "Máx. mensagens visíveis", value = config.MaxMessagesToShow },
-                        new { name = nameof(config.OffsetDateTimeInMinutes).ToLower(), label = "Teporizador mensagens (minutos)", value = config.OffsetDateTimeInMinutes },
-                        new { name = nameof(config.RequiredTokenTimeInMinutes).ToLower(), label = "Tempo para novos utilizadores participarem (mimnutos)", value = config.RequiredTokenTimeInMinutes },
-                        new { name = nameof(config.MessageDelayTime).ToLower(), label = "Cooldown between messages", value = config.MessageDelayTime },
-                        new { name = nameof(config.MuteLenghtInMinutes).ToLower(), label = "Tempo de silenciar", value = config.MuteLenghtInMinutes },
+                        new { name = nameof(config.OffsetDateTimeInMinutes).ToLower(), label = "Temporizador mensagens (minutos)", value = config.OffsetDateTimeInMinutes },
+                        new { name = nameof(config.RequiredTokenTimeInMinutes).ToLower(), label = "Tempo para novos utilizadores participarem (minutos)", value = config.RequiredTokenTimeInMinutes },
+                        new { name = nameof(config.MessageDelayTime).ToLower(), label = "Tempo entre mensagens (segundos)", value = config.MessageDelayTime },
+                        new { name = nameof(config.MuteLenghtInMinutes).ToLower(), label = "Tempo de silenciar (minutos)", value = config.MuteLenghtInMinutes },
                         new { name = nameof(config.MaxLengthTruncation).ToLower(), label = "Tamanho da mensagem antes de truncar", value = config.MaxLengthTruncation },
                         new { name = nameof(config.DefaultName).ToLower(), label = "Nome padrão para novos utilizadores", value = config.DefaultName },
                     }
@@ -325,4 +325,3 @@ namespace shrimpcast.Entities.DB
             };
     }
 }
-
