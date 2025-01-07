@@ -123,7 +123,7 @@ const ManageUserDialog = (props) => {
                   <Grid xs={12} sm={targetUserPublic ? 10 : 12}>
                     <Typography>
                       Visto pela primeira vez {new Date(userInfo.basicResponse.createdAt).toLocaleString('en-GB')}
-                      {siteAdmin && ` with ID ${sessionId}`}{" "}
+                      {siteAdmin && ` com ID ${sessionId}`}{" "}
                     </Typography>
                     {props.createdAt && (
                       <Typography>Mensagem enviada {new Date(props.createdAt).toLocaleString('en-GB')}</Typography>
@@ -140,7 +140,8 @@ const ManageUserDialog = (props) => {
                           target="_blank"
                         >
                           {userInfo.ip}
-                        </Link>
+                        </Link>{" "}
+                        com ID {props.messageId}
                       </Typography>
                     )}
                   </Grid>

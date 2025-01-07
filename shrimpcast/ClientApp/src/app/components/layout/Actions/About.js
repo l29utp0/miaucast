@@ -88,14 +88,17 @@ const About = (props) => {
 
   return (
     <>
-      <IconButton
-        onClick={setOpened}
-        type="button"
-        size="small"
-        sx={{ borderRadius: "0px" }}
+
+      <Tooltip title="Info">
+        <IconButton
+         onClick={setOpened}
+          type="button"
+          size="small"
+          sx={{ borderRadius: "0px" }}
       >
-        <InfoIcon sx={{ color: "secondary.main" }} />
+        <InfoIcon sx={{ color: "primary.500" }} />
       </IconButton>
+      </Tooltip>
 
       {open && (
         <Dialog
