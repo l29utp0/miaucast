@@ -11,7 +11,7 @@ import ConfirmDialog from "../../others/ConfirmDialog";
 import MessageWrapper from "./MessageWrapper";
 
 const WrapperTextBoxSx = {
-    margin: "10px",
+    margin: "5px",
     wordWrap: "break-word",
     padding: "2px",
     position: "relative",
@@ -66,14 +66,20 @@ const UserMessage = React.memo((props) => {
     openConfirmPrompt = () => setShowPromptDialog(true),
     closeConfirmPrompt = () => setShowPromptDialog(false),
     { isAdmin, isMod, isGolden, maxLengthTruncation } = props,
-    escapedName = LocalStorageManager.getName().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+    escapedName = LocalStorageManager.getName().replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&",
+    ),
     // Use lookahead assertion to ensure we're matching the full name
     nameRegex = `@${escapedName}(?:\\s|$|\\.)`,
     emotes = props.emotes.map((emote) => emote.name).join("|"),
     urlRegex = "https?://\\S+",
     regex = new RegExp(`(${nameRegex}|${emotes}|${urlRegex})`, "giu"),
     removeMessage = async () => {
-      let resp = await ChatActionsManager.RemoveMessage(props.signalR, props.messageId);
+      let resp = await ChatActionsManager.RemoveMessage(
+        props.signalR,
+        props.messageId,
+      );
       if (resp) closeConfirmPrompt();
     },
     [isMiniminized, setMinimized] = useState(!isAdmin),
@@ -82,7 +88,8 @@ const UserMessage = React.memo((props) => {
       props.content.length > maxLengthTruncation && isMiniminized
         ? props.content.substring(0, maxLengthTruncation)
         : props.content,
-    getEmote = (emoteName) => props.emotes.find((emote) => emote.name === emoteName);
+    getEmote = (emoteName) =>
+      props.emotes.find((emote) => emote.name === emoteName);
 
   return (
     <MessageWrapper useTransition={props.useTransition}>
@@ -95,7 +102,11 @@ const UserMessage = React.memo((props) => {
                 <DeleteIcon sx={{ fontSize: "16px" }} />
               </IconButton>
               {showPromptDialog && (
-                <ConfirmDialog title="Apagar mensagem?" confirm={removeMessage} cancel={closeConfirmPrompt} />
+                <ConfirmDialog
+                  title="Apagar mensagem?"
+                  confirm={removeMessage}
+                  cancel={closeConfirmPrompt}
+                />
               )}
             </>
           )}
@@ -104,7 +115,11 @@ const UserMessage = React.memo((props) => {
           <Typography
             sx={TextSx(props.userColorDisplay, true)}
             className={`${
-              props.enableChristmasTheme ? "santa-hat" : props.enableHalloweenTheme ? "halloween-hat" : null
+              props.enableChristmasTheme
+                ? "santa-hat"
+                : props.enableHalloweenTheme
+                  ? "halloween-hat"
+                  : null
             } ${isAdmin ? "admin-glow" : isMod ? "mod-glow" : isGolden ? "golden-glow" : null}`}
           >
             {isAdmin && <VerifiedUserIcon sx={VerifiedUserIconSx} />}
@@ -114,10 +129,18 @@ const UserMessage = React.memo((props) => {
           </Typography>
         </Box>
         {": "}
-        <Typography component="span" sx={TextSx(null, false, content.startsWith(">"))}>
+        <Typography
+          component="span"
+          sx={TextSx(null, false, content.startsWith(">"))}
+        >
           {reactStringReplace(content, regex, (match, i) =>
             getEmote(match.toLowerCase()) ? (
-              <img key={i} alt={match.toLowerCase()} className="emote" src={getEmote(match.toLowerCase()).url} />
+              <img
+                key={i}
+                alt={match.toLowerCase()}
+                className="emote"
+                src={getEmote(match.toLowerCase()).url}
+              />
             ) : match.match(urlRegex) ? (
               <Link key={i} href={match} target="_blank">
                 {match}
@@ -126,7 +149,7 @@ const UserMessage = React.memo((props) => {
               <Typography key={i} component="span" sx={HighlightSx}>
                 {match}
               </Typography>
-            )
+            ),
           )}
           {isMiniminized && props.content.length > maxLengthTruncation && (
             <Link
