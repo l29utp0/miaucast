@@ -19,6 +19,7 @@ const VideoJSPlayer = (props) => {
     play = (player) => {
       player.muted(false);
       player.play().catch(() => {
+        if (player && player.isDisposed()) return;
         player.muted(true);
         player.play().catch(() => console.log("Could not autoplay"));
       });
@@ -46,9 +47,8 @@ const VideoJSPlayer = (props) => {
 
   // Dispose the Video.js player when the functional component unmounts
   useEffect(() => {
-    const player = playerRef.current;
-
     return () => {
+      const player = playerRef.current;
       if (player && !player.isDisposed()) {
         player.dispose();
         playerRef.current = null;
