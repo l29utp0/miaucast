@@ -1,5 +1,13 @@
 import SendIcon from "@mui/icons-material/Send";
-import { Box, Checkbox, CircularProgress, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import MessageManager from "../../managers/MessageManager";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
@@ -34,7 +42,6 @@ const SendInputSx = {
     height: "13.5px",
     borderRadius: "1px",
     borderTopRightRadius: "5px",
-    visibility: "hidden",
   }),
   CheckBoxSx = {
     color: "white",
@@ -72,7 +79,10 @@ const ChatTextField = (props) => {
       if (ne?.data === "@") {
         setAutoCompleteIndex(0);
         setShowAutocomplete(true);
-      } else if (ne?.inputType === "deleteContentBackward" && message.charAt(target.selectionStart) === "@") {
+      } else if (
+        ne?.inputType === "deleteContentBackward" &&
+        message.charAt(target.selectionStart) === "@"
+      ) {
         setShowAutocomplete(false);
       }
     },
@@ -89,7 +99,12 @@ const ChatTextField = (props) => {
     handleKeys = async (e) => {
       if (e.key === "Enter") {
         if (!showAutocomplete) await submitMessage();
-        else setAutoCompleteIndex(autoCompleteIndex === 0 ? Number.MIN_SAFE_INTEGER : -autoCompleteIndex);
+        else
+          setAutoCompleteIndex(
+            autoCompleteIndex === 0
+              ? Number.MIN_SAFE_INTEGER
+              : -autoCompleteIndex,
+          );
       }
       if (!showAutocomplete) return;
       switch (e.key) {
@@ -127,7 +142,12 @@ const ChatTextField = (props) => {
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <IconButton disabled={isDisabled || loading} onClick={setEmotesOpen} edge="start" color="secondary">
+              <IconButton
+                disabled={isDisabled || loading}
+                onClick={setEmotesOpen}
+                edge="start"
+                color="secondary"
+              >
                 <InsertEmoticonIcon />
               </IconButton>
             </InputAdornment>
@@ -137,7 +157,12 @@ const ChatTextField = (props) => {
               {loading ? (
                 <CircularProgress size={16} color="secondary" />
               ) : (
-                <IconButton disabled={isDisabled || loading} onClick={submitMessage} edge="end" color="secondary">
+                <IconButton
+                  disabled={isDisabled || loading}
+                  onClick={submitMessage}
+                  edge="end"
+                  color="secondary"
+                >
                   <SendIcon />
                 </IconButton>
               )}
@@ -166,12 +191,22 @@ const ChatTextField = (props) => {
       />
       <WiFiSignalStrength {...props} />
       <Box sx={ScrollSx(props.autoScroll)}>
-        <Typography className="noselect" variant="overline" sx={LabelSx(props.autoScroll)}>
+        <Typography
+          className="noselect"
+          variant="overline"
+          sx={LabelSx(props.autoScroll)}
+        >
           Autoscroll
         </Typography>
         <Checkbox onChange={toggleAutoScroll} defaultChecked sx={CheckBoxSx} />
       </Box>
-      {emotes && <Emotes setEmotes={setEmotes} emotes={props.emotes} setMessage={setMessage} />}
+      {emotes && (
+        <Emotes
+          setEmotes={setEmotes}
+          emotes={props.emotes}
+          setMessage={setMessage}
+        />
+      )}
     </Box>
   );
 };
