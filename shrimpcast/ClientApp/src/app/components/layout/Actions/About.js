@@ -88,16 +88,15 @@ const About = (props) => {
 
   return (
     <>
-
       <Tooltip title="Info">
         <IconButton
-         onClick={setOpened}
+          onClick={setOpened}
           type="button"
           size="small"
           sx={{ borderRadius: "0px" }}
-      >
-        <InfoIcon sx={{ color: "primary.500" }} />
-      </IconButton>
+        >
+          <InfoIcon sx={{ color: "primary.500" }} />
+        </IconButton>
       </Tooltip>
 
       {open && (
@@ -116,7 +115,7 @@ const About = (props) => {
           </DialogTitle>
           <DialogContent>
             <Grid container spacing={3}>
-              {/* Logo/Image Section */}
+              {/* Logo/Image Section
               <Grid item xs={12} display="flex" justifyContent="center">
                 <Avatar
                   src="/images/logo.avif"
@@ -129,29 +128,32 @@ const About = (props) => {
                     borderColor: "secondary.main",
                   }}
                 />
-              </Grid>
+              </Grid>*/}
 
               {/* Description Section */}
               <Grid item xs={12}>
                 <Typography variant="body1" paragraph>
-                  Bem-vindo ao stream do ptchina, aqui podes fazer stream, ver e
-                  participar.
+                  Bem-vindo ao miau, aqui podes fazer stream, ver e participar.
                 </Typography>
                 <Typography variant="body1" paragraph>
-                  Esta plataforma tem:
+                  Regras:
                 </Typography>
                 <ul>
                   <li>
                     <Typography variant="body1">
-                      Stream com chat em tempo real
+                      Proibido coisas ilegais.
                     </Typography>
                   </li>
                   <li>
-                    <Typography variant="body1">Votações e bingo</Typography>
+                    <Typography variant="body1">
+                      Proibido ocupar o stream apenas por ocupar e não deixar
+                      outros.
+                    </Typography>
                   </li>
                   <li>
                     <Typography variant="body1">
-                      Emotes e outras funções
+                      Poibido qualquer coisa que ponha em questão o normal
+                      funcionamento da plataforma.
                     </Typography>
                   </li>
                 </ul>
