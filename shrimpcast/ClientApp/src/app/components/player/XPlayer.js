@@ -81,35 +81,19 @@ const XPlayer = (props) => {
       },
     });
 
-    // Monitor errors, waiting, and stream end
-    player.on("error", (err) => {
-      console.error("Playback error occurred:", err);
-      if (player.readyState <= 2) {
-        console.warn("Retrying playback...");
-        player.replay();
-      }
-    });
-
+    player.on("error", () => player.replay());
+    player.on("ended", () => player.replay());
     player.on("waiting", () => {
-      console.warn("Buffering... monitoring the situation.");
-      if (!window.bufferingTimeout) {
-        window.bufferingTimeout = setTimeout(() => {
+      clearTimeout(window.timeout);
+      window.timeout = setTimeout(() => {
+        try {
           if (player?.readyState <= 2) {
-            console.warn("Playback stuck. Attempting to restart...");
             player.replay();
+            console.log("Playback restarted.");
           }
-        }, 5000);
-      }
+        } catch (e) {}
+      }, 5000);
     });
-
-    player.on("ended", () => {
-      console.info("The live stream appears to have ended.");
-    });
-
-    if (window.bufferingTimeout) {
-      clearTimeout(window.bufferingTimeout);
-      delete window.bufferingTimeout;
-    }
 
     return () => player.destroy();
     // eslint-disable-next-line react-hooks/exhaustive-deps

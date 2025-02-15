@@ -34,7 +34,9 @@ const VideoJSPlayer = (props) => {
 
       videoElement.classList.add("vjs-big-play-centered");
       videoRef.current.appendChild(videoElement);
-      const player = (playerRef.current = videojs(videoElement, options, () => play(player)));
+      const player = (playerRef.current = videojs(videoElement, options, () =>
+        play(player),
+      ));
 
       // Update an existing player in the `else` block here
     } else {

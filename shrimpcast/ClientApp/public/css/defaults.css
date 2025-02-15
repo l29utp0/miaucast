@@ -1,157 +1,138 @@
-﻿﻿#root,
+#root,
 #rtc-embed,
 body,
 html {
-  height: 100%;
+    height: 100%;
 }
-
 * {
-  scrollbar-width: none;
+    scrollbar-width: none;
 }
-
 ::-webkit-scrollbar {
-  width: 0;
-  background: 0 0;
+    width: 0;
+    background: 0 0;
 }
-
 .admin-glow {
-  color: #C60601!important
-
+    color: #c60601 !important;
 }
-
 .mod-glow {
-  color: #00e5ff !important;
+    color: #00e5ff !important;
 }
-
 .noselect {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
-
 .wrapper-comment:hover .wrapper-overlay {
-  visibility: visible;
+    visibility: visible;
 }
-
 .emote {
-  display: inline-block;
-  max-width: 40px;
-  max-height: 30px;
-  margin-left: 2.5px;
-  margin-right: 2.5px;
-  border-radius: 0;
-  position: relative;
-  top: 8.5px;
+    display: inline-block;
+    max-width: 40px;
+    max-height: 30px;
+    margin-left: 2.5px;
+    margin-right: 2.5px;
+    border-radius: 0;
+    position: relative;
+    top: 8.5px;
 }
-
 .full-height {
-  height: 100% !important;
+    height: 100% !important;
 }
-
 #rtc-embed {
-  width: 100%;
-  border: none;
+    width: 100%;
+    border: none;
 }
-
 .scrollbar-custom {
-  scrollbar-width: thin;
-  scrollbar-color: #00E676 transparent;
+    scrollbar-width: thin;
+    scrollbar-color: #00e676 transparent;
 }
-
 .scrollbar-custom::-webkit-scrollbar {
-  width: 5px;
+    width: 5px;
 }
-
 .scrollbar-custom::-webkit-scrollbar-track {
-  background: 0 0;
+    background: 0 0;
 }
-
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background-color: #00E676;
-  border-radius: 10px;
+    background-color: #00e676;
+    border-radius: 10px;
 }
-
 .scrollbar-custom-secondary::-webkit-scrollbar {
-  height: 5px;
-  width: 0px;
+    height: 5px;
+    width: 0px;
 }
-
 .santa-hat:before {
-  content: url("../images/santa-hat.png");
-  position: absolute;
-  z-index: 1;
-  left: -3px;
+    content: url("../images/santa-hat.png");
+    position: absolute;
+    z-index: 1;
+    left: -3px;
 }
-
 .halloween-hat:before {
-  content: url("../images/halloween-hat.png");
-  position: absolute;
-  z-index: 1;
-  left: -3px;
+    content: url("../images/halloween-hat.png");
+    position: absolute;
+    z-index: 1;
+    left: -3px;
 }
-
 .santa-hat-primary {
-  position: relative;
+    position: relative;
 }
-
 .santa-hat-primary:before {
-  content: url("../images/santa-hat-big.png");
-  position: absolute;
-  z-index: 1;
-  top: -12.5px;
-  left: -5.5px;
+    content: url("../images/santa-hat-big.png");
+    position: absolute;
+    z-index: 1;
+    top: -12.5px;
+    left: -5.5px;
 }
-
 .halloween-hat-primary {
-  position: relative;
+    position: relative;
 }
-
 .halloween-hat-primary:before {
-  content: url("../images/halloween-hat-big.png");
-  position: absolute;
-  z-index: 1;
-  top: -12.5px;
-  left: -10.5px;
+    content: url("../images/halloween-hat-big.png");
+    position: absolute;
+    z-index: 1;
+    top: -12.5px;
+    left: -10.5px;
 }
-
 .animated-background {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 1rem,
-    #ffca28 1rem,
-    #ffca28 2rem
-  );
-  background-size: 8.485rem 8.485rem;
-  animation: barberpole 6s linear infinite;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 1rem,
+        #ffca28 1rem,
+        #ffca28 2rem
+    );
+    background-size: 8.485rem 8.485rem;
+    animation: barberpole 6s linear infinite;
 }
-
 @keyframes barberpole {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 8.485rem 8.485rem; /* Match background-size */
-  }
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 8.485rem 8.485rem;
+    }
 }
-
 .golden-glow {
-  color: #ffca28 !important;
-  animation-name: golden-glow;
-  animation-duration: 1s;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
+    color: #ffca28 !important;
+    animation-name: golden-glow;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
 }
-
 @keyframes golden-glow {
-  from {
-    text-shadow: 0 0 5px #ffca28, 0 0 5px #ffb300;
-  }
-
-  to {
-    text-shadow: 0 0 20px #ffca28, 0 0 20px #ffb300;
-  }
+    from {
+        text-shadow:
+            0 0 5px #ffca28,
+            0 0 5px #ffb300;
+    }
+    to {
+        text-shadow:
+            0 0 20px #ffca28,
+            0 0 20px #ffb300;
+    }
+}
+.xgplayer-error {
+    display: none !important;
 }
