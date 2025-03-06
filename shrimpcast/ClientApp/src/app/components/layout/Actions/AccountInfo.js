@@ -76,7 +76,7 @@ const AccountInfo = (props) => {
 
   return (
     <>
-      <Tooltip title="Account info">
+      <Tooltip title="Sessão">
         <IconButton
           sx={{ backgroundColor: "primary.700", borderRadius: "0px" }}
           onClick={handleOpen}

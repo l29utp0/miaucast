@@ -40,7 +40,7 @@ const StyledLink = ({ content, setClosed, backgroundUrl }) => {
         <Box sx={TextContainerSx}>
           <PlayArrowIcon sx={{ color: "primary.main" }} />
           <Typography variant="body1" sx={{ fontWeight: "bold", color: "primary.300" }}>
-            Click to watch {content}
+            Ver {content}
           </Typography>
         </Box>
       </Button>

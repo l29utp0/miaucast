@@ -53,7 +53,7 @@ const XGPlayer = (props) => {
     const noCacheUrl = () => `${props.url}?nocache=${new Date().getTime()}`,
       player = new window.Player({
       id: elId,
-      url: props.url,
+      url: noCacheUrl(),
       playsinline: true,
       autoplay: true,
       autoplayMuted: true,
