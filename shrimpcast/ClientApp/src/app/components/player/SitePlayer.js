@@ -27,15 +27,23 @@ const SitePlayer = (props) => {
         ? secondaryStreamUrl
         : primaryStreamUrl
       : usePrimarySource
-      ? primaryStreamUrl
-      : secondaryStreamUrl,
+        ? primaryStreamUrl
+        : secondaryStreamUrl,
     [muted, setMuted] = useState(false),
     video = useRef(),
     videoJsOptions = {
-      autoplay: true,
+      vhs: {
+        llhls: true,
+        experimentalBufferBasedABR: true,
+      },
+      autoplay: "muted",
       controls: true,
+      liveui: true,
       fill: true,
       playsinline: true,
+      retryOnError: true,
+      poster:
+        "https://stream-eu.bfcdn.host/thumb/app/031304855496+miau/thumb.jpg",
       sources: [
         {
           src: url,

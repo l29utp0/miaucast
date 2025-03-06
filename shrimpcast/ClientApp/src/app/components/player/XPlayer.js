@@ -23,7 +23,7 @@ const XPlayer = (props) => {
     if (!loadState.css)
       postscribe(
         "#player-xg-css",
-        '<link rel="stylesheet" href="./lib/xg/index.min.css"/>',
+        `<link rel="stylesheet" href="./lib/xg/index.min.css?cacheBurst=${process.env.REACT_APP_CACHE_BUST}"/>`,
         {
           done: () => setLoadState((state) => ({ ...state, css: true })),
         },
@@ -31,7 +31,7 @@ const XPlayer = (props) => {
     if (!loadState.player)
       postscribe(
         "#player-xg",
-        '<script src="./lib/xg/player.xg.js"></script>',
+        `<script src="./lib/xg/player.xg.js?cacheBurst=${process.env.REACT_APP_CACHE_BUST}"></script>`,
         {
           done: () => setLoadState((state) => ({ ...state, player: true })),
         },
@@ -39,7 +39,7 @@ const XPlayer = (props) => {
     if (!loadState.hls)
       postscribe(
         "#player-xg-hls",
-        '<script src="./lib/xg/xg.hls.js"></script>',
+        `<script src="./lib/xg/xg.hls.js?cacheBurst=${process.env.REACT_APP_CACHE_BUST}"></script>`,
         {
           done: () => setLoadState((state) => ({ ...state, hls: true })),
         },
@@ -64,6 +64,7 @@ const XPlayer = (props) => {
         targetLatency: 7,
         maxLatency: 14,
       },
+      startTime: 4000,
       lang: "en",
       playbackRate: false,
       cssFullscreen: false,
@@ -81,35 +82,19 @@ const XPlayer = (props) => {
       },
     });
 
-    // Monitor errors, waiting, and stream end
-    player.on("error", (err) => {
-      console.error("Playback error occurred:", err);
-      if (player.readyState <= 2) {
-        console.warn("Retrying playback...");
-        player.replay();
-      }
-    });
-
+    player.on("error", () => player.replay());
+    player.on("ended", () => player.replay());
     player.on("waiting", () => {
-      console.warn("Buffering... monitoring the situation.");
-      if (!window.bufferingTimeout) {
-        window.bufferingTimeout = setTimeout(() => {
+      clearTimeout(window.timeout);
+      window.timeout = setTimeout(() => {
+        try {
           if (player?.readyState <= 2) {
-            console.warn("Playback stuck. Attempting to restart...");
             player.replay();
+            console.log("Playback restarted.");
           }
-        }, 5000);
-      }
+        } catch (e) {}
+      }, 5000);
     });
-
-    player.on("ended", () => {
-      console.info("The live stream appears to have ended.");
-    });
-
-    if (window.bufferingTimeout) {
-      clearTimeout(window.bufferingTimeout);
-      delete window.bufferingTimeout;
-    }
 
     return () => player.destroy();
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -48,7 +48,9 @@ const ConfigUserDialog = (props) => {
       return newObj;
     },
     fetchParsedConfig = async () => {
-      const response = await AdminActionsManager.GetOrderedConfig(props.signalR);
+      const response = await AdminActionsManager.GetOrderedConfig(
+        props.signalR,
+      );
       response.unorderedConfig = lowercaseKeys(response.unorderedConfig);
       setConfig(response);
     },
@@ -61,12 +63,17 @@ const ConfigUserDialog = (props) => {
         },
       })),
     saveConfig = async () => {
-      let configSaved = await AdminActionsManager.SaveConfig(props.signalR, config.unorderedConfig, config.openKey);
+      let configSaved = await AdminActionsManager.SaveConfig(
+        props.signalR,
+        config.unorderedConfig,
+        config.openKey,
+      );
       if (configSaved) setClosed();
     },
     utcToLocal = (time) => {
       const date = new Date(time);
-      const padStart = (num, length) => num.toString().padStart(length || 2, "0");
+      const padStart = (num, length) =>
+        num.toString().padStart(length || 2, "0");
       const year = padStart(date.getFullYear(), 4);
       const month = padStart(date.getMonth() + 1);
       const day = padStart(date.getDate());
@@ -94,16 +101,31 @@ const ConfigUserDialog = (props) => {
   return (
     <>
       <Tooltip title="Configuração">
-        <IconButton onClick={setOpened} type="button" size="small" sx={{ borderRadius: "0px" }}>
+        <IconButton
+          onClick={setOpened}
+          type="button"
+          size="small"
+          sx={{ borderRadius: "0px" }}
+        >
           <SettingsIcon sx={{ color: "primary.500" }} />
         </IconButton>
       </Tooltip>
       {config && (
-        <Dialog open={open} onClose={setClosed} maxWidth={"lg"} PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
+        <Dialog
+          open={open}
+          onClose={setClosed}
+          maxWidth={"lg"}
+          PaperProps={{ sx: { backgroundColor: "primary.900" } }}
+        >
           <DialogTitle sx={{ fontSize: "24px", pb: "7.5px" }}>
             <Box display="flex" width="100%" mb={"10px"}>
               Configuração
-              <Button onClick={saveConfig} sx={{ marginLeft: "auto" }} variant="contained" color="success">
+              <Button
+                onClick={saveConfig}
+                sx={{ marginLeft: "auto" }}
+                variant="contained"
+                color="success"
+              >
                 Guardar
               </Button>
             </Box>
@@ -111,9 +133,18 @@ const ConfigUserDialog = (props) => {
           </DialogTitle>
           <DialogContent>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs value={tabValue} onChange={tabChange} variant="scrollable" scrollButtons={false}>
+              <Tabs
+                value={tabValue}
+                onChange={tabChange}
+                variant="scrollable"
+                scrollButtons={false}
+              >
                 {config.orderedConfig.map((configSection, index) => (
-                  <Tab key={configSection.name} label={configSection.name} {...a11yProps(index)} />
+                  <Tab
+                    key={configSection.name}
+                    label={configSection.name}
+                    {...a11yProps(index)}
+                  />
                 ))}
               </Tabs>
             </Box>
@@ -124,15 +155,23 @@ const ConfigUserDialog = (props) => {
                   typeof configItem.value === "boolean" ? (
                     <FormControlLabel
                       key={configItem.name}
-                      onChange={(e) => updateConfig(e.target.checked, configItem)}
+                      onChange={(e) =>
+                        updateConfig(e.target.checked, configItem)
+                      }
                       sx={{ ml: "-10px", mb: "10px", width: "100%" }}
-                      control={<Checkbox checked={config.unorderedConfig[configItem.name]} />}
+                      control={
+                        <Checkbox
+                          checked={config.unorderedConfig[configItem.name]}
+                        />
+                      }
                       label={configItem.label}
                     />
                   ) : typeof configItem.value === "number" ? (
                     <TextField
                       key={configItem.name}
-                      onChange={(e) => updateConfig(+e.target.value, configItem)}
+                      onChange={(e) =>
+                        updateConfig(+e.target.value, configItem)
+                      }
                       label={configItem.label}
                       defaultValue={config.unorderedConfig[configItem.name]}
                       variant="outlined"
@@ -150,18 +189,33 @@ const ConfigUserDialog = (props) => {
                           : utcToLocal(config.unorderedConfig[configItem.name])
                       }
                       variant="outlined"
-                      type={configItem.name !== config.openKey ? "text" : "datetime-local"}
-                      sx={{ width: configItem.name !== config.openKey ? "100%" : "auto", marginBottom: "10px" }}
+                      type={
+                        configItem.name !== config.openKey
+                          ? "text"
+                          : "datetime-local"
+                      }
+                      sx={{
+                        width:
+                          configItem.name !== config.openKey ? "100%" : "auto",
+                        marginBottom: "10px",
+                      }}
                     />
                   ) : (
                     <Box sx={{ mb: "10px" }} key={configItem.name}>
                       <ColourPicker
                         userDisplayColor={
-                          themeColors.find((tc) => tc.name === config.unorderedConfig[configItem.name])?.colourHex
+                          themeColors.find(
+                            (tc) =>
+                              tc.name ===
+                              config.unorderedConfig[configItem.name],
+                          )?.colourHex
                         }
                         colours={themeColors}
                         executeCallback={(nameColourId) => {
-                          updateConfig(themeColors[nameColourId]?.name, configItem);
+                          updateConfig(
+                            themeColors[nameColourId]?.name,
+                            configItem,
+                          );
                           return themeColors[nameColourId]?.colourHex;
                         }}
                         text={`${configItem.label} (${config.unorderedConfig[configItem.name]})`}
@@ -169,7 +223,7 @@ const ConfigUserDialog = (props) => {
                         useBorderRadius
                       />
                     </Box>
-                  )
+                  ),
                 )}
               </TabPanel>
             ))}

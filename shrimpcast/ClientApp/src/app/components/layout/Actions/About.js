@@ -24,7 +24,7 @@ const About = (props) => {
   const [open, setOpen] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
 
-  const emailAddress = "info@ptchan.org";
+  const emailAddress = "l29utp0@pm.me";
   const sessionAddress =
     "05fd1be0e9b6fd21954b1948442ba8f0382940aef9e4b5dc5da4f91635f8d05d0a";
 
@@ -133,7 +133,13 @@ const About = (props) => {
               {/* Description Section */}
               <Grid item xs={12}>
                 <Typography variant="body1" paragraph>
-                  Bem-vindo ao miau, aqui podes fazer stream, ver e participar.
+                  Bem-vindo ao miau.gg, aqui podes fazer stream, ver e
+                  participar.
+                </Typography>
+                <Typography variant="body1" paragraph>
+                  Podes instalar a app abrindo o endereço no navegador e depois
+                  indo às opções e carregando em algo como "instalar",
+                  "adicionar ao ecrã principal", etc.
                 </Typography>
                 <Typography variant="body1" paragraph>
                   Regras:
@@ -146,13 +152,12 @@ const About = (props) => {
                   </li>
                   <li>
                     <Typography variant="body1">
-                      Proibido ocupar o stream apenas por ocupar e não deixar
-                      outros.
+                      Proibido ocupar o stream apenas por ocupar.
                     </Typography>
                   </li>
                   <li>
                     <Typography variant="body1">
-                      Poibido qualquer coisa que ponha em questão o normal
+                      Proibido qualquer coisa que ponha em causa o normal
                       funcionamento da plataforma.
                     </Typography>
                   </li>
@@ -161,7 +166,7 @@ const About = (props) => {
 
               {/* Links Section */}
               <Grid item xs={12}>
-                <Typography variant="h6" color="secondary.main" gutterBottom>
+                <Typography variant="body1" paragraph>
                   Links úteis:
                 </Typography>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -175,19 +180,36 @@ const About = (props) => {
                   </Link>
 
                   <Link
-                    href="https://ptchan.org"
+                    href="https://github.com/l29utp0/ptchinacast"
                     target="_blank"
                     color="secondary"
                     sx={{ display: "flex", alignItems: "center", gap: 1 }}
                   >
-                    Visita o ptchan
+                    Source
                   </Link>
                 </Box>
               </Grid>
 
+              <Grid item xs={12}>
+                <Typography variant="body1" paragraph>
+                  Amigos:
+                </Typography>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                ></Box>
+                <Link
+                  href="https://ptchan.org"
+                  target="_blank"
+                  color="secondary"
+                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                >
+                  ptchan.org
+                </Link>
+              </Grid>
+
               {/* Contact Section */}
               <Grid item xs={12}>
-                <Typography variant="h6" color="secondary.main" gutterBottom>
+                <Typography variant="body1" paragraph>
                   Contacto:
                 </Typography>
 
