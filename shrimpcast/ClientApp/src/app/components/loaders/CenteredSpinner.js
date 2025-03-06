@@ -14,10 +14,10 @@ const CenteredSpinner = () => {
     <Box sx={Centered}>
       <CircularProgress color="secondary" size={50} sx={{ ml: "auto", mr: "auto" }} />
       <Typography variant="overline" display="block" fontWeight="bold" color="#00E676" sx={{ lineHeight: 1.5 }}>
-        A CARREGAR PERFIL...
+        A carregar...
       </Typography>
       <Typography variant="caption" display="block" fontWeight="bold" color="#00E676" sx={{ fontSize: "10px" }}>
-        POWERED BY PTCHINACAST {process.env.REACT_APP_VERSION}
+        miau.gg {process.env.REACT_APP_VERSION}
       </Typography>
     </Box>
   );

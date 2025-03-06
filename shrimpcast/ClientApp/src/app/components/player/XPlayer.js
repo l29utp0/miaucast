@@ -23,7 +23,7 @@ const XPlayer = (props) => {
     if (!loadState.css)
       postscribe(
         "#player-xg-css",
-        '<link rel="stylesheet" href="./lib/xg/index.min.css"/>',
+        `<link rel="stylesheet" href="./lib/xg/index.min.css?cacheBurst=${process.env.REACT_APP_CACHE_BUST}"/>`,
         {
           done: () => setLoadState((state) => ({ ...state, css: true })),
         },
@@ -31,7 +31,7 @@ const XPlayer = (props) => {
     if (!loadState.player)
       postscribe(
         "#player-xg",
-        '<script src="./lib/xg/player.xg.js"></script>',
+        `<script src="./lib/xg/player.xg.js?cacheBurst=${process.env.REACT_APP_CACHE_BUST}"></script>`,
         {
           done: () => setLoadState((state) => ({ ...state, player: true })),
         },
@@ -39,7 +39,7 @@ const XPlayer = (props) => {
     if (!loadState.hls)
       postscribe(
         "#player-xg-hls",
-        '<script src="./lib/xg/xg.hls.js"></script>',
+        `<script src="./lib/xg/xg.hls.js?cacheBurst=${process.env.REACT_APP_CACHE_BUST}"></script>`,
         {
           done: () => setLoadState((state) => ({ ...state, hls: true })),
         },
@@ -64,6 +64,7 @@ const XPlayer = (props) => {
         targetLatency: 7,
         maxLatency: 14,
       },
+      startTime: 4000,
       lang: "en",
       playbackRate: false,
       cssFullscreen: false,
