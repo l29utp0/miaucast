@@ -26,8 +26,13 @@ const Notifications = (props) => {
   return (
     <>
       <Tooltip title="Enviar notificações">
-        <IconButton onClick={setOpened} type="button" size="small" sx={{ borderRadius: "0px" }}>
-          <NotificationsIcon sx={{ color: "primary.500" }} />
+        <IconButton
+          onClick={setOpened}
+          type="button"
+          size="small"
+          sx={{ backgroundColor: "primary.700", borderRadius: "0px" }}
+        >
+          <NotificationsIcon sx={{ color: "primary.300" }} />
         </IconButton>
       </Tooltip>
       {open && (

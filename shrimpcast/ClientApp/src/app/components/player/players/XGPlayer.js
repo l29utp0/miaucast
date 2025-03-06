@@ -11,7 +11,7 @@ const Loader = {
   webkitTransform: "translate(-50%, -50%);",
 };
 
-const XPlayer = (props) => {
+const XGPlayer = (props) => {
   const elId = "xg-player-cont",
     [loadState, setLoadState] = useState({
       css: false,
@@ -49,9 +49,11 @@ const XPlayer = (props) => {
 
   useEffect(() => {
     if (!loadState.css || !loadState.player || !loadState.hls) return;
-    let player = new window.Player({
+
+    const noCacheUrl = () => `${props.url}?nocache=${new Date().getTime()}`,
+      player = new window.Player({
       id: elId,
-      url: props.url,
+      url: noCacheUrl(),
       playsinline: true,
       autoplay: true,
       autoplayMuted: true,
@@ -80,17 +82,20 @@ const XPlayer = (props) => {
         quality: 1,
         name: "kino",
       },
-    });
+    }),
+      restartPlayback = (player) => {
+        console.log("Attempting to restart playback.");
+        player.switchURL(noCacheUrl());
+      };
 
-    player.on("error", () => player.replay());
-    player.on("ended", () => player.replay());
+    player.on("error", () => restartPlayback(player));
+    player.on("ended", () => restartPlayback(player));
     player.on("waiting", () => {
       clearTimeout(window.timeout);
       window.timeout = setTimeout(() => {
         try {
           if (player?.readyState <= 2) {
-            player.replay();
-            console.log("Playback restarted.");
+            restartPlayback(player);
           }
         } catch (e) {}
       }, 5000);
@@ -115,4 +120,4 @@ const XPlayer = (props) => {
   );
 };
 
-export default XPlayer;
+export default XGPlayer;

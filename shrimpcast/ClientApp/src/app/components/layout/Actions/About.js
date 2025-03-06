@@ -93,9 +93,9 @@ const About = (props) => {
           onClick={setOpened}
           type="button"
           size="small"
-          sx={{ borderRadius: "0px" }}
+          sx={{ backgroundColor: "primary.700", borderRadius: "0px" }}
         >
-          <InfoIcon sx={{ color: "primary.500" }} />
+          <InfoIcon sx={{ color: "primary.300" }} />
         </IconButton>
       </Tooltip>
 
