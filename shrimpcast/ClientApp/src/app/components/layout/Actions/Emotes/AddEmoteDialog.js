@@ -39,21 +39,29 @@ const AddEmoteDialog = (props) => {
     },
     handleFileChange = (e) => {
       const file = e.target.files[0];
-      const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"];
+      const validImageTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "image/avif",
+      ];
       if (!file) {
         handleClose();
         return;
       }
 
       if (!validImageTypes.includes(file.type)) {
-        displayToast("Erro: seleciona um tipo de imagem válido (JPG, PNG, GIF, WEBP, AVIF).");
+        displayToast(
+          "Erro: seleciona um tipo de imagem válido (JPG, PNG, GIF, WEBP, AVIF).",
+        );
         handleClose();
         return;
       }
 
       const img = new Image();
       img.onload = () => {
-        if (img.width > 70 || img.height > 70) {
+        if (img.width > 100 || img.height > 70) {
           displayToast("Erro: resolução não pode exceder 70x70 pixels.");
           setEmote(null);
         } else {
@@ -78,7 +86,11 @@ const AddEmoteDialog = (props) => {
     };
 
   return (
-    <Dialog open={props.open} onClose={props.close} PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
+    <Dialog
+      open={props.open}
+      onClose={props.close}
+      PaperProps={{ sx: { backgroundColor: "primary.900" } }}
+    >
       <DialogTitle>Add new emote</DialogTitle>
       <DialogContent>
         <TextField
@@ -98,7 +110,11 @@ const AddEmoteDialog = (props) => {
           startIcon={<CloudUploadIcon />}
         >
           Upload file {emote?.name && `(${emote.name})`}
-          <VisuallyHiddenInput accept="image/jpeg, image/png, image/gif, image/webp, image/avif" onChange={handleFileChange} type="file" />
+          <VisuallyHiddenInput
+            accept="image/jpeg, image/png, image/gif, image/webp, image/avif"
+            onChange={handleFileChange}
+            type="file"
+          />
         </Button>
       </DialogContent>
       <DialogActions>
@@ -112,7 +128,11 @@ const AddEmoteDialog = (props) => {
         )}
       </DialogActions>
       <Snackbar open={showToast} autoHideDuration={5000} onClose={closeToast}>
-        <Alert severity={toastMessage.includes("Error") ? "error" : "success"} variant="filled" p={2}>
+        <Alert
+          severity={toastMessage.includes("Error") ? "error" : "success"}
+          variant="filled"
+          p={2}
+        >
           <Typography variant="body2">{toastMessage}</Typography>
         </Alert>
       </Snackbar>

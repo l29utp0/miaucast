@@ -35,12 +35,19 @@ const ButtonSx = (backgroundUrl) => ({
 
 const StyledLink = ({ content, setClosed, backgroundUrl }) => {
   return (
-    <Link to={`/${content.toLowerCase()}`} onClick={setClosed} style={{ textDecoration: "none" }}>
+    <Link
+      to={`/${content.toLowerCase()}`}
+      onClick={setClosed}
+      style={{ textDecoration: "none" }}
+    >
       <Button variant="outlined" sx={ButtonSx(backgroundUrl)}>
         <Box sx={TextContainerSx}>
           <PlayArrowIcon sx={{ color: "primary.main" }} />
-          <Typography variant="body1" sx={{ fontWeight: "bold", color: "primary.300" }}>
-            Ver {content}
+          <Typography
+            variant="body1"
+            sx={{ fontWeight: "bold", color: "primary.300" }}
+          >
+            {content}
           </Typography>
         </Box>
       </Button>
