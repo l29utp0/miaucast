@@ -10,25 +10,13 @@ const MultistreamPrompt = ({ streamStatus }) => {
   return (
     <>
       <NotificationBar
-        onClick={() => setSwitchSource(true)}
-        text={`Multistream: clica para mudar`}
+        onClick={() => window.history.back()}
+        text={`Streams`}
         icon={LiveTvIcon}
         palette={red}
         skipCloseButton={true}
+        back={true}
       />
-      {openSwitchSource && (
-        <GenericActionList
-          skipButton={true}
-          title="Streams ativos"
-          getItems={() => streamStatus.sources}
-          contentIdentifier="name"
-          imageIdentifier="thumbnail"
-          identifier="sourceId"
-          closeCallback={() => setSwitchSource(false)}
-          useLinks={true}
-          skipFullWidth={true}
-        />
-      )}
     </>
   );
 };

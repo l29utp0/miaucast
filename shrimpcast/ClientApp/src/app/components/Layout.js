@@ -86,18 +86,20 @@ const Layout = (props) => {
         sourceLocation = location.pathname?.replace("/", ""),
         enabledSources = sources.filter((source) => source.isEnabled),
         locationMatchesSource = enabledSources.find(
-          (source) => source.name.toLowerCase() === sourceLocation.toLowerCase()
+          (source) =>
+            source.name.toLowerCase() === sourceLocation.toLowerCase(),
         ),
         isMultistreaming = enabledSources?.length > 1,
         source = locationMatchesSource
           ? locationMatchesSource
           : !isMultistreaming && enabledSources?.length
-          ? enabledSources[0]
-          : {},
+            ? enabledSources[0]
+            : {},
         mustPickStream = isMultistreaming && !locationMatchesSource;
 
       const StreamStatus = {
-        streamEnabled: configuration.streamEnabled && enabledSources?.length ? true : false,
+        streamEnabled:
+          configuration.streamEnabled && enabledSources?.length ? true : false,
         isMultistreaming: enabledSources?.length > 1,
         source,
         mustPickStream,
@@ -115,10 +117,21 @@ const Layout = (props) => {
       <ShowPing {...props} />
       <Grid container sx={MainGridSx}>
         <Grid xs={12}>
-          <SiteTop {...props} useFullChatMode={useFullChatMode} setFullChatMode={setFullChatMode} />
+          <SiteTop
+            {...props}
+            useFullChatMode={useFullChatMode}
+            setFullChatMode={setFullChatMode}
+          />
         </Grid>
         {!useFullChatMode && (
-          <Grid xs={12} md={8} lg={9} xl={10} sx={PlayerBoxSx(theme)} className={"scrollbar-custom"}>
+          <Grid
+            xs={12}
+            md={8}
+            lg={9}
+            xl={10}
+            sx={PlayerBoxSx(theme)}
+            className={"scrollbar-custom"}
+          >
             <Box sx={PlayerContainerSx}>
               <SitePlayer streamStatus={streamStatus} {...props} />
             </Box>
@@ -132,7 +145,10 @@ const Layout = (props) => {
           md={useFullChatMode ? 12 : 4}
           lg={useFullChatMode ? 12 : 3}
           xl={useFullChatMode ? 12 : 2}
-          sx={[ChatBoxSx(theme, useFullChatMode), configuration.enableHalloweenTheme && HalloweenAnimSx]}
+          sx={[
+            ChatBoxSx(theme, useFullChatMode),
+            configuration.enableHalloweenTheme && HalloweenAnimSx,
+          ]}
         >
           <Chat {...props} />
         </Grid>

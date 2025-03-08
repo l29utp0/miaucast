@@ -8,7 +8,12 @@ import SignalRManager from "../../managers/SignalRManager";
 import LocalStorageManager from "../../managers/LocalStorageManager";
 import ChatActionsManager from "../../managers/ChatActionsManager";
 
-const ChatMessagesSx = (activePoll, activeBingo, bingoButtonExpanded, showGoldenPassButton) => ({
+const ChatMessagesSx = (
+    activePoll,
+    activeBingo,
+    bingoButtonExpanded,
+    showGoldenPassButton,
+  ) => ({
     width: "100%",
     height: `calc(100% - 56px - 28px${activePoll ? " - 35px" : ""}${
       activeBingo ? ` - ${bingoButtonExpanded ? 35 : 10}px` : ""
@@ -40,29 +45,46 @@ const RenderChatMessages = (props) => {
   const [messages, setMessages] = useState([]),
     [pendingMessages, setPendingMessages] = useState(0),
     [loading, setLoading] = useState(true),
-    { signalR, configuration, bingoButtonExpanded, isAdmin, isGolden, goldenPassExpanded } = props,
+    {
+      signalR,
+      configuration,
+      bingoButtonExpanded,
+      isAdmin,
+      isGolden,
+      goldenPassExpanded,
+    } = props,
     scrollReference = useRef(),
     scrollToBottom = () => {
       scrollReference.current.scrollIntoView();
       setPendingMessages(0);
     },
-    removeMessageHandler = () => signalR.off(SignalRManager.events.messageReceived),
+    removeMessageHandler = () =>
+      signalR.off(SignalRManager.events.messageReceived),
     addNewMessageHandler = () =>
       signalR.on(SignalRManager.events.messageReceived, (message) => {
         setMessages((existingMessages) => {
-          if (ChatActionsManager.IsIgnored(message.sessionId, null, message.isAdmin || message.isMod)) {
+          if (
+            ChatActionsManager.IsIgnored(
+              message.sessionId,
+              null,
+              message.isAdmin || message.isMod,
+            )
+          ) {
             return existingMessages;
           }
 
           let messageList = existingMessages;
           if (message.messageType === "MessageRemoved") {
-            let index = messageList.findIndex((m) => m.messageId === message.messageId);
+            let index = messageList.findIndex(
+              (m) => m.messageId === message.messageId,
+            );
             messageList.splice(index, 1);
           }
 
           const isBannedType = message.messageType === "UserBanned",
             isNameChangedType = message.messageType === "NameChange",
-            isNameColourChangedType = message.messageType === "UserColourChange";
+            isNameColourChangedType =
+              message.messageType === "UserColourChange";
           if (isBannedType || isNameChangedType || isNameColourChangedType) {
             messageList
               .filter((m) => m.sessionId === message.sessionId)
@@ -108,10 +130,14 @@ const RenderChatMessages = (props) => {
       }),
     updateNameSuggestions = () =>
       props.setNameSuggestions((existingSuggestions) => {
-        const newSuggestions = [...new Set(messages.map((message) => message.sentBy).filter(Boolean))];
-        if (existingSuggestions.length !== newSuggestions.length) return newSuggestions;
+        const newSuggestions = [
+          ...new Set(messages.map((message) => message.sentBy).filter(Boolean)),
+        ];
+        if (existingSuggestions.length !== newSuggestions.length)
+          return newSuggestions;
         for (let i = 0; i < existingSuggestions.length; i++) {
-          if (existingSuggestions[i] !== newSuggestions[i]) return newSuggestions;
+          if (existingSuggestions[i] !== newSuggestions[i])
+            return newSuggestions;
         }
         return existingSuggestions;
       });
@@ -120,11 +146,15 @@ const RenderChatMessages = (props) => {
   useEffect(() => {
     async function getMessages(abortControllerSignal) {
       if (!loading) return;
-      let existingMessages = await MessageManager.GetExistingMessages(abortControllerSignal);
+      let existingMessages = await MessageManager.GetExistingMessages(
+        abortControllerSignal,
+      );
       if (abortControllerSignal.aborted) return;
-      const ignoredUsers = LocalStorageManager.getIgnoredUsers().map((iu) => iu.sessionId);
+      const ignoredUsers = LocalStorageManager.getIgnoredUsers().map(
+        (iu) => iu.sessionId,
+      );
       existingMessages = existingMessages.filter(
-        (em) => em.isAdmin || em.isMod || !ignoredUsers.includes(em.sessionId)
+        (em) => em.isAdmin || em.isMod || !ignoredUsers.includes(em.sessionId),
       );
 
       existingMessages = existingMessages.reverse();
@@ -147,7 +177,8 @@ const RenderChatMessages = (props) => {
 
   /** Scroll listeners */
   useEffect(() => {
-    const lastMessage = messages[messages.length ? messages.length - 1 : 0]?.content;
+    const lastMessage =
+      messages[messages.length ? messages.length - 1 : 0]?.content;
     if (!lastMessage) return;
     if (props.autoScroll) scrollToBottom();
     else setPendingMessages((state) => state + 1);
@@ -162,7 +193,10 @@ const RenderChatMessages = (props) => {
         configuration.showPoll,
         configuration.showBingo,
         bingoButtonExpanded,
-        !isAdmin && !isGolden && configuration.showGoldenPassButton && goldenPassExpanded
+        !isAdmin &&
+          !isGolden &&
+          configuration.showGoldenPassButton &&
+          goldenPassExpanded,
       )}
     >
       {loading && (
@@ -175,7 +209,12 @@ const RenderChatMessages = (props) => {
           !message.hidden &&
           message.content &&
           (message.messageType !== "UserMessage" ? (
-            <SystemMessage key={message.messageId} siteAdmin={props.isAdmin} signalR={signalR} {...message} />
+            <SystemMessage
+              key={message.messageId}
+              siteAdmin={props.isAdmin}
+              signalR={signalR}
+              {...message}
+            />
           ) : (
             <UserMessage
               key={message.messageId}
@@ -189,7 +228,7 @@ const RenderChatMessages = (props) => {
               maxLengthTruncation={configuration.maxLengthTruncation}
               {...message}
             />
-          ))
+          )),
       )}
       <Box ref={scrollReference}></Box>
       {pendingMessages > 0 && (
@@ -200,7 +239,7 @@ const RenderChatMessages = (props) => {
           onClick={scrollToBottom}
           endIcon={<ArrowDownwardIcon />}
         >
-          {pendingMessages} new messages
+          {pendingMessages} mensagens novas
         </Button>
       )}
     </Box>
