@@ -45,7 +45,7 @@ const Danmaku = ({ messages, isActive, emotes }) => {
             const emoteImg = document.createElement("img");
             emoteImg.src = emote.url;
             emoteImg.alt = emote.name;
-            emoteImg.style.height = "30px";
+            emoteImg.style.height = "40px";
             emoteImg.style.verticalAlign = "middle";
             emoteImg.style.display = "inline-block";
             commentElement.appendChild(emoteImg);
