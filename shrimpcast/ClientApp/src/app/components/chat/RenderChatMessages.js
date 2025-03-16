@@ -73,143 +73,159 @@ const RenderChatMessages = (props) => {
   };
 
   const handleNewMessage = (message) => {
-    setMessages((existingMessages) => {
-      if (
-        ChatActionsManager.IsIgnored(
-          message.sessionId,
-          null,
-          message.isAdmin || message.isMod,
-        )
-      ) {
-        return existingMessages;
-      }
+      setMessages((existingMessages) => {
+        if (
+          ChatActionsManager.IsIgnored(
+            message.sessionId,
+            null,
+            message.isAdmin || message.isMod,
+          )
+        ) {
+          return existingMessages;
+        }
 
-      let messageList = existingMessages;
-      if (message.messageType === "MessageRemoved") {
-        let index = messageList.findIndex(
-          (m) => m.messageId === message.messageId,
-        );
-        messageList.splice(index, 1);
-      }
+        let messageList = existingMessages;
+        if (message.messageType === "MessageRemoved") {
+          let index = messageList.findIndex(
+            (m) => m.messageId === message.messageId,
+          );
+          messageList.splice(index, 1);
+        }
 
-      const isBannedType = message.messageType === "UserBanned";
-      const isNameChangedType = message.messageType === "NameChange";
-      const isNameColourChangedType =
-        message.messageType === "UserColourChange";
+        const isBannedType = message.messageType === "UserBanned";
+        const isNameChangedType = message.messageType === "NameChange";
+        const isNameColourChangedType =
+          message.messageType === "UserColourChange";
 
-      if (isBannedType || isNameChangedType || isNameColourChangedType) {
-        messageList
-          .filter((m) => m.sessionId === message.sessionId)
-          .forEach((m) => {
-            if (isBannedType) {
-              m.hidden = true;
-            }
-            if (isNameChangedType) {
-              m.sentBy = message.sentBy;
-            }
-            if (isNameColourChangedType) {
-              const { content } = message;
-              const isModAdded = content === "ModAdded";
-              const isModRemoved = content === "ModRemoved";
-              const isGoldenAdded = content === "GoldenAdded";
+        if (isBannedType || isNameChangedType || isNameColourChangedType) {
+          messageList
+            .filter((m) => m.sessionId === message.sessionId)
+            .forEach((m) => {
+              if (isBannedType) {
+                m.hidden = true;
+              }
+              if (isNameChangedType) {
+                m.sentBy = message.sentBy;
+              }
+              if (isNameColourChangedType) {
+                const { content } = message;
+                const isModAdded = content === "ModAdded";
+                const isModRemoved = content === "ModRemoved";
+                const isGoldenAdded = content === "GoldenAdded";
 
-              if (isModAdded) m.isMod = true;
-              else if (isModRemoved) m.isMod = false;
-              else if (isGoldenAdded) m.isGolden = true;
-              else m.userColorDisplay = content;
-            }
+                if (isModAdded) m.isMod = true;
+                else if (isModRemoved) m.isMod = false;
+                else if (isGoldenAdded) m.isGolden = true;
+                else m.userColorDisplay = content;
+              }
+            });
+        }
+
+        // Check for emote combos
+        if (message.messageType === "UserMessage" && message.content) {
+          // First split by spaces to handle spaced emotes
+          const spaceSplit = message.content.trim().split(/\s+/);
+
+          // For each space-separated part, check if it's multiple joined emotes
+          const allEmotes = spaceSplit.flatMap((part) => {
+            // Find all emote matches in this part (handles cases with no spaces between emotes)
+            const matches = props.emotes
+              .map((emote) => emote.name)
+              .reduce((acc, emoteName) => {
+                const regex = new RegExp(emoteName, "g");
+                const matches = part.match(regex) || [];
+                return [...acc, ...matches];
+              }, []);
+
+            return matches;
           });
-      }
 
-      // Check for emote combos
-      if (message.messageType === "UserMessage" && message.content) {
-        // First split by spaces to handle spaced emotes
-        const spaceSplit = message.content.trim().split(/\s+/);
+          // Get unique emotes
+          const uniqueEmotes = [...new Set(allEmotes)];
 
-        // For each space-separated part, check if it's multiple joined emotes
-        const allEmotes = spaceSplit.flatMap((part) => {
-          // Find all emote matches in this part (handles cases with no spaces between emotes)
-          const matches = props.emotes
-            .map((emote) => emote.name)
-            .reduce((acc, emoteName) => {
-              const regex = new RegExp(emoteName, "g");
-              const matches = part.match(regex) || [];
-              return [...acc, ...matches];
-            }, []);
+          // If there's exactly one unique emote type
+          if (uniqueEmotes.length === 1) {
+            const emote = uniqueEmotes[0];
 
-          return matches;
-        });
+            // Clear existing combo timeout
+            if (comboTimeoutRef.current) {
+              clearTimeout(comboTimeoutRef.current);
+            }
 
-        // Get unique emotes
-        const uniqueEmotes = [...new Set(allEmotes)];
+            setCurrentCombo((prev) => {
+              if (
+                prev.emote === emote &&
+                Date.now() - prev.lastUpdate < 20000
+              ) {
+                prev.messageIds.add(message.messageId);
+                return {
+                  emote,
+                  count: prev.count + 1,
+                  messageIds: prev.messageIds,
+                  lastUpdate: Date.now(),
+                };
+              }
 
-        // If there's exactly one unique emote type
-        if (uniqueEmotes.length === 1) {
-          const emote = uniqueEmotes[0];
-
-          // Clear existing combo timeout
-          if (comboTimeoutRef.current) {
-            clearTimeout(comboTimeoutRef.current);
-          }
-
-          setCurrentCombo((prev) => {
-            if (prev.emote === emote && Date.now() - prev.lastUpdate < 20000) {
-              prev.messageIds.add(message.messageId);
               return {
                 emote,
-                count: prev.count + 1,
-                messageIds: prev.messageIds,
+                count: 1,
+                messageIds: new Set([message.messageId]),
                 lastUpdate: Date.now(),
               };
-            }
+            });
 
-            return {
-              emote,
-              count: 1,
-              messageIds: new Set([message.messageId]),
-              lastUpdate: Date.now(),
-            };
-          });
-
-          // Set new timeout to reset combo
-          comboTimeoutRef.current = setTimeout(() => {
+            // Set new timeout to reset combo
+            comboTimeoutRef.current = setTimeout(() => {
+              setCurrentCombo({
+                emote: null,
+                count: 0,
+                messageIds: new Set(),
+                lastUpdate: 0,
+              });
+            }, 10000);
+          } else {
+            // Reset combo on non-emote messages
             setCurrentCombo({
               emote: null,
               count: 0,
               messageIds: new Set(),
               lastUpdate: 0,
             });
-          }, 10000);
-        } else {
-          // Reset combo on non-emote messages
-          setCurrentCombo({
-            emote: null,
-            count: 0,
-            messageIds: new Set(),
-            lastUpdate: 0,
-          });
+          }
         }
-      }
 
-      if (message.content && !isNameColourChangedType) {
-        message.useTransition = true;
-        messageList = messageList.concat(message);
-      } else {
-        messageList = messageList.concat({ hidden: true });
-      }
+        if (message.content && !isNameColourChangedType) {
+          message.useTransition = true;
+          messageList = messageList.concat(message);
+        } else {
+          messageList = messageList.concat({ hidden: true });
+        }
 
-      /**
-       * Clean excess messages
-       */
-      const maxItems = configuration.maxMessagesToShow;
-      if (messageList.length > maxItems) {
-        const excessItemsCount = messageList.length - maxItems;
-        messageList.splice(0, excessItemsCount);
-      }
+        /**
+         * Clean excess messages
+         */
+        const maxItems = configuration.maxMessagesToShow;
+        if (messageList.length > maxItems) {
+          const excessItemsCount = messageList.length - maxItems;
+          messageList.splice(0, excessItemsCount);
+        }
 
-      return messageList;
-    });
-  };
+        return messageList;
+      });
+    },
+    updateNameSuggestions = () =>
+      props.setNameSuggestions((existingSuggestions) => {
+        const newSuggestions = [
+          ...new Set(messages.map((message) => message.sentBy).filter(Boolean)),
+        ];
+        if (existingSuggestions.length !== newSuggestions.length)
+          return newSuggestions;
+        for (let i = 0; i < existingSuggestions.length; i++) {
+          if (existingSuggestions[i] !== newSuggestions[i])
+            return newSuggestions;
+        }
+        return existingSuggestions;
+      });
 
   const removeMessageHandler = () =>
     signalR.off(SignalRManager.events.messageReceived);
@@ -263,6 +279,7 @@ const RenderChatMessages = (props) => {
     if (!lastMessage) return;
     if (props.autoScroll) scrollToBottom();
     else setPendingMessages((state) => state + 1);
+    updateNameSuggestions();
     if (loading) setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);

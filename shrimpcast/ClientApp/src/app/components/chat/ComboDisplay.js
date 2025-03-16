@@ -99,7 +99,7 @@ const ComboDisplay = ({ combo, emotes, setMessage }) => {
           src={emote.url}
           alt={emote.name}
           style={{
-            height: "30px",
+            height: "40px",
             animation:
               comboLevel === "unique" ? "spin 2s linear infinite" : "none",
             transition: "transform 0.3s",
