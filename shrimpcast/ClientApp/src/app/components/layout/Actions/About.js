@@ -9,7 +9,6 @@ import {
   Typography,
   Link,
   Grid,
-  Avatar,
   Button,
   Snackbar,
   Alert,
@@ -17,7 +16,6 @@ import {
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import EmailIcon from "@mui/icons-material/Email";
-import ChatIcon from "@mui/icons-material/Chat";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 const About = (props) => {
@@ -25,8 +23,6 @@ const About = (props) => {
   const [showCopyToast, setShowCopyToast] = useState(false);
 
   const emailAddress = "l29utp0@pm.me";
-  const sessionAddress =
-    "05fd1be0e9b6fd21954b1948442ba8f0382940aef9e4b5dc5da4f91635f8d05d0a";
 
   const setClosed = () => setOpen(false);
   const setOpened = () => setOpen(true);
@@ -142,6 +138,9 @@ const About = (props) => {
                   "adicionar ao ecrã principal", etc.
                 </Typography>
                 <Typography variant="body1" paragraph>
+                  Todas as mensagens do chat desaparecem passadas 24 horas.
+                </Typography>
+                <Typography variant="body1" paragraph>
                   Regras:
                 </Typography>
                 <ul>
@@ -218,13 +217,6 @@ const About = (props) => {
                   text={emailAddress}
                   type="Email"
                   tooltip="Email"
-                />
-
-                <ContactBox
-                  icon={ChatIcon}
-                  text={sessionAddress}
-                  type="endereço Session"
-                  tooltip="Endereço Session"
                 />
 
                 <Typography

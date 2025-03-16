@@ -7,140 +7,215 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import SignalRManager from "../../managers/SignalRManager";
 import LocalStorageManager from "../../managers/LocalStorageManager";
 import ChatActionsManager from "../../managers/ChatActionsManager";
+import ComboDisplay from "./ComboDisplay";
 
 const ChatMessagesSx = (
-    activePoll,
-    activeBingo,
-    bingoButtonExpanded,
-    showGoldenPassButton,
-  ) => ({
-    width: "100%",
-    height: `calc(100% - 56px - 28px${activePoll ? " - 35px" : ""}${
-      activeBingo ? ` - ${bingoButtonExpanded ? 35 : 10}px` : ""
-    }${showGoldenPassButton ? " - 20px" : ""})`,
-    overflowY: "scroll",
-  }),
-  Loader = {
-    width: "50px",
-    top: "50%",
-    left: "50%",
-    position: "relative",
-    transform: "translate(-50%, -50%)",
-    webkitTransform: "translate(-50%, -50%);",
-  },
-  NewMessagesToastSx = {
-    borderRadius: "2.5px",
-    position: "sticky",
-    width: "100%",
-    textAlign: "center",
-    maxHeight: "28px",
-    height: "25px",
-    display: "flex",
-    justifyContent: "center",
-    overflow: "hidden",
-    bottom: "0",
-  };
+  activePoll,
+  activeBingo,
+  bingoButtonExpanded,
+  showGoldenPassButton,
+) => ({
+  width: "100%",
+  height: `calc(100% - 56px - 28px${activePoll ? " - 35px" : ""}${
+    activeBingo ? ` - ${bingoButtonExpanded ? 35 : 10}px` : ""
+  }${showGoldenPassButton ? " - 20px" : ""})`,
+  overflowY: "scroll",
+});
+
+const Loader = {
+  width: "50px",
+  top: "50%",
+  left: "50%",
+  position: "relative",
+  transform: "translate(-50%, -50%)",
+  webkitTransform: "translate(-50%, -50%);",
+};
+
+const NewMessagesToastSx = {
+  borderRadius: "2.5px",
+  position: "sticky",
+  width: "100%",
+  textAlign: "center",
+  maxHeight: "28px",
+  height: "25px",
+  display: "flex",
+  justifyContent: "center",
+  overflow: "hidden",
+  bottom: "0",
+};
 
 const RenderChatMessages = (props) => {
-  const [messages, setMessages] = useState([]),
-    [pendingMessages, setPendingMessages] = useState(0),
-    [loading, setLoading] = useState(true),
-    {
-      signalR,
-      configuration,
-      bingoButtonExpanded,
-      isAdmin,
-      isGolden,
-      goldenPassExpanded,
-    } = props,
-    scrollReference = useRef(),
-    scrollToBottom = () => {
-      scrollReference.current.scrollIntoView();
-      setPendingMessages(0);
-    },
-    removeMessageHandler = () =>
-      signalR.off(SignalRManager.events.messageReceived),
-    addNewMessageHandler = () =>
-      signalR.on(SignalRManager.events.messageReceived, (message) => {
-        setMessages((existingMessages) => {
-          if (
-            ChatActionsManager.IsIgnored(
-              message.sessionId,
-              null,
-              message.isAdmin || message.isMod,
-            )
-          ) {
-            return existingMessages;
-          }
+  const [messages, setMessages] = useState([]);
+  const [pendingMessages, setPendingMessages] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [currentCombo, setCurrentCombo] = useState({
+    emote: null,
+    count: 0,
+    messageIds: new Set(),
+    lastUpdate: 0,
+  });
 
-          let messageList = existingMessages;
-          if (message.messageType === "MessageRemoved") {
-            let index = messageList.findIndex(
-              (m) => m.messageId === message.messageId,
-            );
-            messageList.splice(index, 1);
-          }
+  const {
+    signalR,
+    configuration,
+    bingoButtonExpanded,
+    isAdmin,
+    isGolden,
+    goldenPassExpanded,
+  } = props;
 
-          const isBannedType = message.messageType === "UserBanned",
-            isNameChangedType = message.messageType === "NameChange",
-            isNameColourChangedType =
-              message.messageType === "UserColourChange";
-          if (isBannedType || isNameChangedType || isNameColourChangedType) {
-            messageList
-              .filter((m) => m.sessionId === message.sessionId)
-              .forEach((m) => {
-                if (isBannedType) {
-                  m.hidden = true;
-                }
-                if (isNameChangedType) {
-                  m.sentBy = message.sentBy;
-                }
-                if (isNameColourChangedType) {
-                  const { content } = message,
-                    isModAdded = content === "ModAdded",
-                    isModRemoved = content === "ModRemoved",
-                    isGoldenAdded = content === "GoldenAdded";
+  const scrollReference = useRef();
+  const comboTimeoutRef = useRef();
 
-                  if (isModAdded) m.isMod = true;
-                  else if (isModRemoved) m.isMod = false;
-                  else if (isGoldenAdded) m.isGolden = true;
-                  else m.userColorDisplay = content;
-                }
-              });
-          }
+  const scrollToBottom = () => {
+    scrollReference.current.scrollIntoView();
+    setPendingMessages(0);
+  };
 
-          if (message.content && !isNameColourChangedType) {
-            message.useTransition = true;
-            messageList = messageList.concat(message);
-          } else {
-            messageList = messageList.concat({ hidden: true });
-          }
+  const handleNewMessage = (message) => {
+    setMessages((existingMessages) => {
+      if (
+        ChatActionsManager.IsIgnored(
+          message.sessionId,
+          null,
+          message.isAdmin || message.isMod,
+        )
+      ) {
+        return existingMessages;
+      }
 
-          /**
-           * Clean excess messages
-           */
-          const maxItems = configuration.maxMessagesToShow;
-          if (messageList.length > maxItems) {
-            const excessItemsCount = messageList.length - maxItems;
-            messageList.splice(0, excessItemsCount);
-          }
+      let messageList = existingMessages;
+      if (message.messageType === "MessageRemoved") {
+        let index = messageList.findIndex(
+          (m) => m.messageId === message.messageId,
+        );
+        messageList.splice(index, 1);
+      }
 
-          return messageList;
+      const isBannedType = message.messageType === "UserBanned";
+      const isNameChangedType = message.messageType === "NameChange";
+      const isNameColourChangedType =
+        message.messageType === "UserColourChange";
+
+      if (isBannedType || isNameChangedType || isNameColourChangedType) {
+        messageList
+          .filter((m) => m.sessionId === message.sessionId)
+          .forEach((m) => {
+            if (isBannedType) {
+              m.hidden = true;
+            }
+            if (isNameChangedType) {
+              m.sentBy = message.sentBy;
+            }
+            if (isNameColourChangedType) {
+              const { content } = message;
+              const isModAdded = content === "ModAdded";
+              const isModRemoved = content === "ModRemoved";
+              const isGoldenAdded = content === "GoldenAdded";
+
+              if (isModAdded) m.isMod = true;
+              else if (isModRemoved) m.isMod = false;
+              else if (isGoldenAdded) m.isGolden = true;
+              else m.userColorDisplay = content;
+            }
+          });
+      }
+
+      // Check for emote combos
+      if (message.messageType === "UserMessage" && message.content) {
+        // First split by spaces to handle spaced emotes
+        const spaceSplit = message.content.trim().split(/\s+/);
+
+        // For each space-separated part, check if it's multiple joined emotes
+        const allEmotes = spaceSplit.flatMap((part) => {
+          // Find all emote matches in this part (handles cases with no spaces between emotes)
+          const matches = props.emotes
+            .map((emote) => emote.name)
+            .reduce((acc, emoteName) => {
+              const regex = new RegExp(emoteName, "g");
+              const matches = part.match(regex) || [];
+              return [...acc, ...matches];
+            }, []);
+
+          return matches;
         });
-      }),
-    updateNameSuggestions = () =>
-      props.setNameSuggestions((existingSuggestions) => {
-        const newSuggestions = [
-          ...new Set(messages.map((message) => message.sentBy).filter(Boolean)),
-        ];
-        if (existingSuggestions.length !== newSuggestions.length)
-          return newSuggestions;
-        for (let i = 0; i < existingSuggestions.length; i++) {
-          if (existingSuggestions[i] !== newSuggestions[i])
-            return newSuggestions;
+
+        // Get unique emotes
+        const uniqueEmotes = [...new Set(allEmotes)];
+
+        // If there's exactly one unique emote type
+        if (uniqueEmotes.length === 1) {
+          const emote = uniqueEmotes[0];
+
+          // Clear existing combo timeout
+          if (comboTimeoutRef.current) {
+            clearTimeout(comboTimeoutRef.current);
+          }
+
+          setCurrentCombo((prev) => {
+            if (prev.emote === emote && Date.now() - prev.lastUpdate < 20000) {
+              prev.messageIds.add(message.messageId);
+              return {
+                emote,
+                count: prev.count + 1,
+                messageIds: prev.messageIds,
+                lastUpdate: Date.now(),
+              };
+            }
+
+            return {
+              emote,
+              count: 1,
+              messageIds: new Set([message.messageId]),
+              lastUpdate: Date.now(),
+            };
+          });
+
+          // Set new timeout to reset combo
+          comboTimeoutRef.current = setTimeout(() => {
+            setCurrentCombo({
+              emote: null,
+              count: 0,
+              messageIds: new Set(),
+              lastUpdate: 0,
+            });
+          }, 10000);
+        } else {
+          // Reset combo on non-emote messages
+          setCurrentCombo({
+            emote: null,
+            count: 0,
+            messageIds: new Set(),
+            lastUpdate: 0,
+          });
         }
-        return existingSuggestions;
-      });
+      }
+
+      if (message.content && !isNameColourChangedType) {
+        message.useTransition = true;
+        messageList = messageList.concat(message);
+      } else {
+        messageList = messageList.concat({ hidden: true });
+      }
+
+      /**
+       * Clean excess messages
+       */
+      const maxItems = configuration.maxMessagesToShow;
+      if (messageList.length > maxItems) {
+        const excessItemsCount = messageList.length - maxItems;
+        messageList.splice(0, excessItemsCount);
+      }
+
+      return messageList;
+    });
+  };
+
+  const removeMessageHandler = () =>
+    signalR.off(SignalRManager.events.messageReceived);
+
+  const addNewMessageHandler = () =>
+    signalR.on(SignalRManager.events.messageReceived, handleNewMessage);
 
   /** Get the initial messages */
   useEffect(() => {
@@ -171,7 +246,13 @@ const RenderChatMessages = (props) => {
   /** Add the handlers */
   useEffect(() => {
     addNewMessageHandler();
-    return () => removeMessageHandler();
+    return () => {
+      removeMessageHandler();
+      // Clear any existing combo timeout
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current);
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration.maxMessagesToShow]);
 
@@ -182,7 +263,6 @@ const RenderChatMessages = (props) => {
     if (!lastMessage) return;
     if (props.autoScroll) scrollToBottom();
     else setPendingMessages((state) => state + 1);
-    updateNameSuggestions();
     if (loading) setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
@@ -226,6 +306,7 @@ const RenderChatMessages = (props) => {
               enableHalloweenTheme={configuration.enableHalloweenTheme}
               userSessionId={props.sessionId}
               maxLengthTruncation={configuration.maxLengthTruncation}
+              isComboMessage={currentCombo.messageIds.has(message.messageId)}
               {...message}
             />
           )),
@@ -242,6 +323,12 @@ const RenderChatMessages = (props) => {
           {pendingMessages} mensagens novas
         </Button>
       )}
+      <ComboDisplay
+        combo={currentCombo}
+        emotes={props.emotes}
+        setMessage={props.setMessage}
+        inputRef={props.inputRef}
+      />
     </Box>
   );
 };

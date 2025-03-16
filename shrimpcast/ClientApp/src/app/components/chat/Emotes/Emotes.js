@@ -19,7 +19,14 @@ const EmotesWrapperSx = {
 
 const Emotes = (props) => {
   const handleClose = () => props.setEmotes(false),
-    emoteClick = (emote) => props.setMessage((message) => message + emote);
+    emoteClick = (emote) => {
+      props.setMessage((message) => message + emote);
+      handleClose();
+      // Focus the chat input after adding the emote
+      if (props.inputRef?.current) {
+        props.inputRef.current.focus();
+      }
+    };
 
   return (
     <ClickAwayListener onClickAway={handleClose}>
@@ -27,7 +34,11 @@ const Emotes = (props) => {
         <Box sx={EmotesSx}>
           {props.emotes.map((emote) => (
             <IconButton onClick={() => emoteClick(emote.name)} key={emote.name}>
-              <Avatar alt={emote.alt} sx={{ borderRadius: "0px", width: "30px", height: "30px" }} src={emote.url} />
+              <Avatar
+                alt={emote.alt}
+                sx={{ borderRadius: "0px", width: "30px", height: "30px" }}
+                src={emote.url}
+              />
             </IconButton>
           ))}
         </Box>
