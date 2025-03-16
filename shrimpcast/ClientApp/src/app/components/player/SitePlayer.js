@@ -1,10 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import { useRef, useState, useEffect } from "react";
 import ReactPlayer from "react-player";
-import VideoJSPlayer from "./players/VideoJSPlayer";
-import XGPlayer from "./players/XGPlayer";
+import XGPlayer from "./XGPlayer";
 import PickSource from "../layout/Actions/Sources/PickSource";
-import Danmaku from "./players/Danmaku";
+import Danmaku from "./Danmaku";
 import { useLocation } from "react-router-dom";
 
 const WrapperSx = {
@@ -21,29 +20,9 @@ const SitePlayer = (props) => {
   const previousPath = useRef(location.pathname);
   const { streamStatus } = props,
     { source, streamEnabled, mustPickStream } = streamStatus,
-    { useRTCEmbed, useLegacyPlayer } = source,
-    url = source.url || "",
-    video = useRef(),
-    videoJsOptions = {
-      vhs: {
-        llhls: true,
-        experimentalBufferBasedABR: true,
-      },
-      autoplay: "muted",
-      controls: true,
-      liveui: true,
-      fill: true,
-      playsinline: true,
-      retryOnError: true,
-      poster:
-        "https://stream-eu.bfcdn.host/thumb/app/031304855496+miau/thumb.jpg",
-      sources: [
-        {
-          src: url,
-          type: "application/x-mpegURL",
-        },
-      ],
-    },
+    { useRTCEmbed, useLegacyPlayer } = source;
+  let url = source.url || "";
+  const video = useRef(),
     isHLS = url.endsWith(".m3u8"),
     forceM3U8 = isHLS && !window.MediaSource,
     [muted, setMuted] = useState(false),
@@ -57,8 +36,7 @@ const SitePlayer = (props) => {
     };
 
   if (isHLS && forceM3U8) {
-    videoJsOptions.sources[0].src =
-      url.substr(0, url.lastIndexOf(".")) + ".m3u8";
+    url = url.substr(0, url.lastIndexOf(".")) + ".m3u8";
     console.log("Forcing M3U8 because FLV is not supported.");
   }
 
@@ -112,7 +90,7 @@ const SitePlayer = (props) => {
         </>
       ) : !useLegacyPlayer ? (
         <>
-          <VideoJSPlayer options={videoJsOptions} />
+          <XGPlayer url={url} />
           <Danmaku messages={messages} emotes={props.emotes} isActive={true} />
         </>
       ) : (
