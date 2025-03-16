@@ -5,10 +5,12 @@ import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import LocalStorageManager from "../../../managers/LocalStorageManager";
 import reactStringReplace from "react-string-replace";
 import DeleteIcon from "@mui/icons-material/Delete";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ChatActionsManager from "../../../managers/ChatActionsManager";
 import ManageUserDialog from "../ManageUserDialog";
 import ConfirmDialog from "../../others/ConfirmDialog";
 import MessageWrapper from "./MessageWrapper";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 const WrapperTextBoxSx = {
     margin: "5px",
@@ -61,35 +63,102 @@ const WrapperTextBoxSx = {
     marginRight: "2px",
   };
 
+// Define a new style for internal links
+const InternalLinkSx = {
+  fontWeight: "bold",
+  color: "secondary.main",
+  display: "inline-flex",
+  alignItems: "center",
+  textDecoration: "none",
+  "&:hover": {
+    textDecoration: "underline",
+  },
+};
+
+const InternalLinkIconSx = {
+  fontSize: "10px",
+  color: "secondary.main",
+};
+
 const UserMessage = React.memo((props) => {
-  const [showPromptDialog, setShowPromptDialog] = useState(false),
-    openConfirmPrompt = () => setShowPromptDialog(true),
-    closeConfirmPrompt = () => setShowPromptDialog(false),
-    { isAdmin, isMod, isGolden, maxLengthTruncation } = props,
-    escapedName = LocalStorageManager.getName().replace(
-      /[.*+?^${}()|[\]\\]/g,
-      "\\$&",
-    ),
-    // Use lookahead assertion to ensure we're matching the full name
-    nameRegex = `@${escapedName}(?:\\s|$|\\.)`,
-    emotes = props.emotes.map((emote) => emote.name).join("|"),
-    urlRegex = "https?://\\S+",
-    regex = new RegExp(`(${nameRegex}|${emotes}|${urlRegex})`, "giu"),
-    removeMessage = async () => {
-      let resp = await ChatActionsManager.RemoveMessage(
-        props.signalR,
-        props.messageId,
+  const navigate = useNavigate();
+  const [showPromptDialog, setShowPromptDialog] = useState(false);
+  const openConfirmPrompt = () => setShowPromptDialog(true);
+  const closeConfirmPrompt = () => setShowPromptDialog(false);
+  const { isAdmin, isMod, isGolden, maxLengthTruncation } = props;
+
+  // Function to determine if a URL is from your own domain
+  const isOwnDomainUrl = (url) => {
+    try {
+      const urlObj = new URL(url);
+      // Check if it's your domain - adjust to match your actual domain
+      return (
+        urlObj.hostname === "miau.gg" ||
+        urlObj.hostname === window.location.hostname
       );
-      if (resp) closeConfirmPrompt();
-    },
-    [isMiniminized, setMinimized] = useState(!isAdmin),
-    openMinimized = () => setMinimized(false),
-    content =
-      props.content.length > maxLengthTruncation && isMiniminized
-        ? props.content.substring(0, maxLengthTruncation)
-        : props.content,
-    getEmote = (emoteName) =>
-      props.emotes.find((emote) => emote.name === emoteName);
+    } catch (e) {
+      return false;
+    }
+  };
+
+  // Function to extract the path from a URL
+  const getPathFromUrl = (url) => {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.pathname;
+    } catch (e) {
+      return url;
+    }
+  };
+
+  // Function to extract the path from a URL and remove the leading slash
+  const formatInternalLink = (url) => {
+    try {
+      const urlObj = new URL(url);
+      // Remove the leading slash from the path
+      return urlObj.pathname.replace(/^\//, "");
+    } catch (e) {
+      // For invalid URLs or if there's an error, return just the string without leading slash
+      return url.replace(/^\//, "");
+    }
+  };
+
+  // Handle click on internal links
+  const handleInternalLinkClick = (e, path) => {
+    e.preventDefault();
+    navigate(path);
+  };
+
+  const escapedName = LocalStorageManager.getName().replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&",
+  );
+  // Use lookahead assertion to ensure we're matching the full name
+  const nameRegex = `@${escapedName}(?:\\s|$|\\.)`;
+  const emotes = props.emotes.map((emote) => emote.name).join("|");
+  const urlRegex = "https?://\\S+";
+  const slashCommandRegex = "\\/[a-zA-Z0-9_-]+";
+  const regex = new RegExp(
+    `(${nameRegex}|${emotes}|${urlRegex}|${slashCommandRegex})`,
+    "giu",
+  );
+
+  const removeMessage = async () => {
+    let resp = await ChatActionsManager.RemoveMessage(
+      props.signalR,
+      props.messageId,
+    );
+    if (resp) closeConfirmPrompt();
+  };
+
+  const [isMiniminized, setMinimized] = useState(!isAdmin);
+  const openMinimized = () => setMinimized(false);
+  const content =
+    props.content.length > maxLengthTruncation && isMiniminized
+      ? props.content.substring(0, maxLengthTruncation)
+      : props.content;
+  const getEmote = (emoteName) =>
+    props.emotes.find((emote) => emote.name === emoteName);
 
   return (
     <MessageWrapper useTransition={props.useTransition}>
@@ -133,29 +202,66 @@ const UserMessage = React.memo((props) => {
           component="span"
           sx={TextSx(null, false, content.startsWith(">"))}
         >
-          {reactStringReplace(content, regex, (match, i) =>
-            getEmote(match.toLowerCase()) ? (
-              <img
-                key={i}
-                alt={match.toLowerCase()}
-                className="emote"
-                src={getEmote(match.toLowerCase()).url}
-              />
-            ) : match.match(urlRegex) ? (
-              <Link key={i} href={match} target="_blank">
-                {match}
-              </Link>
-            ) : (
-              <Typography key={i} component="span" sx={HighlightSx}>
-                {match}
-              </Typography>
-            ),
-          )}
+          {reactStringReplace(content, regex, (match, i) => {
+            if (getEmote(match.toLowerCase())) {
+              return (
+                <img
+                  key={i}
+                  alt={match.toLowerCase()}
+                  className="emote"
+                  src={getEmote(match.toLowerCase()).url}
+                />
+              );
+            } else if (match.match(urlRegex)) {
+              // Handle URLs first
+              return isOwnDomainUrl(match) ? (
+                <RouterLink
+                  key={i}
+                  to={getPathFromUrl(match)}
+                  onClick={(e) =>
+                    handleInternalLinkClick(e, getPathFromUrl(match))
+                  }
+                  style={{ textDecoration: "none" }}
+                >
+                  <Box component="span" sx={InternalLinkSx}>
+                    <PlayArrowIcon sx={InternalLinkIconSx} />
+                    {formatInternalLink(match)}
+                  </Box>
+                </RouterLink>
+              ) : (
+                <Link key={i} href={match} target="_blank">
+                  {match}
+                </Link>
+              );
+            } else if (match.match(/^\/[a-zA-Z0-9_-]+$/)) {
+              // Only handle exact slash commands
+              const path = match.substring(1); // Remove the leading slash
+              return (
+                <RouterLink
+                  key={i}
+                  to={`/${path}`}
+                  onClick={(e) => handleInternalLinkClick(e, `/${path}`)}
+                  style={{ textDecoration: "none" }}
+                >
+                  <Box component="span" sx={InternalLinkSx}>
+                    <PlayArrowIcon sx={InternalLinkIconSx} />
+                    {path}
+                  </Box>
+                </RouterLink>
+              );
+            } else {
+              return (
+                <Typography key={i} component="span" sx={HighlightSx}>
+                  {match}
+                </Typography>
+              );
+            }
+          })}
           {isMiniminized && props.content.length > maxLengthTruncation && (
             <Link
               component="button"
               sx={{ color: "secondary.500", ml: "2.5px" }}
-              title="Click to expand"
+              title="Expandir"
               onClick={openMinimized}
             >
               {" [+]"}
