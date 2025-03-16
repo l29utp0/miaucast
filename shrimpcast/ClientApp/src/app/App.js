@@ -42,11 +42,14 @@ const App = () => {
         ...state,
         ...updatedData,
         // Refresh this property in case the server updates in real time
-        FRONTEND_NEEDS_UPDATE: process.env.REACT_APP_VERSION !== updatedData.version,
+        FRONTEND_NEEDS_UPDATE:
+          process.env.REACT_APP_VERSION !== updatedData.version,
       }));
     };
 
-    connection.onclose(() => !disconnectMessage && setSignalR({ errorAtLoad: true }));
+    connection.onclose(
+      () => !disconnectMessage && setSignalR({ errorAtLoad: true }),
+    );
     connection.onreconnecting(() => updateConnectionStatus());
     connection.onreconnected(() => {
       updateConnectionStatus();
@@ -62,35 +65,35 @@ const App = () => {
       setConnectionDataState((state) => ({
         ...state,
         configuration,
-      }))
+      })),
     );
 
     connection.on(SignalRManager.events.modStatusUpdate, (isMod) =>
       setConnectionDataState((state) => ({
         ...state,
         isMod,
-      }))
+      })),
     );
 
     connection.on(SignalRManager.events.goldStatusUpdate, (isGolden) =>
       setConnectionDataState((state) => ({
         ...state,
         isGolden,
-      }))
+      })),
     );
 
     connection.on(SignalRManager.events.emoteAdded, (emote) =>
       setConnectionDataState((state) => ({
         ...state,
         emotes: state.emotes.concat(emote),
-      }))
+      })),
     );
 
     connection.on(SignalRManager.events.emoteRemoved, (emoteId) =>
       setConnectionDataState((state) => ({
         ...state,
         emotes: state.emotes.filter((emote) => emote.emoteId !== emoteId),
-      }))
+      })),
     );
 
     updateConnectionStatus();
@@ -99,13 +102,16 @@ const App = () => {
   useEffect(() => {
     const connectSignalR = async (abortControllerSignal) => {
       if (!loading) return;
-      const response = await TokenManager.EnsureTokenExists(abortControllerSignal);
+      const response = await TokenManager.EnsureTokenExists(
+        abortControllerSignal,
+      );
       if (abortControllerSignal.aborted) return;
 
       setConnectionDataState((state) => ({
         ...state,
         ...response,
-        FRONTEND_NEEDS_UPDATE: process.env.REACT_APP_VERSION !== response.version,
+        FRONTEND_NEEDS_UPDATE:
+          process.env.REACT_APP_VERSION !== response.version,
       }));
 
       if (response.message) {
@@ -145,13 +151,15 @@ const App = () => {
           <Layout signalR={signalR} {...connectionDataState} />
         </ErrorBoundary>
       )}
-      {connectionDataState?.version && connectionDataState?.FRONTEND_NEEDS_UPDATE && (
-        <Snackbar open={true}>
-          <Alert severity={"error"} variant="filled" sx={{ width: "100%" }}>
-            Estás a usar uma versão antiga. Por favor faz ctrl+f5 ou limpa o cache e refresca a página.
-          </Alert>
-        </Snackbar>
-      )}
+      {connectionDataState?.version &&
+        connectionDataState?.FRONTEND_NEEDS_UPDATE && (
+          <Snackbar open={true}>
+            <Alert severity={"error"} variant="filled" sx={{ width: "100%" }}>
+              Estás a usar uma versão antiga. Por favor faz ctrl+f5 ou limpa o
+              cache e refresca a página.
+            </Alert>
+          </Snackbar>
+        )}
     </ThemeProvider>
   );
 };

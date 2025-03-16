@@ -9,7 +9,9 @@ class MessageManager {
     return response?.data || [];
   }
   static async NewMessage(signalR, message) {
-    const response = await signalR.invoke("NewMessage", message).catch((ex) => console.log(ex));
+    const response = await signalR
+      .invoke("NewMessage", message)
+      .catch((ex) => console.log(ex));
     return response;
   }
 }

@@ -123,23 +123,22 @@ const Layout = (props) => {
             setFullChatMode={setFullChatMode}
           />
         </Grid>
-        {!useFullChatMode && (
-          <Grid
-            xs={12}
-            md={8}
-            lg={9}
-            xl={10}
-            sx={PlayerBoxSx(theme)}
-            className={"scrollbar-custom"}
-          >
-            <Box sx={PlayerContainerSx}>
-              <SitePlayer streamStatus={streamStatus} {...props} />
-            </Box>
-            <Box sx={SiteDetailsSx}>
-              <SiteDetails {...props} streamStatus={streamStatus} />
-            </Box>
-          </Grid>
-        )}
+        <Grid
+          xs={12}
+          md={8}
+          lg={9}
+          xl={10}
+          sx={PlayerBoxSx(theme)}
+          className={"scrollbar-custom"}
+          style={{ display: useFullChatMode ? "none" : "flex" }} // Use style to hide instead of removing
+        >
+          <Box sx={PlayerContainerSx}>
+            <SitePlayer streamStatus={streamStatus} {...props} />
+          </Box>
+          <Box sx={SiteDetailsSx}>
+            <SiteDetails {...props} streamStatus={streamStatus} />
+          </Box>
+        </Grid>
         <Grid
           xs={12}
           md={useFullChatMode ? 12 : 4}

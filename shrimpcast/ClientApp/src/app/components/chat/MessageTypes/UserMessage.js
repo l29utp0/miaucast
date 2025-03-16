@@ -63,7 +63,6 @@ const WrapperTextBoxSx = {
     marginRight: "2px",
   };
 
-// Define a new style for internal links
 const InternalLinkSx = {
   fontWeight: "bold",
   color: "secondary.main",
@@ -87,11 +86,9 @@ const UserMessage = React.memo((props) => {
   const closeConfirmPrompt = () => setShowPromptDialog(false);
   const { isAdmin, isMod, isGolden, maxLengthTruncation } = props;
 
-  // Function to determine if a URL is from your own domain
   const isOwnDomainUrl = (url) => {
     try {
       const urlObj = new URL(url);
-      // Check if it's your domain - adjust to match your actual domain
       return (
         urlObj.hostname === "miau.gg" ||
         urlObj.hostname === window.location.hostname
@@ -101,7 +98,6 @@ const UserMessage = React.memo((props) => {
     }
   };
 
-  // Function to extract the path from a URL
   const getPathFromUrl = (url) => {
     try {
       const urlObj = new URL(url);
@@ -111,19 +107,15 @@ const UserMessage = React.memo((props) => {
     }
   };
 
-  // Function to extract the path from a URL and remove the leading slash
   const formatInternalLink = (url) => {
     try {
       const urlObj = new URL(url);
-      // Remove the leading slash from the path
       return urlObj.pathname.replace(/^\//, "");
     } catch (e) {
-      // For invalid URLs or if there's an error, return just the string without leading slash
       return url.replace(/^\//, "");
     }
   };
 
-  // Handle click on internal links
   const handleInternalLinkClick = (e, path) => {
     e.preventDefault();
     navigate(path);
@@ -133,11 +125,10 @@ const UserMessage = React.memo((props) => {
     /[.*+?^${}()|[\]\\]/g,
     "\\$&",
   );
-  // Use lookahead assertion to ensure we're matching the full name
   const nameRegex = `@${escapedName}(?:\\s|$|\\.)`;
   const emotes = props.emotes.map((emote) => emote.name).join("|");
   const urlRegex = "https?://\\S+";
-  const slashCommandRegex = "\\/[a-zA-Z0-9_-]+";
+  const slashCommandRegex = "(?:^|\\s)\\/[a-zA-Z0-9_-]+(?:\\s|$)";
   const regex = new RegExp(
     `(${nameRegex}|${emotes}|${urlRegex}|${slashCommandRegex})`,
     "giu",
@@ -162,7 +153,10 @@ const UserMessage = React.memo((props) => {
 
   return (
     <MessageWrapper useTransition={props.useTransition}>
-      <Box className="wrapper-comment" sx={WrapperTextBoxSx}>
+      <Box
+        className={`wrapper-comment ${props.isComboMessage ? "combo-message" : ""}`}
+        sx={WrapperTextBoxSx}
+      >
         <Box className="wrapper-overlay" sx={OverlaySx}>
           <ManageUserDialog OverlayButtonSx={OverlayButtonSx} {...props} />
           {props.siteAdmin && (
@@ -203,17 +197,21 @@ const UserMessage = React.memo((props) => {
           sx={TextSx(null, false, content.startsWith(">"))}
         >
           {reactStringReplace(content, regex, (match, i) => {
-            if (getEmote(match.toLowerCase())) {
+            // First check for emotes
+            const emote = getEmote(match.toLowerCase());
+            if (emote) {
               return (
                 <img
                   key={i}
                   alt={match.toLowerCase()}
-                  className="emote"
-                  src={getEmote(match.toLowerCase()).url}
+                  className={`emote ${props.isComboMessage ? "combo-emote" : ""}`}
+                  src={emote.url}
                 />
               );
-            } else if (match.match(urlRegex)) {
-              // Handle URLs first
+            }
+
+            // Then check for URLs
+            if (match.match(/^https?:\/\//i)) {
               return isOwnDomainUrl(match) ? (
                 <RouterLink
                   key={i}
@@ -233,9 +231,11 @@ const UserMessage = React.memo((props) => {
                   {match}
                 </Link>
               );
-            } else if (match.match(/^\/[a-zA-Z0-9_-]+$/)) {
-              // Only handle exact slash commands
-              const path = match.substring(1); // Remove the leading slash
+            }
+
+            // Check for slash commands
+            if (match.trim().match(/^\/[a-zA-Z0-9_-]+$/)) {
+              const path = match.trim().substring(1);
               return (
                 <RouterLink
                   key={i}
@@ -249,13 +249,14 @@ const UserMessage = React.memo((props) => {
                   </Box>
                 </RouterLink>
               );
-            } else {
-              return (
-                <Typography key={i} component="span" sx={HighlightSx}>
-                  {match}
-                </Typography>
-              );
             }
+
+            // Handle mentions and other matches
+            return (
+              <Typography key={i} component="span" sx={HighlightSx}>
+                {match}
+              </Typography>
+            );
           })}
           {isMiniminized && props.content.length > maxLengthTruncation && (
             <Link

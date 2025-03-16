@@ -13,10 +13,11 @@ const ChatSx = {
 };
 
 const Chat = (props) => {
-  const [autoScroll, toggleAutoScroll] = useState(true),
-    [nameSuggestions, setNameSuggestions] = useState([]),
-    [bingoButtonExpanded, setBingoButtonExpanded] = useState(true),
-    [goldenPassExpanded, setGoldenPassExpanded] = useState(true);
+  const [autoScroll, toggleAutoScroll] = useState(true);
+  const [nameSuggestions, setNameSuggestions] = useState([]);
+  const [message, setMessage] = useState("");
+  const [bingoButtonExpanded, setBingoButtonExpanded] = useState(true);
+  const [goldenPassExpanded, setGoldenPassExpanded] = useState(true);
 
   return (
     <Box sx={ChatSx}>
@@ -27,6 +28,7 @@ const Chat = (props) => {
         setNameSuggestions={setNameSuggestions}
         bingoButtonExpanded={bingoButtonExpanded}
         goldenPassExpanded={goldenPassExpanded}
+        setMessage={setMessage} // Pass setMessage to RenderChatMessages
         {...props}
       />
       <ActiveBingo
@@ -38,6 +40,8 @@ const Chat = (props) => {
         autoScroll={autoScroll}
         toggleAutoScroll={toggleAutoScroll}
         nameSuggestions={nameSuggestions}
+        message={message}
+        setMessage={setMessage}
         {...props}
       />
       <GoldenPassButton
