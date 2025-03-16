@@ -68,6 +68,7 @@ const MainGridSx = {
     width: "100%",
     borderRadius: "5px",
     backgroundColor: "#121212",
+    overflow: "hidden",
   },
   SiteDetailsSx = {
     backgroundColor: "primary.900",
