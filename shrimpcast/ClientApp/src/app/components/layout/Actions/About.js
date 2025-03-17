@@ -175,7 +175,7 @@ const About = (props) => {
                     color="secondary"
                     sx={{ display: "flex", alignItems: "center", gap: 1 }}
                   >
-                    Como fazer stream
+                    Como fazer stream no /oficial
                   </Link>
 
                   <Link
