@@ -1,4 +1,11 @@
-import { Box, Button, CircularProgress, IconButton, TextField, Tooltip } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import React, { useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
@@ -38,7 +45,16 @@ const SiteTopSx = {
   };
 
 const SiteTop = (props) => {
-  const { isAdmin, isMod, isGolden, signalR, userDisplayColor, colours, useFullChatMode, setFullChatMode } = props,
+  const {
+      isAdmin,
+      isMod,
+      isGolden,
+      signalR,
+      userDisplayColor,
+      colours,
+      useFullChatMode,
+      setFullChatMode,
+    } = props,
     [registeredName, setRegisteredName] = useState(props.name),
     [newName, setNewName] = useState(registeredName),
     [editMode, setEditMode] = useState(false),
@@ -89,7 +105,11 @@ const SiteTop = (props) => {
               <IconButton
                 type="button"
                 size="small"
-                sx={{ backgroundColor: "primary.700", borderRadius: "0px", color: "primary.500" }}
+                sx={{
+                  backgroundColor: "primary.700",
+                  borderRadius: "0px",
+                  color: "primary.500",
+                }}
                 onClick={toggleFullChatMode}
               >
                 {useFullChatMode ? <CloseFullscreenIcon /> : <OpenInNew />}
@@ -109,7 +129,10 @@ const SiteTop = (props) => {
                 userDisplayColor={userDisplayColor}
                 colours={colours}
                 executeCallback={async (nameColourId) =>
-                  await ChatActionsManager.ChangeColour(props.signalR, nameColourId)
+                  await ChatActionsManager.ChangeColour(
+                    props.signalR,
+                    nameColourId,
+                  )
                 }
               />
             )}
@@ -141,7 +164,11 @@ const SiteTop = (props) => {
               size="small"
               sx={{ borderRadius: "0px" }}
             >
-              {loading ? <CircularProgress color="secondary" size={12} /> : <DoneIcon />}
+              {loading ? (
+                <CircularProgress color="secondary" size={12} />
+              ) : (
+                <DoneIcon />
+              )}
             </IconButton>
             <IconButton
               disabled={loading}

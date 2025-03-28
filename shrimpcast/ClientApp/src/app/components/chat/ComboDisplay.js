@@ -35,7 +35,7 @@ const ComboWrapper = styled(Box)(({ theme, comboLevel, isShaking }) => ({
 }));
 
 const ComboEmote = styled("img")(({ isShaking, comboLevel }) => ({
-  height: "30px",
+  height: "40px",
   animation: comboLevel === "unique" ? `${spin} 2s linear infinite` : "none",
   transition: "transform 0.3s",
   transform: isShaking ? "scale(1.1)" : "scale(1)",
