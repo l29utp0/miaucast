@@ -38,7 +38,6 @@ const XGPlayer = (props) => {
           image: "/images/poster.avif",
           muted: true,
           autoStart: true,
-          showSeekControl: true,
           hlsConfig: {
             loader: Hls.DefaultConfig.loader,
           },
