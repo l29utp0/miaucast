@@ -141,6 +141,11 @@ const About = (props) => {
                   Todas as mensagens do chat desaparecem passadas 24 horas.
                 </Typography>
                 <Typography variant="body1" paragraph>
+                  Se estiveres interessado em fazer algo diferente ou especial
+                  por aqui regularmente podes enviar-me um email que eu dou-te o
+                  teu próprio canal e endereço para stream na plataforma.
+                </Typography>
+                <Typography variant="body1" paragraph>
                   Regras:
                 </Typography>
                 <ul>
@@ -158,6 +163,11 @@ const About = (props) => {
                     <Typography variant="body1">
                       Proibido qualquer coisa que ponha em causa o normal
                       funcionamento da plataforma.
+                    </Typography>
+                  </li>
+                  <li>
+                    <Typography variant="body1">
+                      Podem pedir doações DENTRO do vosso stream, não no chat.
                     </Typography>
                   </li>
                 </ul>
