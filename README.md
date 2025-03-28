@@ -1,4 +1,4 @@
-# miauacast
+# miaucast
 
 ## Introduction
 
