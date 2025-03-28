@@ -1,10 +1,10 @@
 import React from "react";
 import Layout from "./components/Layout";
 import CssBaseline from "@mui/material/CssBaseline";
-import "@fontsource/roboto/latin-300.css";
-import "@fontsource/roboto/latin-400.css";
-import "@fontsource/roboto/latin-500.css";
-import "@fontsource/roboto/latin-700.css";
+import "@fontsource/inter/latin-300.css";
+import "@fontsource/inter/latin-400.css";
+import "@fontsource/inter/latin-500.css";
+import "@fontsource/inter/latin-700.css";
 import { ThemeProvider } from "@emotion/react";
 import { Alert, Snackbar } from "@mui/material";
 import { useState } from "react";

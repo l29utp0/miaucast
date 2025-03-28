@@ -12,7 +12,7 @@ const BlockSx = (theme) => ({
     },
   }),
   TitleSx = {
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: "Inter, sans-serif",
     fontSize: "3rem",
     fontWeight: 600,
     letterSpacing: 0.5,
@@ -22,21 +22,28 @@ const BlockSx = (theme) => ({
     },
   },
   DescriptionSx = {
-    fontFamily: "'Roboto', sans-serif",
+    fontFamily: "'Inter', sans-serif",
     fontSize: "1.1rem",
     letterSpacing: 0.25,
     lineHeight: 1.6,
   };
 
 const SiteDetails = (props) => {
-  const { enableChristmasTheme, hideStreamTitle, streamDescription, enableHalloweenTheme } = props.configuration,
+  const {
+      enableChristmasTheme,
+      hideStreamTitle,
+      streamDescription,
+      enableHalloweenTheme,
+    } = props.configuration,
     { streamEnabled, isMultistreaming, mustPickStream } = props.streamStatus,
     streamTitle = hideStreamTitle ? null : props.configuration.streamTitle,
     theme = useTheme();
 
   return (
     <Grid width="100%" container>
-      {streamEnabled && isMultistreaming && !mustPickStream && <MultistreamPrompt streamStatus={props.streamStatus} />}
+      {streamEnabled && isMultistreaming && !mustPickStream && (
+        <MultistreamPrompt streamStatus={props.streamStatus} />
+      )}
       <Grid>
         <Box sx={BlockSx(theme)}>
           <Box sx={{ wordBreak: "break-word" }}>
@@ -47,15 +54,19 @@ const SiteDetails = (props) => {
                   ? enableChristmasTheme
                     ? "santa-hat-primary"
                     : enableHalloweenTheme
-                    ? "halloween-hat-primary"
-                    : null
+                      ? "halloween-hat-primary"
+                      : null
                   : null
               }`}
               sx={TitleSx}
             >
               {streamTitle}
             </Typography>
-            <Typography className="neon-text" color="secondary.main" sx={DescriptionSx}>
+            <Typography
+              className="neon-text"
+              color="secondary.main"
+              sx={DescriptionSx}
+            >
               {streamDescription}
             </Typography>
           </Box>

@@ -175,3 +175,15 @@ html {
 .combo-milestone {
     animation: comboShake 0.5s;
 }
+
+.op-wrapper {
+    height: 100%;
+}
+
+.op-message-box {
+    display: none;
+}
+
+#player_id {
+    --op-accent-color: #ff1744;
+}

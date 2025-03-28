@@ -14,7 +14,7 @@
 .loading-spinner-cont {
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
-    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-family: "Inter", "Helvetica", "Arial", sans-serif;
     font-weight: 400;
     font-size: 1rem;
     line-height: 1.5;
@@ -30,7 +30,7 @@
 .loading-spinner {
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
-    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-family: "Inter", "Helvetica", "Arial", sans-serif;
     font-weight: 400;
     font-size: 1rem;
     line-height: 1.5;
@@ -38,7 +38,7 @@
     text-align: center;
     box-sizing: inherit;
     display: inline-block;
-    color: #00E676;
+    color: #00e676;
     animation: animation-p 1.4s linear infinite;
     margin-left: auto;
     margin-right: auto;
@@ -49,13 +49,13 @@
 .loading-spinner svg {
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
-    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-family: "Inter", "Helvetica", "Arial", sans-serif;
     font-weight: 400;
     font-size: 1rem;
     line-height: 1.5;
     letter-spacing: 0.00938em;
     text-align: center;
-    color: #00E676;
+    color: #00e676;
     box-sizing: inherit;
     display: block;
 }
@@ -63,13 +63,13 @@
 .loading-spinner svg circle {
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
-    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-family: "Inter", "Helvetica", "Arial", sans-serif;
     font-weight: 400;
     font-size: 1rem;
     line-height: 1.5;
     letter-spacing: 0.00938em;
     text-align: center;
-    color: #00E676;
+    color: #00e676;
     fill: none;
     stroke-width: 3.6;
     box-sizing: inherit;
@@ -85,12 +85,12 @@
     text-align: center;
     box-sizing: inherit;
     margin: 0;
-    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-family: "Inter", "Helvetica", "Arial", sans-serif;
     font-size: 0.75rem;
     letter-spacing: 0.08333em;
     text-transform: uppercase;
     display: block;
-    color: #00E676;
+    color: #00e676;
     line-height: 1.5;
     font-weight: bold;
 }
@@ -101,11 +101,11 @@
     text-align: center;
     box-sizing: inherit;
     margin: 0;
-    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-family: "Inter", "Helvetica", "Arial", sans-serif;
     line-height: 1.66;
     letter-spacing: 0.03333em;
     display: block;
-    color: #00E676;
+    color: #00e676;
     font-size: 10px;
     text-transform: uppercase;
     font-weight: bold;
