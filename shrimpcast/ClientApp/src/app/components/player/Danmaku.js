@@ -9,9 +9,8 @@ import React, {
 const COMMENT_STYLES = {
   base: {
     position: "absolute",
-    fontWeight: "bold",
     fontSize: "24px",
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: "Inter, sans-serif",
     textShadow: "2px 2px 4px rgba(0, 0, 0, 0.8)",
     whiteSpace: "nowrap",
     zIndex: "999",
