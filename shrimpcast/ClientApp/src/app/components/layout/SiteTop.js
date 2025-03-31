@@ -44,6 +44,19 @@ const SiteTopSx = {
     marginTop: "2.5px",
   };
 
+const isValidName = (name) => {
+  // Check length
+  if (name.length > 15) return false;
+
+  // Check for emojis using regex
+  const emojiRegex = /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu;
+  if (emojiRegex.test(name)) return false;
+
+  // Only allow letters, numbers, and basic punctuation
+  const validCharRegex = /^[a-zA-Z0-9._-]+$/;
+  return validCharRegex.test(name);
+};
+
 const SiteTop = (props) => {
   const {
       isAdmin,
@@ -59,11 +72,21 @@ const SiteTop = (props) => {
     [newName, setNewName] = useState(registeredName),
     [editMode, setEditMode] = useState(false),
     [loading, setLoading] = useState(false),
+    [errorMessage, setErrorMessage] = useState(""),
     submitEditMode = async () => {
       let trimmedName = newName.trim();
+
+      setErrorMessage("");
+
       if (!trimmedName || trimmedName === registeredName) {
         return;
       }
+
+      if (!isValidName(trimmedName)) {
+        setErrorMessage("Usa apenas letras e números (máx. 15 caracteres)");
+        return;
+      }
+
       setLoading(true);
       let changedName = await TokenManager.ChangeName(signalR, trimmedName);
       setLoading(false);
@@ -80,6 +103,7 @@ const SiteTop = (props) => {
     closeEditMode = () => {
       setNewName(registeredName);
       setEditMode(false);
+      setErrorMessage("");
     },
     changeInput = (e) => setNewName(e.target.value),
     handleKeys = async (e) => {
@@ -139,7 +163,7 @@ const SiteTop = (props) => {
           </>
         ) : (
           <>
-            <Box width="calc(100% - 68px)">
+            <Box width="calc(100% - 68px)" position="relative">
               <TextField
                 hiddenLabel
                 size="small"
@@ -148,7 +172,21 @@ const SiteTop = (props) => {
                   style: {
                     height: "17px",
                   },
-                  maxLength: 32,
+                  maxLength: 15,
+                }}
+                error={Boolean(errorMessage)}
+                helperText={errorMessage}
+                FormHelperTextProps={{
+                  style: {
+                    position: "absolute",
+                    bottom: "-24px",
+                    color: "#f44336",
+                    backgroundColor: "rgba(0,0,0,0.8)",
+                    padding: "0 4px",
+                    borderRadius: "4px",
+                    fontSize: "0.7rem",
+                    zIndex: 10,
+                  },
                 }}
                 onInput={changeInput}
                 onKeyDown={handleKeys}

@@ -24,6 +24,8 @@ namespace shrimpcast.Entities.DB
 
         public required bool StreamEnabled { get; set; }
 
+        public required bool GoHomeOnStreamSwitch { get; set; }
+
         public List<Source> Sources { get; set; } = [];
 
         public required string StreamTitle { get; set; }
@@ -207,7 +209,8 @@ namespace shrimpcast.Entities.DB
                     name = "Stream",
                     values = new object[]
                     {
-                        new { name = nameof(config.StreamEnabled).ToLower(), label = "Enable stream", value = config.StreamEnabled },
+                        new { name = nameof(config.StreamEnabled).ToLower(), label = "Ligar stream", value = config.StreamEnabled },
+                        new { name = nameof(config.GoHomeOnStreamSwitch).ToLower(), label = "Navegar para casa ou menu multistream", value = config.GoHomeOnStreamSwitch },
                         new
                         {
                             name = nameof(config.Sources).ToLower(),
