@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace shrimpcast.Entities.DB
@@ -23,8 +21,6 @@ namespace shrimpcast.Entities.DB
         public required bool HideStreamTitle { get; set; }
 
         public required bool StreamEnabled { get; set; }
-
-        public required bool GoHomeOnStreamSwitch { get; set; }
 
         public List<Source> Sources { get; set; } = [];
 
@@ -167,6 +163,24 @@ namespace shrimpcast.Entities.DB
 
         public required bool EnableHalloweenTheme { get; set; }
 
+        public required bool EnableStripe { get; set; }
+
+        public required bool EnableBTCServer { get; set; }
+
+        [JsonIgnore]
+        public string? StripeSecretKey { get; set; } = string.Empty;
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [NotMapped]
+        public string? StripeSecretKeyNotMapped { get; set; }
+
+        [JsonIgnore]
+        public string? StripeWebhookSecret { get; set; } = string.Empty;
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [NotMapped]
+        public string? StripeWebhookSecretNotMapped { get; set; }
+
         public object Clone() => MemberwiseClone();
     }
 
@@ -210,7 +224,6 @@ namespace shrimpcast.Entities.DB
                     values = new object[]
                     {
                         new { name = nameof(config.StreamEnabled).ToLower(), label = "Ligar stream", value = config.StreamEnabled },
-                        new { name = nameof(config.GoHomeOnStreamSwitch).ToLower(), label = "Navegar para casa ou menu multistream", value = config.GoHomeOnStreamSwitch },
                         new
                         {
                             name = nameof(config.Sources).ToLower(),
@@ -223,6 +236,9 @@ namespace shrimpcast.Entities.DB
                                 new { name = nameof(Source.Thumbnail).ToLower(), label = "Thumbnail" },
                                 new { name = nameof(Source.UseLegacyPlayer).ToLower(), label = "Player nativo" },
                                 new { name = nameof(Source.UseRTCEmbed).ToLower(), label = "Embutir" },
+                                new { name = nameof(Source.ResetOnScheduledSwitch).ToLower(), label = "Recomeçar no começo" },
+                                new { name = nameof(Source.StartsAt).ToLower(), label = "Horário começo" },
+                                new { name = nameof(Source.EndsAt).ToLower(), label = "Horário fim" },
                                 new { name = "delete", label = string.Empty },
                             }
                         }
@@ -310,13 +326,17 @@ namespace shrimpcast.Entities.DB
                     name = "Golden pass",
                     values = new object[]
                     {
-                        new { name = nameof(config.ShowGoldenPassButton).ToLower(), label = "Ligar compra de OURO", value = config.ShowGoldenPassButton },
-                        new { name = nameof(config.GoldenPassValue).ToLower(), label = "Valor do OURO (USD)", value = config.GoldenPassValue },
-                        new { name = nameof(config.GoldenPassTitle).ToLower(), label = "Título do OURO", value = config.GoldenPassTitle },
-                        new { name = nameof(config.BTCServerInstanceURL).ToLower(), label = "URL da instância BTCPay server", value = config.BTCServerInstanceURL },
-                        new { name = nameof(config.BTCServerStoreId).ToLower(), label = "ID da loja BTCPay server", value = config.BTCServerStoreId },
-                        new { name = nameof(config.BTCServerApiKeyNotMapped).ToLower(), label = "Chave API BTCPay server", value = config.BTCServerApiKey },
-                        new { name = nameof(config.BTCServerWebhookSecretNotMapped).ToLower(), label = "Segredo webhook BTCPay server", value = config.BTCServerWebhookSecret },
+                        new { name = nameof(config.ShowGoldenPassButton).ToLower(), label = "Ligar passes OURO", value = config.ShowGoldenPassButton },
+                        new { name = nameof(config.EnableBTCServer).ToLower(), label = "Ligar pagamentos crypto", value = config.EnableBTCServer },
+                        new { name = nameof(config.EnableStripe).ToLower(), label = "Ligar pagamentos stripe", value = config.EnableStripe },
+                        new { name = nameof(config.GoldenPassValue).ToLower(), label = "Valor passe OURO (EUR)", value = config.GoldenPassValue },
+                        new { name = nameof(config.GoldenPassTitle).ToLower(), label = "Título passe OURO", value = config.GoldenPassTitle },
+                        new { name = nameof(config.BTCServerInstanceURL).ToLower(), label = "BTCServer instance URL", value = config.BTCServerInstanceURL },
+                        new { name = nameof(config.BTCServerStoreId).ToLower(), label = "BTCServer store ID", value = config.BTCServerStoreId },
+                        new { name = nameof(config.BTCServerApiKeyNotMapped).ToLower(), label = "BTCServer API key", value = config.BTCServerApiKey },
+                        new { name = nameof(config.BTCServerWebhookSecretNotMapped).ToLower(), label = "BTCServer webhook secret", value = config.BTCServerWebhookSecret },
+                        new { name = nameof(config.StripeSecretKeyNotMapped).ToLower(), label = "Stripe secret key", value = config.StripeSecretKey },
+                        new { name = nameof(config.StripeWebhookSecretNotMapped).ToLower(), label = "Stripe webhook secret", value = config.StripeWebhookSecret },
                     }
                 }
             };

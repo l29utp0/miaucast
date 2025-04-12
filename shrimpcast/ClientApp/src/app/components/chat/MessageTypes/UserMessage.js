@@ -11,6 +11,7 @@ import ManageUserDialog from "../ManageUserDialog";
 import ConfirmDialog from "../../others/ConfirmDialog";
 import MessageWrapper from "./MessageWrapper";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Tooltip } from "@mui/material";
 
 const WrapperTextBoxSx = {
     margin: "5px",
@@ -61,7 +62,11 @@ const WrapperTextBoxSx = {
     height: "20px",
     borderRadius: "5px",
     marginRight: "2px",
-  };
+  },
+  GoldenPassGlow = (color) => ({
+    color,
+    //    animation: `${KeyframesManager.getGoldenGlowKeyframes(color)} 1s infinite alternate`,
+  });
 
 const InternalLinkSx = {
   fontWeight: "bold",
@@ -84,7 +89,8 @@ const UserMessage = React.memo((props) => {
   const [showPromptDialog, setShowPromptDialog] = useState(false);
   const openConfirmPrompt = () => setShowPromptDialog(true);
   const closeConfirmPrompt = () => setShowPromptDialog(false);
-  const { isAdmin, isMod, isGolden, maxLengthTruncation } = props;
+  const { isAdmin, isMod, isGolden, maxLengthTruncation, userColorDisplay } =
+    props;
 
   const isOwnDomainUrl = (url) => {
     try {
@@ -176,14 +182,17 @@ const UserMessage = React.memo((props) => {
         </Box>
         <Box display="inline-block">
           <Typography
-            sx={TextSx(props.userColorDisplay, true)}
+            sx={[
+              TextSx(userColorDisplay, true),
+              isGolden ? GoldenPassGlow(userColorDisplay) : null,
+            ]}
             className={`${
               props.enableChristmasTheme
                 ? "santa-hat"
                 : props.enableHalloweenTheme
                   ? "halloween-hat"
                   : null
-            } ${isAdmin ? "admin-glow" : isMod ? "mod-glow" : isGolden ? "golden-glow" : null}`}
+            } ${isAdmin ? "admin-glow" : isMod ? "mod-glow" : null}`}
           >
             {isAdmin && <VerifiedUserIcon sx={VerifiedUserIconSx} />}
             {isMod && <VerifiedUserIcon sx={VerifiedUserIconSx} />}
@@ -201,12 +210,13 @@ const UserMessage = React.memo((props) => {
             const emote = getEmote(match.toLowerCase());
             if (emote) {
               return (
-                <img
-                  key={i}
-                  alt={match.toLowerCase()}
-                  className={`emote ${props.isComboMessage ? "combo-emote" : ""}`}
-                  src={emote.url}
-                />
+                <Tooltip key={i} title={emote.name} placement="top" arrow>
+                  <img
+                    alt={match.toLowerCase()}
+                    className={`emote ${props.isComboMessage ? "combo-emote" : ""}`}
+                    src={emote.url}
+                  />
+                </Tooltip>
               );
             }
 
