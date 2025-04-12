@@ -66,7 +66,7 @@ const Emotes = ({ emotes, setMessage, inputRef, setEmotes }) => {
       <EmotesWrapper elevation={2}>
         <EmotesGrid className="scrollbar-custom">
           {emotes.map((emote) => (
-            <Tooltip key={emote.name} title={emote.name} placement="top">
+            <Tooltip key={emote.name} title={emote.name} placement="top" arrow>
               <EmoteButton onClick={() => handleEmoteClick(emote.name)}>
                 <EmoteAvatar
                   alt={emote.alt || emote.name}

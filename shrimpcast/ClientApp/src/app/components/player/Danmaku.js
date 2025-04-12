@@ -148,7 +148,9 @@ const Danmaku = ({ messages, isActive, emotes }) => {
     if (!isActive || !isLoaded || !messages?.length) return;
 
     const newMessages = messages.filter(
-      (message) => !displayedMessagesRef.current.has(message.messageId),
+      (message) =>
+        !displayedMessagesRef.current.has(message.messageId) &&
+        (message.isGolden || message.isAdmin || message.isMod), // Include golden, admin and mod messages
     );
 
     newMessages.forEach((message) => {
