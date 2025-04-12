@@ -23,7 +23,7 @@ namespace shrimpcast.Data.Repositories
         }
             
 
-        public async Task<bool> SaveAsync(Configuration configuration)
+        public async Task<(bool updated, bool updatedSources)> SaveAsync(Configuration configuration)
         {
             var config = await _context.Configurations.FirstAsync();
             configuration.ConfigurationId = config.ConfigurationId;
@@ -34,6 +34,8 @@ namespace shrimpcast.Data.Repositories
             configuration.IPServiceApiKey = configuration.IPServiceApiKeyNotMapped;
             configuration.BTCServerApiKey = configuration.BTCServerApiKeyNotMapped;
             configuration.BTCServerWebhookSecret = configuration.BTCServerWebhookSecretNotMapped;
+            configuration.StripeSecretKey = configuration.StripeSecretKeyNotMapped;
+            configuration.StripeWebhookSecret = configuration.StripeWebhookSecretNotMapped;
             if (configuration.MaxConnectionsPerIP < 1) configuration.MaxConnectionsPerIP = 1;
             _context.Entry(config).CurrentValues.SetValues(configuration);
             var updated = await _context.SaveChangesAsync();
@@ -44,9 +46,11 @@ namespace shrimpcast.Data.Repositories
             configuration.IPServiceApiKeyNotMapped = null;
             configuration.BTCServerApiKeyNotMapped = null;
             configuration.BTCServerWebhookSecretNotMapped = null;
-            var updateSources = await _sourceRepository.Save(configuration.Sources);
-            if (updateSources) configuration.Sources = await _sourceRepository.GetAll();
-            return updated > 0 || updateSources ? true : throw new Exception("Could not update record.");
+            configuration.StripeSecretKeyNotMapped = null;
+            configuration.StripeWebhookSecretNotMapped = null;
+            var updatedSources = await _sourceRepository.Save(configuration.Sources);
+            if (updatedSources) configuration.Sources = await _sourceRepository.GetAll();
+            return updated > 0 || updatedSources ? (true, updatedSources) : throw new Exception("Could not update record.");
         }
     }
 }

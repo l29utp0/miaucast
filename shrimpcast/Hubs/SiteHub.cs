@@ -10,7 +10,6 @@ using shrimpcast.Entities.DB;
 using shrimpcast.Entities.DTO;
 using shrimpcast.Helpers;
 using shrimpcast.Hubs.Dictionaries;
-using System;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using Message = shrimpcast.Entities.DB.Message;
@@ -32,13 +31,15 @@ namespace shrimpcast.Hubs
         private readonly IEmoteRepository _emoteRepository;
         private readonly IBingoRepository _bingoRepository;
         private readonly IBTCServerRepository _btcServerRepository;
+        private readonly IStripeRepository _stripeRepository;
+        private readonly ISourceRepository _sourceRepository;
         private readonly IHubContext<SiteHub> _hubContext;
         private readonly ConfigurationSingleton _configurationSigleton;
         private readonly Connections<SiteHub> _activeConnections;
         private readonly Pings<SiteHub> _pings;
         private readonly BingoSuggestions<SiteHub> _bingoSuggestions;
 
-        public SiteHub(IConfigurationRepository configurationRepository, ISessionRepository sessionRepository, IMessageRepository messageRepository, IBanRepository banRepository, IPollRepository pollRepository, ITorExitNodeRepository torExitNodeRepository, IHubContext<SiteHub> hubContext, ConfigurationSingleton configurationSingleton, Connections<SiteHub> activeConnections, Pings<SiteHub> pings, IOBSCommandsRepository obsCommandsRepository, IAutoModFilterRepository autoModFilterRepository, INotificationRepository notificationRepository, IEmoteRepository emoteRepository, IBingoRepository bingoRepository, IVpnAddressRepository vpnAddressRepository, BingoSuggestions<SiteHub> bingoSuggestions, IBTCServerRepository btcServerRepository)
+        public SiteHub(IConfigurationRepository configurationRepository, ISessionRepository sessionRepository, IMessageRepository messageRepository, IBanRepository banRepository, IPollRepository pollRepository, ITorExitNodeRepository torExitNodeRepository, IHubContext<SiteHub> hubContext, ConfigurationSingleton configurationSingleton, Connections<SiteHub> activeConnections, Pings<SiteHub> pings, IOBSCommandsRepository obsCommandsRepository, IAutoModFilterRepository autoModFilterRepository, INotificationRepository notificationRepository, IEmoteRepository emoteRepository, IBingoRepository bingoRepository, IVpnAddressRepository vpnAddressRepository, BingoSuggestions<SiteHub> bingoSuggestions, IBTCServerRepository btcServerRepository, ISourceRepository sourceRepository, IStripeRepository stripeRepository)
         {
             _configurationRepository = configurationRepository;
             _sessionRepository = sessionRepository;
@@ -58,6 +59,8 @@ namespace shrimpcast.Hubs
             _vpnAddressRepository = vpnAddressRepository;
             _bingoSuggestions = bingoSuggestions;
             _btcServerRepository = btcServerRepository;
+            _sourceRepository = sourceRepository;
+            _stripeRepository = stripeRepository;
         }
 
         private Configuration Configuration => _configurationSigleton.Configuration;
@@ -321,18 +324,18 @@ namespace shrimpcast.Hubs
             await ShouldGrantAccess(true);
             var session = GetCurrentConnection().Session;
             var mutedUntil = await _sessionRepository.Mute(SessionId);
-            
+
             foreach (var connection in ActiveConnections.Where(ac => ac.Value.Session.SessionId == SessionId))
-            { 
+            {
                 connection.Value.Session.MutedUntil = mutedUntil;
             }
 
-            if (session.IsMod) 
+            if (session.IsMod)
             {
                 var name = await _sessionRepository.GetCurrentName(SessionId);
                 var message = $"{session.SessionNames.Last().Name} silenciou {name}";
                 await DispatchSystemMessage(message, true, false, GetAdminSessions());
-            } 
+            }
             return true;
         }
 
@@ -525,7 +528,7 @@ namespace shrimpcast.Hubs
         #region Bingo
         public async Task<List<BingoOption>> GetAll() => await _bingoRepository.GetAllOptions();
 
-        public async Task<BingoOption?> AddBingoOption ([FromBody] string Content)
+        public async Task<BingoOption?> AddBingoOption([FromBody] string Content)
         {
             await ShouldGrantAccess();
             Content = Content.Trim();
@@ -535,7 +538,7 @@ namespace shrimpcast.Hubs
                 return null;
             }
 
-            var newOption = await _bingoRepository.AddOption(Content); 
+            var newOption = await _bingoRepository.AddOption(Content);
             await Clients.All.SendAsync("BingoOptionAdded", newOption);
             return newOption;
         }
@@ -597,10 +600,67 @@ namespace shrimpcast.Hubs
         public async Task<bool> SaveConfig([FromBody] Configuration updatedConfiguration)
         {
             await ShouldGrantAccess();
-            var ConfigUpdated = await _configurationRepository.SaveAsync(updatedConfiguration);
+            var (updated, updatedSources) = await _configurationRepository.SaveAsync(updatedConfiguration);
             _configurationSigleton.Configuration = updatedConfiguration;
-            await Clients.All.SendAsync("ConfigUpdated", updatedConfiguration);
-            return ConfigUpdated;
+            await _hubContext.Clients.All.SendAsync("ConfigUpdated", updatedConfiguration);
+            if (updatedSources) ScheduleBackgroundJobs();
+            return updated;
+        }
+
+        private void ScheduleBackgroundJobs()
+        {
+            static string dateToCron(DateTime scheduledTime) => $"{scheduledTime.Minute} {scheduledTime.Hour} {scheduledTime.Day} {scheduledTime.Month} *";
+            var UtcNow = DateTime.UtcNow;
+
+            foreach (var source in _configurationSigleton.Configuration.Sources)
+            {
+                if (source.StartsAt > UtcNow)
+                {
+                    RecurringJob.AddOrUpdate(
+                        $"{source.Name}-enable", 
+                        () => ChangeSourceStatusBackground(Constants.FIREANDFORGET_TOKEN, source.Name, true, source.ResetOnScheduledSwitch)
+                        , dateToCron(source.StartsAt.Value));
+                }
+                else RecurringJob.RemoveIfExists($"{source.Name}-enable");
+
+                if (source.EndsAt > UtcNow)
+                {
+                    RecurringJob.AddOrUpdate(
+                        $"{source.Name}-disable", 
+                        () => ChangeSourceStatusBackground(Constants.FIREANDFORGET_TOKEN, source.Name, false, false), 
+                        dateToCron(source.EndsAt.Value));
+                }
+                else RecurringJob.RemoveIfExists($"{source.Name}-disable");
+            }
+        }
+
+        public async Task ChangeSourceStatusBackground(string VerificationToken, string sourceName, bool status, bool resetOnScheduledSwitch)
+        {
+            if (VerificationToken != Constants.FIREANDFORGET_TOKEN) throw new Exception("Permission denied");
+            var sourceUpdated = false;
+            try
+            {
+                sourceUpdated = await _sourceRepository.ChangeSourceStatus(sourceName, status);
+            } catch (Exception) { }
+
+            if (sourceUpdated)
+            {
+                _configurationSigleton.Configuration.Sources = await _sourceRepository.GetAll();
+                if (status && resetOnScheduledSwitch)
+                {
+                    await DispatchSystemMessage($"[SYSTEM] Restarting media server. Playback will automatically resume shortly.", true, true);
+                    string cmdResult;
+                    try
+                    {
+                        cmdResult = await ProcessHelper.DockerRestart();
+                    } catch (Exception ex) { cmdResult = ex.Message; }
+                    await DispatchSystemMessage(cmdResult, true, false, GetAdminSessions());
+                }
+                await _hubContext.Clients.All.SendAsync("ConfigUpdated", _configurationSigleton.Configuration);
+            }
+
+            await DispatchSystemMessage($"{(sourceUpdated ? "Executed" : "Could not execute")} scheduled job for [{sourceName}, {status}]", true, false, GetAdminSessions());
+            RecurringJob.RemoveIfExists($"{sourceName}-{(status ? "enable" : "disable")}");
         }
 
         public async Task<object> GetOrderedConfig()
@@ -614,6 +674,8 @@ namespace shrimpcast.Hubs
             unorderedConfig.IPServiceApiKeyNotMapped = unorderedConfig.IPServiceApiKey;
             unorderedConfig.BTCServerApiKeyNotMapped = unorderedConfig.BTCServerApiKey;
             unorderedConfig.BTCServerWebhookSecretNotMapped = unorderedConfig.BTCServerWebhookSecret;
+            unorderedConfig.StripeSecretKeyNotMapped = unorderedConfig.StripeSecretKey;
+            unorderedConfig.StripeWebhookSecretNotMapped = unorderedConfig.StripeWebhookSecret;
             return new
             {
                 OrderedConfig = Configuration.BuildJSONConfiguration(),
@@ -681,13 +743,29 @@ namespace shrimpcast.Hubs
         #endregion
 
         #region Golden pass
-        public async Task<string> BeginPurchase()
+        public async Task<string> BeginPurchase(bool isCrypto)
         {
             string? response;
             try
             {
                 var session = GetCurrentConnection().Session;
-                response = await _btcServerRepository.GenerateInvoice(session.SessionNames.Last().Name, session.SessionId);
+                if (isCrypto)
+                {
+                    if (Configuration.EnableBTCServer)
+                    {
+                        response = await _btcServerRepository.GenerateInvoice(session.SessionNames.Last().Name, session.SessionId);
+                    }
+                    else response = "Error: BTCServer is disabled.";
+                }
+                else
+                {
+                    if (Configuration.EnableStripe)
+                    {
+                        var host = Context.GetHttpContext()?.Request.Host.Value ?? string.Empty;
+                        response = await _stripeRepository.GenerateInvoice(session.SessionNames.Last().Name, session.SessionId, host);
+                    }
+                    else response = "Error: Stripe is disabled.";
+                }
             }
             catch (Exception ex)
             {
@@ -696,8 +774,16 @@ namespace shrimpcast.Hubs
             return response;
         }
 
-        public async Task<List<InvoiceDTO>?> GetSessionInvoices() =>
-            await _btcServerRepository.GetInvoices(GetCurrentConnection().Session.SessionId);
+        public async Task<List<InvoiceDTO>?> GetSessionInvoices()
+        {
+            var sessionId = GetCurrentConnection().Session.SessionId;
+            List<Task<List<InvoiceDTO>?>> invoices = [];
+            if (Configuration.EnableBTCServer) invoices.Add(_btcServerRepository.GetInvoices(sessionId));
+            // Retrieving invoices from stripe currently not implemented because Stripe's list API is a mess
+            // if (Configuration.EnableStripe) invoices.Add(_stripeRepository.GetInvoices(sessionId));
+            var result = await Task.WhenAll(invoices);
+            return result.SelectMany(task => task ?? []).ToList();
+        }
         #endregion
 
         #region Private methods
@@ -871,7 +957,7 @@ namespace shrimpcast.Hubs
 
             var Action = "ChatMessage";
             if (!useCallers) await Clients.Caller.SendAsync(Action, obj);
-            else if (useAll) await Clients.All.SendAsync(Action, obj);
+            else if (useAll) await _hubContext.Clients.All.SendAsync(Action, obj);
             else if (Callers != null) await _hubContext.Clients.Clients(Callers).SendAsync(Action, obj);
         }
 
@@ -1045,6 +1131,7 @@ namespace shrimpcast.Hubs
             await DispatchSystemMessage($"Executing {Constants.DOCKER_RESTART} command...");
             try
             {
+                await DispatchSystemMessage($"[SYSTEM] Restarting media server. Playback will automatically resume shortly.", true, true);
                 var result = await ProcessHelper.DockerRestart();
                 await DispatchSystemMessage(result);
             }
