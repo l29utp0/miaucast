@@ -8,13 +8,16 @@ const GoldenPassSx = {
     height: "20px",
     overflow: "hidden",
     position: "relative",
-    backgroundColor: "secondary",
+    backgroundColor: "secondary.main",
     textAlign: "center",
     borderRadius: "1px",
     borderBottomRightRadius: "5px",
     borderBottomLeftRadius: "5px",
     cursor: "pointer",
     zIndex: 1,
+    "&:hover": {
+      backgroundColor: "secondary.dark",
+    },
   },
   TextSx = {
     height: "15px",
@@ -36,7 +39,13 @@ const GoldenPassSx = {
   };
 
 const GoldenPassButton = (props) => {
-  const { isAdmin, configuration, goldenPassExpanded, setGoldenPassExpanded, isGolden } = props,
+  const {
+      isAdmin,
+      configuration,
+      goldenPassExpanded,
+      setGoldenPassExpanded,
+      isGolden,
+    } = props,
     { showGoldenPassButton } = configuration,
     [showDialog, setShowDialog] = useState(false),
     openDialog = () => setShowDialog(true),
@@ -48,15 +57,26 @@ const GoldenPassButton = (props) => {
 
   return !isAdmin && !isGolden && showGoldenPassButton && goldenPassExpanded ? (
     <>
-      <Box sx={GoldenPassSx} onClick={openDialog} className="animated-background">
+      <Box sx={GoldenPassSx} onClick={openDialog}>
         <Typography className="noselect" variant="caption" sx={TextSx}>
           ADQUIRE {goldenPassTitle}{" "}
         </Typography>
-        <IconButton onClick={closeButton} type="button" size="small" sx={CloseIconSx}>
+        <IconButton
+          onClick={closeButton}
+          type="button"
+          size="small"
+          sx={CloseIconSx}
+        >
           <CloseIcon sx={{ fontSize: "16px" }} />
         </IconButton>
       </Box>
-      {showDialog && <GoldenPassDialog closeDialog={closeDialog} goldenPassTitle={goldenPassTitle} {...props} />}
+      {showDialog && (
+        <GoldenPassDialog
+          closeDialog={closeDialog}
+          goldenPassTitle={goldenPassTitle}
+          {...props}
+        />
+      )}
     </>
   ) : null;
 };
