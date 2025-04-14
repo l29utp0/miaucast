@@ -42,6 +42,7 @@ const NewMessagesToastSx = {
   justifyContent: "center",
   overflow: "hidden",
   bottom: "0",
+  zIndex: 10,
 };
 
 const RenderChatMessages = (props) => {

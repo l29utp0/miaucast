@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { useRef, useState, useEffect } from "react";
-import ReactPlayer from "react-player";
+import ReactPlayer from "react-player/youtube";
 import XGPlayer from "./XGPlayer";
 import PickSource from "../layout/Actions/Sources/PickSource";
 import Danmaku from "./Danmaku";
