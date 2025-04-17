@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ConnectedUsersCount from "./ConnectedUsersCount";
 import RenderChatMessages from "./RenderChatMessages";
 import ChatTextField from "./ChatTextField";
@@ -18,6 +18,7 @@ const Chat = (props) => {
   const [message, setMessage] = useState("");
   const [bingoButtonExpanded, setBingoButtonExpanded] = useState(true);
   const [goldenPassExpanded, setGoldenPassExpanded] = useState(true);
+  const inputRef = useRef(null);
 
   return (
     <Box sx={ChatSx}>
@@ -28,7 +29,8 @@ const Chat = (props) => {
         setNameSuggestions={setNameSuggestions}
         bingoButtonExpanded={bingoButtonExpanded}
         goldenPassExpanded={goldenPassExpanded}
-        setMessage={setMessage} // Pass setMessage to RenderChatMessages
+        setMessage={setMessage}
+        inputRef={inputRef}
         {...props}
       />
       <ActiveBingo
@@ -42,6 +44,7 @@ const Chat = (props) => {
         nameSuggestions={nameSuggestions}
         message={message}
         setMessage={setMessage}
+        inputRef={inputRef}
         {...props}
       />
       <GoldenPassButton
