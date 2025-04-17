@@ -4,7 +4,7 @@ namespace shrimpcast.Entities
 {
     public class Constants
     {
-        public const string BACKEND_VERSION = "1.2.4";
+        public const string BACKEND_VERSION = "1.2.5";
 
         public const string PING_COMMAND = "!ping";
 
@@ -32,6 +32,8 @@ namespace shrimpcast.Entities
 
         public const string VPN_DISABLED_MESSAGE = " Acesso VPN está temporáriamente desligado.";
 
+        public const string MAX_USERS_REACHED = "O miau.gg está com elevado tráfego e não consegue acomodar mais utilizadores, volta a tentar mais tarde.";
+        
         public static string EMOTE_GET (string name) => $"/api/emote/get/{name}";
 
         #region OBS

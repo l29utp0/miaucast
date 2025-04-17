@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace shrimpcast.Entities.DB
@@ -13,6 +13,8 @@ namespace shrimpcast.Entities.DB
         public required bool EnableVerifiedMode { get; set; }
 
         public required int MaxConnectionsPerIP { get; set; }
+
+        public required int MaxConnectedUsers { get; set; }
 
         public required string DefaultName { get; set; }
 
@@ -195,6 +197,7 @@ namespace shrimpcast.Entities.DB
                     {
                         new { name = nameof(config.HideStreamTitle).ToLower(), label = "Esconder título do stream", value = config.HideStreamTitle },
                         new { name = nameof(config.MaxConnectionsPerIP).ToLower(), label = "Máx. de conexões por IP", value = config.MaxConnectionsPerIP },
+                        new { name = nameof(config.MaxConnectedUsers).ToLower(), label = "Máx. utilizadores conectados (0 = ∞)", value = config.MaxConnectedUsers },
                         new { name = nameof(config.MinABTimeInMs).ToLower(), label = "Min.tempo automod (ms)", value = config.MinABTimeInMs },
                         new { name = nameof(config.MaxABTimeInMs).ToLower(), label = "Máx. tempo automod (ms)", value = config.MaxABTimeInMs },
                         new { name = nameof(config.OpenAt).ToLower(), label = "Abrir site a", value = config.OpenAt },
