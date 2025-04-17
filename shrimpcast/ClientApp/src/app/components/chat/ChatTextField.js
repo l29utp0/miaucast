@@ -148,7 +148,6 @@ const ChatTextField = (props) => {
       )}
       <TextField
         InputProps={{
-          inputRef: inputRef,
           startAdornment: (
             <InputAdornment position="start">
               <IconButton
@@ -178,6 +177,7 @@ const ChatTextField = (props) => {
             </InputAdornment>
           ),
         }}
+        inputRef={props.inputRef}
         inputProps={{
           maxLength: 500,
         }}

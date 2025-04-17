@@ -1,5 +1,5 @@
 import { Box, Button, CircularProgress } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import SystemMessage from "./MessageTypes/SystemMessage";
 import MessageManager from "../../managers/MessageManager";
 import UserMessage from "./MessageTypes/UserMessage";
@@ -45,7 +45,7 @@ const NewMessagesToastSx = {
   zIndex: 10,
 };
 
-const RenderChatMessages = (props) => {
+const RenderChatMessages = React.memo((props) => {
   const [messages, setMessages] = useState([]);
   const [pendingMessages, setPendingMessages] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -55,6 +55,7 @@ const RenderChatMessages = (props) => {
     messageIds: new Set(),
     lastUpdate: 0,
   });
+  const { inputRef, setMessage } = props;
 
   const {
     signalR,
@@ -63,17 +64,40 @@ const RenderChatMessages = (props) => {
     isAdmin,
     isGolden,
     goldenPassExpanded,
+    setNameSuggestions,
   } = props;
 
   const scrollReference = useRef();
   const comboTimeoutRef = useRef();
 
-  const scrollToBottom = () => {
-    scrollReference.current.scrollIntoView();
-    setPendingMessages(0);
-  };
+  const scrollToBottom = useCallback(() => {
+    if (scrollReference.current) {
+      scrollReference.current.scrollIntoView({ behavior: "smooth" });
+      setPendingMessages(0);
+    }
+  }, []);
 
-  const handleNewMessage = (message) => {
+  const handleNameClick = useCallback(
+    (username) => {
+      if (inputRef?.current) {
+        setMessage((currentMessage) => {
+          const newMessage = `${currentMessage}@${username} `;
+          setTimeout(() => {
+            if (inputRef.current) {
+              inputRef.current.focus();
+              inputRef.current.selectionStart = newMessage.length;
+              inputRef.current.selectionEnd = newMessage.length;
+            }
+          }, 0);
+          return newMessage;
+        });
+      }
+    },
+    [inputRef, setMessage],
+  );
+
+  const handleNewMessage = useCallback(
+    (message) => {
       setMessages((existingMessages) => {
         if (
           ChatActionsManager.IsIgnored(
@@ -202,9 +226,6 @@ const RenderChatMessages = (props) => {
           messageList = messageList.concat({ hidden: true });
         }
 
-        /**
-         * Clean excess messages
-         */
         const maxItems = configuration.maxMessagesToShow;
         if (messageList.length > maxItems) {
           const excessItemsCount = messageList.length - maxItems;
@@ -214,29 +235,25 @@ const RenderChatMessages = (props) => {
         return messageList;
       });
     },
-    updateNameSuggestions = () =>
-      props.setNameSuggestions((existingSuggestions) => {
-        const newSuggestions = [
-          ...new Set(messages.map((message) => message.sentBy).filter(Boolean)),
-        ];
-        if (existingSuggestions.length !== newSuggestions.length)
-          return newSuggestions;
-        for (let i = 0; i < existingSuggestions.length; i++) {
-          if (existingSuggestions[i] !== newSuggestions[i])
-            return newSuggestions;
-        }
-        return existingSuggestions;
-      });
+    [configuration.maxMessagesToShow, props.emotes],
+  );
 
-  const removeMessageHandler = () =>
-    signalR.off(SignalRManager.events.messageReceived);
+  const updateNameSuggestions = useCallback(() => {
+    setNameSuggestions((existingSuggestions) => {
+      const newSuggestions = [
+        ...new Set(messages.map((message) => message.sentBy).filter(Boolean)),
+      ];
+      if (existingSuggestions.length !== newSuggestions.length)
+        return newSuggestions;
+      for (let i = 0; i < existingSuggestions.length; i++) {
+        if (existingSuggestions[i] !== newSuggestions[i]) return newSuggestions;
+      }
+      return existingSuggestions;
+    });
+  }, [messages, setNameSuggestions]);
 
-  const addNewMessageHandler = () =>
-    signalR.on(SignalRManager.events.messageReceived, handleNewMessage);
-
-  /** Get the initial messages */
   useEffect(() => {
-    async function getMessages(abortControllerSignal) {
+    const getMessages = async (abortControllerSignal) => {
       if (!loading) return;
       let existingMessages = await MessageManager.GetExistingMessages(
         abortControllerSignal,
@@ -252,28 +269,23 @@ const RenderChatMessages = (props) => {
       existingMessages = existingMessages.reverse();
       setMessages(existingMessages);
       setLoading(false);
-    }
+    };
 
     const abortController = new AbortController();
     getMessages(abortController.signal);
     return () => abortController.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loading]);
 
-  /** Add the handlers */
   useEffect(() => {
-    addNewMessageHandler();
+    signalR.on(SignalRManager.events.messageReceived, handleNewMessage);
     return () => {
-      removeMessageHandler();
-      // Clear any existing combo timeout
+      signalR.off(SignalRManager.events.messageReceived);
       if (comboTimeoutRef.current) {
         clearTimeout(comboTimeoutRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration.maxMessagesToShow]);
+  }, [signalR, handleNewMessage]);
 
-  /** Scroll listeners */
   useEffect(() => {
     const lastMessage =
       messages[messages.length ? messages.length - 1 : 0]?.content;
@@ -282,8 +294,13 @@ const RenderChatMessages = (props) => {
     else setPendingMessages((state) => state + 1);
     updateNameSuggestions();
     if (loading) setLoading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+  }, [
+    messages,
+    props.autoScroll,
+    scrollToBottom,
+    updateNameSuggestions,
+    loading,
+  ]);
 
   return (
     <Box
@@ -325,6 +342,7 @@ const RenderChatMessages = (props) => {
               userSessionId={props.sessionId}
               maxLengthTruncation={configuration.maxLengthTruncation}
               isComboMessage={currentCombo.messageIds.has(message.messageId)}
+              onNameClick={handleNameClick}
               {...message}
             />
           )),
@@ -349,6 +367,6 @@ const RenderChatMessages = (props) => {
       />
     </Box>
   );
-};
+});
 
 export default RenderChatMessages;
