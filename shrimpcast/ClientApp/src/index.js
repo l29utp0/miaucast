@@ -18,4 +18,13 @@ root.render(
   </React.StrictMode>,
 );
 
-serviceWorkerRegistration.register();
+fetch("/serviceworkerstatus.json", {
+  cache: "no-store",
+})
+  .then(async (res) => {
+    const serviceWorkerStatus = await res.json();
+    console.log("Service worker enabled: " + serviceWorkerStatus.enabled);
+    if (serviceWorkerStatus.enabled) serviceWorkerRegistration.register();
+    else serviceWorkerRegistration.unregister();
+  })
+  .catch((ex) => console.log(ex));
