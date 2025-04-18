@@ -150,14 +150,20 @@ const SitePlayer = (props) => {
 
     const checkStreams = async () => {
       const newActiveStreams = new Set();
+
       for (const source of streamStatus.sources) {
-        if (source.url && streamEnabled) {
+        // Only check m3u8 streams
+        if (source.url?.endsWith(".m3u8") && streamEnabled) {
           const isActive = await checkStreamState(source.url);
           if (isActive) {
             newActiveStreams.add(source.name);
           }
+        } else if (!source.url?.endsWith(".m3u8")) {
+          // Automatically mark non-m3u8 streams as active
+          newActiveStreams.add(source.name);
         }
       }
+
       setActiveStreams(newActiveStreams);
     };
 
@@ -183,7 +189,7 @@ const SitePlayer = (props) => {
           sources={streamStatus.sources.map((source) => ({
             ...source,
             isStreaming:
-              !source.url.endsWith(".m3u8") || activeStreams.has(source.name),
+              !source.url?.endsWith(".m3u8") || activeStreams.has(source.name),
           }))}
         />
       ) : (
