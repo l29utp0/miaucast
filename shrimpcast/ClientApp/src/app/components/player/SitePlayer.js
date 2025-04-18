@@ -16,24 +16,64 @@ const WrapperSx = {
 
 const SitePlayer = (props) => {
   const [messages, setMessages] = useState([]);
+  const [activeStreams, setActiveStreams] = useState(new Set());
   const location = useLocation();
   const previousPath = useRef(location.pathname);
-  const { streamStatus } = props,
-    { source, streamEnabled, mustPickStream } = streamStatus,
-    { useRTCEmbed, useLegacyPlayer } = source;
+  const { streamStatus } = props;
+  const { source, streamEnabled, mustPickStream } = streamStatus;
+  const { useRTCEmbed, useLegacyPlayer } = source;
   let url = source.url || "";
-  const video = useRef(),
-    isHLS = url.endsWith(".m3u8"),
-    forceM3U8 = isHLS && !window.MediaSource,
-    [muted, setMuted] = useState(false),
-    tryPlay = () => {
-      let player = video.current.getInternalPlayer();
-      if (player.play !== undefined) {
-        player.play().catch(() => setMuted(true));
-      } else {
-        player.playVideo();
+  const video = useRef();
+  const isHLS = url.endsWith(".m3u8");
+  const forceM3U8 = isHLS && !window.MediaSource;
+  const [muted, setMuted] = useState(false);
+
+  const tryPlay = () => {
+    let player = video.current.getInternalPlayer();
+    if (player.play !== undefined) {
+      player.play().catch(() => setMuted(true));
+    } else {
+      player.playVideo();
+    }
+  };
+
+  // Function to check stream state
+  const checkStreamState = async (url) => {
+    try {
+      const response = await fetch(url, { method: "HEAD" });
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  // Effect to periodically check stream states
+  useEffect(() => {
+    if (!mustPickStream || !streamStatus.sources) return;
+
+    const checkStreams = async () => {
+      const newActiveStreams = new Set();
+
+      for (const source of streamStatus.sources) {
+        if (source.url && streamEnabled) {
+          const isActive = await checkStreamState(source.url);
+          if (isActive) {
+            newActiveStreams.add(source.name);
+          }
+        }
       }
+
+      setActiveStreams(newActiveStreams);
     };
+
+    // Initial check
+    checkStreams();
+
+    // Set up periodic checking
+    const interval = setInterval(checkStreams, 30000); // Check every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [mustPickStream, streamStatus.sources, streamEnabled]);
 
   if (isHLS && forceM3U8) {
     url = url.substr(0, url.lastIndexOf(".")) + ".m3u8";
@@ -50,7 +90,7 @@ const SitePlayer = (props) => {
 
       return () => {
         props.signalR.off("ChatMessage");
-        setMessages([]); // Clear messages on unmount
+        setMessages([]);
       };
     }
   }, [props.signalR]);
@@ -62,6 +102,21 @@ const SitePlayer = (props) => {
     }
   }, [location]);
 
+  // Handle XGPlayer events
+  const handlePlayerStateChange = (state) => {
+    if (!mustPickStream && source?.name) {
+      if (state === "playing") {
+        setActiveStreams((prev) => new Set(prev).add(source.name));
+      } else if (state === "error") {
+        setActiveStreams((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(source.name);
+          return newSet;
+        });
+      }
+    }
+  };
+
   return streamEnabled ? (
     <div
       style={{
@@ -71,10 +126,16 @@ const SitePlayer = (props) => {
       }}
     >
       {mustPickStream ? (
-        <PickSource sources={streamStatus.sources} />
+        <PickSource
+          sources={streamStatus.sources.map((source) => ({
+            ...source,
+            isStreaming:
+              !source.url.endsWith(".m3u8") || activeStreams.has(source.name),
+          }))}
+        />
       ) : isHLS && !forceM3U8 ? (
         <>
-          <XGPlayer url={url} />
+          <XGPlayer url={url} onStateChange={handlePlayerStateChange} />
           <Danmaku messages={messages} emotes={props.emotes} isActive={true} />
         </>
       ) : useRTCEmbed ? (
@@ -90,7 +151,7 @@ const SitePlayer = (props) => {
         </>
       ) : !useLegacyPlayer ? (
         <>
-          <XGPlayer url={url} />
+          <XGPlayer url={url} onStateChange={handlePlayerStateChange} />
           <Danmaku messages={messages} emotes={props.emotes} isActive={true} />
         </>
       ) : (
@@ -105,6 +166,8 @@ const SitePlayer = (props) => {
             playing={muted}
             muted={muted}
             onReady={tryPlay}
+            onPlay={() => handlePlayerStateChange("playing")}
+            onError={() => handlePlayerStateChange("error")}
           />
           <Danmaku messages={messages} emotes={props.emotes} isActive={true} />
         </>

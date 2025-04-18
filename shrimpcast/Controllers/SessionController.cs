@@ -10,8 +10,9 @@ using shrimpcast.Hubs.Dictionaries;
 namespace shrimpcast.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    public class SessionController(ISessionRepository sessionRepository, IBanRepository banRepository, IPollRepository pollRepository, INameColourRepository nameColourRepository, ITorExitNodeRepository torExitNodeRepository, IVpnAddressRepository vpnAddressRepository, INotificationRepository notificationRepository, IEmoteRepository emoteRepository, IHubContext<SiteHub> hubContext, ConfigurationSingleton configurationSingleton, Connections<SiteHub> activeConnections) : ControllerBase
+    public class SessionController(ILogger<SessionController> logger, ISessionRepository sessionRepository, IBanRepository banRepository, IPollRepository pollRepository, INameColourRepository nameColourRepository, ITorExitNodeRepository torExitNodeRepository, IVpnAddressRepository vpnAddressRepository, INotificationRepository notificationRepository, IEmoteRepository emoteRepository, IHubContext<SiteHub> hubContext, ConfigurationSingleton configurationSingleton, Connections<SiteHub> activeConnections) : ControllerBase
     {
+        private readonly ILogger<SessionController> _logger = logger;
         private readonly ISessionRepository _sessionRepository = sessionRepository;
         private readonly IBanRepository _banRepository = banRepository;
         private readonly IPollRepository _pollRepository = pollRepository;
@@ -32,6 +33,10 @@ namespace shrimpcast.Controllers
             var ensureCreated = await _sessionRepository.GetNewOrExistingAsync(accessToken, remoteAddress);
             var isAdmin = ensureCreated.IsAdmin;
             var configuration = _configurationSingleton.Configuration;
+
+            // Log all headers to stdout
+            _logger.LogDebug("Logging headers...");
+            foreach (var header in HttpContext.Request.Headers) _logger.LogDebug("{Key}: {Value}", header.Key, header.Value);
 
             if (!isAdmin)
             {
