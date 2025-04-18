@@ -14,9 +14,10 @@ const Loader = {
   webkitTransform: "translate(-50%, -50%);",
 };
 
-const XGPlayer = (props) => {
+const XGPlayer = ({ url, onStateChange }) => {
   const [isLoading, setIsLoading] = useState(true);
   const playerRef = useRef(null);
+  const lastErrorTime = useRef(0);
   const containerId = "player_id";
 
   useEffect(() => {
@@ -32,7 +33,7 @@ const XGPlayer = (props) => {
           sources: [
             {
               type: "ll-hls",
-              file: props.url,
+              file: url,
             },
           ],
           image: "/images/poster.avif",
@@ -53,19 +54,34 @@ const XGPlayer = (props) => {
 
         // Handle errors and reload
         ovenPlayer.on("error", (error) => {
-          console.log("Player error, attempting to reload...", error);
-          setTimeout(() => {
-            loadOvenPlayer();
-          }, 10000);
+          const currentTime = Date.now();
+          const timeSinceLastError = currentTime - lastErrorTime.current;
+
+          // Only attempt reload if more than 10 seconds have passed since last error
+          if (timeSinceLastError >= 10000) {
+            console.log("Player error, attempting to reload...", error);
+            onStateChange?.("error");
+            lastErrorTime.current = currentTime;
+
+            setTimeout(() => {
+              loadOvenPlayer();
+            }, 10000);
+          }
         });
 
-        // Optional: Handle other events
+        // Add events to detect when stream is actually playing
         ovenPlayer.on("stateChanged", (state) => {
           console.log("Player state changed:", state);
+          onStateChange?.(state);
+        });
+
+        ovenPlayer.on("playing", () => {
+          onStateChange?.("playing");
         });
       } catch (error) {
         console.error("Error initializing OvenPlayer:", error);
         setIsLoading(false);
+        onStateChange?.("error");
       }
     };
 
@@ -83,7 +99,7 @@ const XGPlayer = (props) => {
         playerRef.current = null;
       }
     };
-  }, [props.url]); // Reload player when URL changes
+  }, [url, onStateChange]);
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
