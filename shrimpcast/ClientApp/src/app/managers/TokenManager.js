@@ -2,8 +2,14 @@ import axios from "axios";
 import LocalStorageManager from "./LocalStorageManager";
 
 class TokenManager {
-  static async EnsureTokenExists(abortSignal) {
+  static async EnsureTokenExists(abortSignal, location) {
     let url = "/api/session/GetNewOrExisting?accessToken=" + LocalStorageManager.getToken();
+    const params = new URLSearchParams(location.search);
+    const turnstileToken = params.get("TT");
+    if (turnstileToken) {
+      url += "&turnstileToken=" + turnstileToken;
+      console.log("TT: " + turnstileToken);
+    }
     let response = await axios.get(url, { signal: abortSignal }).catch((ex) => {
       if (!abortSignal.aborted) {
         if (ex.message.includes("Pedido falhou com o código 403")) {
