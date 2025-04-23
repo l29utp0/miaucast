@@ -12,9 +12,19 @@ const Centered = {
 const CenteredSpinner = ({ turnstail }) => {
   return (
     <Box sx={Centered}>
-      <CircularProgress color="secondary" size={50} sx={{ ml: "auto", mr: "auto" }} />
-      <Typography variant="overline" display="block" fontWeight="bold" color="secondary.500" sx={{ lineHeight: 1.5 }}>
-        A CARREGAR {turnstail ? "TURNSTAIL" : "PROFILE"}
+      <CircularProgress
+        color="secondary"
+        size={50}
+        sx={{ ml: "auto", mr: "auto" }}
+      />
+      <Typography
+        variant="overline"
+        display="block"
+        fontWeight="bold"
+        color="secondary"
+        sx={{ lineHeight: 1.5 }}
+      >
+        A CARREGAR {turnstail ? "TURNSTAIL" : "PERFIL"}
       </Typography>
       <Typography
         variant="caption"
