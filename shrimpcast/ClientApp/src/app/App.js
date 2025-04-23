@@ -17,12 +17,14 @@ import { HelmetProvider, Helmet } from "react-helmet-async";
 import { ErrorBoundary } from "react-error-boundary";
 import FallbackError from "./components/layout/FallbackError";
 import makeTheme from "./theme/makeTheme";
+import { useLocation } from "react-router-dom";
 
 const App = () => {
   const [loading, setLoading] = useState(true),
     [signalR, setSignalR] = useState({}),
     [connectionDataState, setConnectionDataState] = useState({}),
-    [disconnectMessage, setDisconnectMessage] = useState(null);
+    [disconnectMessage, setDisconnectMessage] = useState(null),
+    location = useLocation();
 
   const addSocketEvents = (connection) => {
     const updateConnectionStatus = () =>
@@ -102,9 +104,7 @@ const App = () => {
   useEffect(() => {
     const connectSignalR = async (abortControllerSignal) => {
       if (!loading) return;
-      const response = await TokenManager.EnsureTokenExists(
-        abortControllerSignal,
-      );
+      const response = await TokenManager.EnsureTokenExists(abortControllerSignal, location);
       if (abortControllerSignal.aborted) return;
 
       setConnectionDataState((state) => ({
@@ -145,7 +145,7 @@ const App = () => {
       {loading ? (
         <CenteredSpinner />
       ) : signalR.errorAtLoad || disconnectMessage ? (
-        <ErrorAlert disconnectMessage={disconnectMessage} />
+        <ErrorAlert config={connectionDataState?.configuration} disconnectMessage={disconnectMessage} />
       ) : (
         <ErrorBoundary fallbackRender={FallbackError}>
           <Layout signalR={signalR} {...connectionDataState} />

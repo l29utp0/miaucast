@@ -1,5 +1,6 @@
 import { Alert, Container } from "@mui/material";
 import CountdownTimer from "../others/CountdownTimer";
+import CloudflareTurnstile from "../others/CloudflareTurnstile";
 
 const Centered = {
   position: "absolute",
@@ -10,24 +11,25 @@ const Centered = {
 };
 
 const ErrorAlert = (props) => {
-  const { disconnectMessage } = props;
-
-  // Only treat it as a countdown if it's a valid future timestamp
-  const isCountdown =
-    disconnectMessage &&
-    !isNaN(Date.parse(disconnectMessage)) &&
-    new Date(disconnectMessage) > new Date();
+  const { disconnectMessage } = props,
+    isCountdown = disconnectMessage && new Date(disconnectMessage).toString() !== "Invalid Date",
+    turnstileMode = disconnectMessage === "TURNSTILE_VERIFICATION_REQUIRED";
 
   return (
     <Container sx={Centered}>
-      <Alert severity={isCountdown ? "info" : "error"}>
-        {isCountdown ? (
-          <CountdownTimer timestamp={disconnectMessage} />
-        ) : (
-          disconnectMessage ||
-          "Não foi possível estabelecer uma ligação com o servidor. Refresca para tentar outra vez."
-        )}
-      </Alert>
+      {turnstileMode ? (
+        <CloudflareTurnstile {...props} />
+      ) : (
+        <Alert severity={isCountdown ? "info" : "error"}>
+          {isCountdown ? (
+            <CountdownTimer timestamp={disconnectMessage} />
+          ) : disconnectMessage ? (
+            disconnectMessage
+          ) : (
+            "Não foi possível estabelecer uma ligação com o servidor. Refresca para tentar outra vez."
+          )}
+        </Alert>
+      )}
     </Container>
   );
 };
