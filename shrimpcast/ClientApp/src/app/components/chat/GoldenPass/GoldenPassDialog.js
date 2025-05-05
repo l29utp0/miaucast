@@ -135,6 +135,7 @@ const GoldenPassDialog = (props) => {
               Crachá especial
             </Typography>
             <Typography variant="body2">- Verificação automática</Typography>
+            <Typography variant="body2">- Menu ultra secreto com algumas informações</Typography>
             <Typography variant="body2">
               - Mensagens danmaku (passam por cima do stream)
             </Typography>

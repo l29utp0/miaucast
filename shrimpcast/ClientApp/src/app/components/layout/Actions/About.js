@@ -145,7 +145,7 @@ const About = (props) => {
                   por aqui regularmente podes enviar-me um email que eu dou-te o
                   teu próprio canal e endereço para stream na plataforma.
                 </Typography>
-                <Typography variant="body1" paragraph>
+                <Typography variant="h6" paragraph>
                   Regras:
                 </Typography>
                 <ul>
@@ -175,18 +175,10 @@ const About = (props) => {
 
               {/* Links Section */}
               <Grid item xs={12}>
-                <Typography variant="body1" paragraph>
+                <Typography variant="h6" paragraph>
                   Links úteis:
                 </Typography>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  <Link
-                    href="https://ptchan.org/av/custompage/stream.html"
-                    target="_blank"
-                    color="secondary"
-                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                  >
-                    Como fazer stream no /oficial
-                  </Link>
 
                   <Link
                     href="https://github.com/l29utp0/ptchinacast"
@@ -200,7 +192,7 @@ const About = (props) => {
               </Grid>
 
               <Grid item xs={12}>
-                <Typography variant="body1" paragraph>
+                <Typography variant="h6" paragraph>
                   Amigos:
                 </Typography>
                 <Box
@@ -218,7 +210,7 @@ const About = (props) => {
 
               {/* Contact Section */}
               <Grid item xs={12}>
-                <Typography variant="body1" paragraph>
+                <Typography variant="h6" paragraph>
                   Contacto:
                 </Typography>
 
