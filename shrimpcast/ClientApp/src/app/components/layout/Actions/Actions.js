@@ -18,13 +18,19 @@ import Mutes from "./Mutes";
 import Moderators from "./Moderators";
 import IgnoredUsers from "./IgnoredUsers";
 import BingoOptions from "./BingoOptions";
+import GoldenPassInfo from "./GoldenPassInfo";
 import About from "./About";
 
 const Actions = (props) => {
   const theme = useTheme();
   const shouldCollapseMenu = useMediaQuery(theme.breakpoints.down("md"));
-  const actions = props.isAdmin
-    ? [
+
+  // Determine which actions to show based on user role
+  const getActionsComponents = () => {
+    const { isAdmin, isGolden, isMod } = props;
+
+    if (isAdmin) {
+      return [
         <ConfigUserDialog {...props} />,
         <ActiveUsers {...props} />,
         <Bans {...props} />,
@@ -36,14 +42,26 @@ const Actions = (props) => {
         <BingoOptions {...props} />,
         <AccountInfo {...props} />,
         <IgnoredUsers {...props} />,
+        <GoldenPassInfo {...props} />,
         <About {...props} />,
-      ]
-    : [
+      ];
+    } else if (isGolden || isMod) {
+      return [
+        <AccountInfo {...props} />,
+        <IgnoredUsers {...props} />,
+        <GoldenPassInfo {...props} />,
+        <About {...props} />,
+      ];
+    } else {
+      return [
         <AccountInfo {...props} />,
         <IgnoredUsers {...props} />,
         <About {...props} />,
       ];
+    }
+  };
 
+  const actions = getActionsComponents();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
