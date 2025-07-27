@@ -38,6 +38,8 @@ const GoldenPassInfo = (props) => {
   // Use your predefined RTMP information
   const rtmpUrl = process.env.REACT_APP_STREAM_URL || "Stream URL not set";
   const streamKey = process.env.REACT_APP_STREAM_KEY || "Stream key not set";
+  const chatOverlay = process.env.REACT_APP_CHATOVERLAY || "Chat overlay not set";
+
 
   return (
     <>
@@ -122,6 +124,34 @@ const GoldenPassInfo = (props) => {
                 size="small"
                 startIcon={<ContentCopyIcon />}
                 onClick={() => copyToClipboard(streamKey, "Stream Key")}
+                variant="contained"
+                color="secondary"
+              >
+                Copiar
+              </Button>
+            </Box>
+          </Box>
+
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle1" gutterBottom fontWeight="bold">
+              Chat Overlay
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'primary.800',
+                p: 1,
+                borderRadius: 1
+              }}
+            >
+              <Typography variant="body2" sx={{ flexGrow: 1, fontFamily: 'monospace' }}>
+                {chatOverlay}
+              </Typography>
+              <Button
+                size="small"
+                startIcon={<ContentCopyIcon />}
+                onClick={() => copyToClipboard(chatOverlay, "Chat Overlay")}
                 variant="contained"
                 color="secondary"
               >
