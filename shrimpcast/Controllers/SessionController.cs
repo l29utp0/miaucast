@@ -28,7 +28,7 @@ namespace shrimpcast.Controllers
 
 
         [HttpGet, Route("GetNewOrExisting")]
-        public async Task<object> GetNewOrExisting([FromQuery] string accessToken, [FromQuery] string? turnstileToken)
+        public async Task<object> GetNewOrExisting([FromQuery] string accessToken, [FromQuery] string? version, [FromQuery] string? turnstileToken)
         {
             var remoteAddress = (HttpContext.Connection.RemoteIpAddress?.ToString()) ?? throw new Exception("RemoteAddress can't be null");
             var ensureCreated = await _sessionRepository.GetNewOrExistingAsync(accessToken, remoteAddress);
@@ -86,6 +86,11 @@ namespace shrimpcast.Controllers
                         {
                             message = Constants.MAX_USERS_REACHED;
                         }
+
+                        if (configuration.ForceLatestVersion && version != Constants.BACKEND_VERSION)
+                        {
+                            message = Constants.FRONTEND_OUTDATED;
+                        }
                     }
                 }
 
@@ -101,6 +106,7 @@ namespace shrimpcast.Controllers
                         configuration.UseDarkTheme,
                         configuration.TurnstilePublicKey,
                         configuration.TurnstileTitle,
+                        configuration.EnablePWA
                     },
                 };
             }

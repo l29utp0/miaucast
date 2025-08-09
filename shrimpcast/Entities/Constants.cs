@@ -4,7 +4,7 @@ namespace shrimpcast.Entities
 {
     public class Constants
     {
-        public const string BACKEND_VERSION = "1.2.7";
+        public const string BACKEND_VERSION = "1.3.2";
 
         public const string PING_COMMAND = "!ping";
 
@@ -22,6 +22,8 @@ namespace shrimpcast.Entities
 
         public const string DOCKER_RESTART = $"!dockerrestart";
 
+        public const string REDIRECT_SOURCE = $"!redirectsource";
+
         public const string FILTERS = "filters.json";
 
         public static readonly string FIREANDFORGET_TOKEN = SecureToken.GenerateTokenThreadSafe();
@@ -37,6 +39,8 @@ namespace shrimpcast.Entities
         public const string MAX_IP_USER_REACHED = "Excedeste o número máximo de ligações simultâneas ao site.";
 
         public const string TURNSTILE_REQUIRED = "TURNSTILE_VERIFICATION_REQUIRED";
+
+        public const string FRONTEND_OUTDATED = "Outdated frontend, please reload.";
 
         public static string EMOTE_GET (string name) => $"/api/emote/get/{name}";
 

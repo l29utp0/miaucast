@@ -33,7 +33,8 @@
     "workbox-routing": "^6.5.4",
     "workbox-strategies": "^6.5.4",
     "hls.js": "^1.5.20",
-    "ovenplayer": "^0.10.40"
+    "ovenplayer": "^0.10.40",
+    "video.js": "8.17.3"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",

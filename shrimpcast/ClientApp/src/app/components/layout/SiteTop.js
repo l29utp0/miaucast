@@ -45,8 +45,8 @@ const SiteTopSx = {
   };
 
 const isValidName = (name) => {
-  // Check length
-  if (name.length > 15) return false;
+  // Check length (minimum 4, maximum 15)
+  if (name.length < 4 || name.length > 15) return false;
 
   // Check for emojis using regex
   const emojiRegex = /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu;
@@ -58,7 +58,7 @@ const isValidName = (name) => {
 };
 
 const SiteTop = (props) => {
-  const { isAdmin, isMod, signalR, userDisplayColor, colours, useFullChatMode, setFullChatMode } = props,
+  const { isAdmin, isMod, isGolden, signalR, userDisplayColor, colours, useFullChatMode, setFullChatMode } = props,
     [registeredName, setRegisteredName] = useState(props.name),
     [newName, setNewName] = useState(registeredName),
     [editMode, setEditMode] = useState(false),
@@ -74,7 +74,7 @@ const SiteTop = (props) => {
       }
 
       if (!isValidName(trimmedName)) {
-        setErrorMessage("Usa apenas letras e números (máx. 15 caracteres)");
+        setErrorMessage("Usa apenas letras e números (4-15 caracteres)");
         return;
       }
 
@@ -135,11 +135,11 @@ const SiteTop = (props) => {
               variant="contained"
               endIcon={<EditIcon />}
               size="small"
-              sx={ButtonSx(isAdmin || isMod)}
+              sx={ButtonSx(isAdmin || (isMod && !isGolden))}
             >
               <Box sx={ButtonTextSx}>{registeredName}</Box>
             </Button>
-            {!isAdmin && !isMod && (
+            {((!isAdmin && !isMod) || (isMod && isGolden)) && (
               <ColourPicker
                 userDisplayColor={userDisplayColor}
                 colours={colours}

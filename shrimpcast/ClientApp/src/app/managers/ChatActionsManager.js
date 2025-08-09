@@ -85,6 +85,12 @@ class ChatActionsManager {
     ignoredUsers = ignoredUsers.filter((eu) => eu.sessionId !== sessionId);
     return LocalStorageManager.setIgnoredUsers(ignoredUsers);
   }
+  static async SetQueryParams(signalR, source) {
+    await signalR.invoke("SetQueryParams", source).catch((ex) => console.log(ex));
+  }
+  static async GetSourceViewerCount(signalR) {
+    await signalR.invoke("GetSourceViewerCount").catch((ex) => console.log(ex));
+  }
 }
 
 export default ChatActionsManager;

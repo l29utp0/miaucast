@@ -1,17 +1,21 @@
 import { useState, useEffect } from "react";
 
-const CountdownTimer = ({ timestamp }) => {
+const CountdownTimer = ({ timestamp, skipText }) => {
   const calculateTimeLeft = () => {
       const endTime = new Date(timestamp);
       const difference = endTime.getTime() - Date.now();
       return difference > 0 ? difference : 0;
     },
     [timeLeft, setTimeLeft] = useState(calculateTimeLeft()),
+    padStart = (number) => number.toString().padStart(2, 0),
     formatTime = (time) => {
       const hours = Math.max(Math.floor(time / 3600000), 0);
       const minutes = Math.max(Math.floor((time % 3600000) / 60000), 0);
       const seconds = Math.max(Math.floor((time % 60000) / 1000), 0);
-      return `O stream vai começar em 
+
+      return skipText
+        ? `${padStart(hours)}:${padStart(minutes)}:${padStart(seconds)}`
+        : `O stream vai começar em
       ${!hours ? "" : `${hours} ${hours === 1 ? "hora" : "horas"}, `} 
       ${!minutes ? "" : `${minutes} ${minutes === 1 ? "minuto" : "minutos"} e `}
       ${seconds} ${seconds === 1 ? "segundo" : "segundos"}. Fica atento!`;

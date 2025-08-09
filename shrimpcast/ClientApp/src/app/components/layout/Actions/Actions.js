@@ -8,7 +8,6 @@ import {
 import React, { useState } from "react";
 import ConfigUserDialog from "./ConfigUserDialog";
 import Bans from "./Bans";
-import ActiveUsers from "./ActiveUsers";
 import AutoModFilters from "./AutoModFilters";
 import Notifications from "./Notifications";
 import AccountInfo from "./AccountInfo";
@@ -32,7 +31,6 @@ const Actions = (props) => {
     if (isAdmin) {
       return [
         <ConfigUserDialog {...props} />,
-        <ActiveUsers {...props} />,
         <Bans {...props} />,
         <Mutes {...props} />,
         <AutoModFilters {...props} />,

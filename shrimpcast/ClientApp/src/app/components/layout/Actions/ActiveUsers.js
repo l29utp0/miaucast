@@ -1,20 +1,45 @@
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
-import React, { useEffect, useState } from "react";
-import { Box, DialogContent, Divider, IconButton, List, ListItem, ListItemText, Tooltip } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+  Box,
+  Chip,
+  CircularProgress,
+  DialogContent,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Tooltip,
+} from "@mui/material";
 import AdminActionsManager from "../../../managers/AdminActionsManager";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import ManageUserDialog from "../../chat/ManageUserDialog";
 import SignalRManager from "../../../managers/SignalRManager";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+
+const ConnectedUsersSx = (isAdmin) => ({
+  borderRadius: "5px",
+  width: "24px",
+  height: "20px",
+  position: "relative",
+  bottom: "1px",
+  ml: isAdmin ? "5px" : "2.5px",
+});
 
 const ActiveUsers = (props) => {
   const [open, setOpen] = useState(false),
-    [users, setUsers] = useState([]),
+    [openedOnce, setOpenedOnce] = useState(false),
+    [users, setUsers] = useState(null),
     setClosed = () => setOpen(false),
-    setOpened = () => setOpen(true),
-    { signalR } = props;
+    setOpened = () => {
+      setOpen(true);
+      if (!openedOnce) setOpenedOnce(true);
+    },
+    { signalR, isAdmin } = props;
 
   useEffect(() => {
+    if (!openedOnce) return;
+
     const addUser = (user) =>
         setUsers((users) => {
           const userExists = users.find((existingUser) => existingUser.sessionId === user.sessionId);
@@ -29,11 +54,12 @@ const ActiveUsers = (props) => {
         );
 
     const getUsers = async () => {
+      const activeUsers = await AdminActionsManager.GetActiveUsers(signalR);
+      setUsers(activeUsers || []);
+      if (!activeUsers) setOpenedOnce(false);
       signalR.on(SignalRManager.events.userConnected, addUser);
       signalR.on(SignalRManager.events.userDisconnected, removeUser);
       signalR.on(SignalRManager.events.nameChange, nameChange);
-      const activeUsers = await AdminActionsManager.GetActiveUsers(signalR);
-      setUsers(activeUsers || []);
     };
 
     getUsers();
@@ -43,46 +69,54 @@ const ActiveUsers = (props) => {
       signalR.off(SignalRManager.events.nameChange);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [openedOnce]);
 
   return (
     <>
       <Tooltip title="Utilizadores ativos">
-        <IconButton
-          onClick={setOpened}
-          type="button"
+        <Chip
+          icon={<VisibilityIcon sx={{ position: "relative", left: "4px" }} />}
           size="small"
-          sx={{ backgroundColor: "primary.700", borderRadius: "0px" }}
-        >
-          <PeopleAltIcon sx={{ color: "primary.300" }} />
-        </IconButton>
+          color="primary"
+          sx={ConnectedUsersSx(isAdmin)}
+          onClick={setOpened}
+        />
       </Tooltip>
       {open && (
-        <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth PaperProps={{ sx: { backgroundColor:"primary.900" }}}>
+        <Dialog open={open} onClose={setClosed} maxWidth={"sm"} fullWidth>
           <DialogTitle sx={{ fontSize: "24px", pb: "7.5px" }}>
             <Box display="flex" width="100%" mb={"10px"}>
-              Lista de utilizadores ativos
+              Utilizadores online
             </Box>
             <Divider />
           </DialogTitle>
           <DialogContent>
-            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-              {users?.map((user) => (
-                <ListItem
-                  key={user.sessionId}
-                  secondaryAction={
-                    <ManageUserDialog
-                      {...props}
-                      siteAdmin={props.isAdmin}
-                      useSession={true}
-                      sessionId={user.sessionId}
-                    />
-                  }
-                >
-                  <ListItemText primary={user.name} />
-                </ListItem>
-              ))}
-            </List>
+            {!users ? (
+              <Box width="40px" ml="auto" mr="auto">
+                <CircularProgress color="secondary" />
+              </Box>
+            ) : (
+              <List sx={{ width: "100%", bgcolor: "background.paper", borderRadius: 1 }}>
+                {users?.map((user, index) => (
+                  <ListItem
+                    divider={index !== users.length - 1}
+                    key={user.sessionId}
+                    secondaryAction={
+                      <ManageUserDialog
+                        {...props}
+                        siteAdmin={props.isAdmin}
+                        siteMod={props.isMod}
+                        userSessionId={props.sessionId}
+                        useSession={true}
+                        sessionId={user.sessionId}
+                      />
+                    }
+                  >
+                    <ListItemText primary={user.name} />
+                  </ListItem>
+                ))}
+              </List>
+            )}
           </DialogContent>
         </Dialog>
       )}

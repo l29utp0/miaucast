@@ -1,10 +1,13 @@
 import { Box, Typography } from "@mui/material";
-import React, { useRef, useState, useEffect, memo, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player/youtube";
-import XGPlayer from "./XGPlayer";
 import PickSource from "../layout/Actions/Sources/PickSource";
+import XGPlayer from "./XGPlayer";
 import Danmaku from "./Danmaku";
-import { useLocation } from "react-router-dom";
+import SignalRManager from "../../managers/SignalRManager";
+import { useNavigate, useLocation } from "react-router-dom";
+import SourceCountdown from "../layout/Actions/Sources/SourceCountdown";
+import ChatActionsManager from "../../managers/ChatActionsManager";
 
 const WrapperSx = {
   width: "100%",
@@ -14,42 +17,137 @@ const WrapperSx = {
   alignItems: "center",
 };
 
-// Memoized Player Component
-const Player = memo(
-  ({ url, onStateChange, useRTCEmbed, useLegacyPlayer }) => {
-    const video = useRef();
-    const [muted, setMuted] = useState(false);
-    const isHLS = url.endsWith(".m3u8");
-    const forceM3U8 = isHLS && !window.MediaSource;
-
-    const adjustedUrl =
-      isHLS && forceM3U8 ? url.substr(0, url.lastIndexOf(".")) + ".m3u8" : url;
-
-    const tryPlay = () => {
-      let player = video.current?.getInternalPlayer();
-      if (player?.play !== undefined) {
+const SitePlayer = (props) => {
+  const { streamStatus, signalR, configuration } = props,
+    { source, streamEnabled, mustPickStream } = streamStatus,
+    { useRTCEmbed, useLegacyPlayer, startsAt } = source,
+    url = source.url || "",
+    video = useRef(),
+    isHLS = url.endsWith(".m3u8"),
+    isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent),
+    forceM3U8 = isHLS && !window.MediaSource,
+    [muted, setMuted] = useState(false),
+    [messages, setMessages] = useState([]),
+    location = useLocation(),
+    previousPath = useRef(location.pathname),
+    tryPlay = () => {
+      let player = video.current.getInternalPlayer();
+      if (player.play !== undefined) {
         player.play().catch(() => setMuted(true));
-      } else if (player?.playVideo) {
+      } else {
         player.playVideo();
+      }
+    },
+    navigate = useNavigate(),
+    showCountdown = startsAt && new Date(startsAt).getTime() - Date.now() > 0;
+
+  // Use original URL for iOS native video (don't modify HLS URLs)
+  const adjustedUrl = url;
+
+  // Effect to handle chat messages for danmaku
+  useEffect(() => {
+    if (!signalR) return;
+
+    const handleChatMessage = (message) => {
+      if (message.messageType === "UserMessage" && message.messageId) {
+        setMessages((prev) => [...prev, message]);
       }
     };
 
-    if (isHLS && !forceM3U8) {
-      return <XGPlayer url={adjustedUrl} onStateChange={onStateChange} />;
-    } else if (useRTCEmbed) {
+    signalR.on("ChatMessage", handleChatMessage);
+
+    return () => {
+      signalR.off("ChatMessage", handleChatMessage);
+      setMessages([]);
+    };
+  }, [signalR]);
+
+  // Effect to handle path changes
+  useEffect(() => {
+    if (previousPath.current !== location.pathname) {
+      setMessages([]);
+      previousPath.current = location.pathname;
+    }
+  }, [location]);
+
+  useEffect(() => {
+    signalR.on(SignalRManager.events.redirectSource, (data) => {
+      const { from, to } = data;
+      if (from === source?.name) {
+        console.log(`Redirecting from ${from} to ${to}`);
+        navigate(`/${to}`);
+      }
+    });
+
+    ChatActionsManager.SetQueryParams(signalR, source?.name);
+    return () => signalR.off(SignalRManager.events.redirectSource);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [source]);
+
+  const renderPlayer = () => {
+    if (useRTCEmbed) {
       return (
         <iframe
           src={`${adjustedUrl}`}
           title="rtc-embed"
           id="rtc-embed"
           allow="autoplay"
+          frameBorder="no"
+          scrolling="no"
           allowFullScreen
-          style={{ width: "100%", height: "100%", border: "none" }}
         />
       );
-    } else if (!useLegacyPlayer) {
-      return <XGPlayer url={adjustedUrl} onStateChange={onStateChange} />;
+    } else if (isIOS && isHLS) {
+      // Use native HTML5 video for iOS HLS streams with live edge seeking
+      return (
+        <video
+          width="100%"
+          height="100%"
+          controls
+          playsInline
+          muted
+          autoPlay
+          src={adjustedUrl}
+          style={{ backgroundColor: '#000' }}
+          onLoadedMetadata={(e) => {
+            const video = e.target;
+            console.log('Video duration:', video.duration);
+            console.log('Video seekable:', video.seekable.length > 0 ? video.seekable.end(0) : 'No seekable range');
+
+            // For live streams, try to seek to the end
+            if (video.duration === Infinity || video.duration > 3600) { // Likely a live stream
+              setTimeout(() => {
+                try {
+                  if (video.seekable.length > 0) {
+                    const liveEdge = video.seekable.end(0) - 5; // 5 seconds from live edge
+                    console.log('Seeking to live edge:', liveEdge);
+                    video.currentTime = Math.max(0, liveEdge);
+                  }
+                } catch (error) {
+                  console.log('Could not seek to live edge:', error);
+                }
+              }, 1000);
+            }
+          }}
+          onCanPlay={(e) => {
+            const video = e.target;
+            console.log('Video can play, current time:', video.currentTime);
+
+            // Try to seek to live edge when video can play
+            if (video.seekable.length > 0 && video.currentTime < video.seekable.end(0) - 30) {
+              const liveEdge = video.seekable.end(0) - 5;
+              console.log('Seeking on canplay to:', liveEdge);
+              video.currentTime = Math.max(0, liveEdge);
+            }
+          }}
+          onError={(e) => console.log('iOS video error:', e)}
+        />
+      );
+    } else if (!useLegacyPlayer && isHLS && !forceM3U8) {
+      // Use XGPlayer for non-iOS devices with MediaSource support
+      return <XGPlayer url={adjustedUrl} />;
     } else {
+      // ReactPlayer for YouTube or other supported URLs
       return (
         <ReactPlayer
           width={"100%"}
@@ -61,154 +159,37 @@ const Player = memo(
           playing={muted}
           muted={muted}
           onReady={tryPlay}
-          onPlay={() => onStateChange("playing")}
-          onError={() => onStateChange("error")}
         />
       );
     }
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.url === nextProps.url &&
-      prevProps.useRTCEmbed === nextProps.useRTCEmbed &&
-      prevProps.useLegacyPlayer === nextProps.useLegacyPlayer
-    );
-  },
-);
-
-// Memoized Danmaku component wrapper
-const MemoizedDanmaku = memo(({ messages, emotes, isActive }) => {
-  return <Danmaku messages={messages} emotes={emotes} isActive={isActive} />;
-});
-
-const SitePlayer = (props) => {
-  const [messages, setMessages] = useState([]);
-  const [activeStreams, setActiveStreams] = useState(new Set());
-  const location = useLocation();
-  const previousPath = useRef(location.pathname);
-
-  const { streamStatus } = props;
-  const { source, streamEnabled, mustPickStream } = streamStatus;
-  const { useRTCEmbed, useLegacyPlayer } = source;
-  const url = source.url || "";
-
-  const checkStreamState = async (url) => {
-    try {
-      const response = await fetch(url, { method: "HEAD" });
-      return response.ok;
-    } catch (error) {
-      return false;
-    }
   };
 
-  const handlePlayerStateChange = useCallback(
-    (state) => {
-      if (!mustPickStream && source?.name) {
-        if (state === "playing") {
-          setActiveStreams((prev) => new Set(prev).add(source.name));
-        } else if (state === "error") {
-          setActiveStreams((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(source.name);
-            return newSet;
-          });
-        }
-      }
-    },
-    [mustPickStream, source?.name],
-  );
 
-  // Effect to handle chat messages
-  useEffect(() => {
-    if (!props.signalR) return;
-
-    const handleChatMessage = (message) => {
-      if (message.messageType === "UserMessage" && message.messageId) {
-        setMessages((prev) => [...prev, message]);
-      }
-    };
-
-    props.signalR.on("ChatMessage", handleChatMessage);
-
-    return () => {
-      props.signalR.off("ChatMessage");
-      setMessages([]);
-    };
-  }, [props.signalR]);
-
-  // Effect to handle path changes
-  useEffect(() => {
-    if (previousPath.current !== location.pathname) {
-      setMessages([]);
-      previousPath.current = location.pathname;
-    }
-  }, [location]);
-
-  // Effect to periodically check stream states
-  useEffect(() => {
-    if (!mustPickStream || !streamStatus.sources) return;
-
-    const checkStreams = async () => {
-      const newActiveStreams = new Set();
-
-      for (const source of streamStatus.sources) {
-        // Only check m3u8 streams
-        if (source.url?.endsWith(".m3u8") && streamEnabled) {
-          const isActive = await checkStreamState(source.url);
-          if (isActive) {
-            newActiveStreams.add(source.name);
-          }
-        } else if (!source.url?.endsWith(".m3u8")) {
-          // Automatically mark non-m3u8 streams as active
-          newActiveStreams.add(source.name);
-        }
-      }
-
-      setActiveStreams(newActiveStreams);
-    };
-
-    checkStreams();
-    const interval = setInterval(checkStreams, 30000);
-    return () => clearInterval(interval);
-  }, [mustPickStream, streamStatus.sources, streamEnabled]);
-
-  if (!streamEnabled) {
-    return (
-      <Box sx={WrapperSx}>
-        <Typography className="noselect" textAlign="center" variant="h2">
-          Nada a tocar de momento ;_;
-        </Typography>
-      </Box>
-    );
-  }
-
-  return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {mustPickStream ? (
-        <PickSource
-          sources={streamStatus.sources.map((source) => ({
-            ...source,
-            isStreaming:
-              !source.url?.endsWith(".m3u8") || activeStreams.has(source.name),
-          }))}
+  return streamEnabled ? (
+    mustPickStream ? (
+      <PickSource
+        showViewerCountPerStream={configuration.showViewerCountPerStream}
+        sources={streamStatus.sources}
+        signalR={signalR}
+      />
+    ) : showCountdown ? (
+      <SourceCountdown startsAt={startsAt} />
+    ) : (
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        {renderPlayer()}
+        <Danmaku
+          messages={messages}
+          emotes={props.emotes}
+          isActive={true}
         />
-      ) : (
-        <>
-          <Player
-            key={url}
-            url={url}
-            onStateChange={handlePlayerStateChange}
-            useRTCEmbed={useRTCEmbed}
-            useLegacyPlayer={useLegacyPlayer}
-          />
-          <MemoizedDanmaku
-            messages={messages}
-            emotes={props.emotes}
-            isActive={true}
-          />
-        </>
-      )}
-    </div>
+      </div>
+    )
+  ) : (
+    <Box sx={WrapperSx}>
+      <Typography className="noselect" textAlign="center" variant="h2">
+        Nada a tocar de momento ;_;
+      </Typography>
+    </Box>
   );
 };
 
