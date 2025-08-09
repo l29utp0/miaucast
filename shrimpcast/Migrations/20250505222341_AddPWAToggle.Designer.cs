@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using shrimpcast.Data;
@@ -11,9 +12,11 @@ using shrimpcast.Data;
 namespace shrimpcast.Migrations
 {
     [DbContext(typeof(APPContext))]
-    partial class APPContextModelSnapshot : ModelSnapshot
+    [Migration("20250505222341_AddPWAToggle")]
+    partial class AddPWAToggle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,9 +169,6 @@ namespace shrimpcast.Migrations
                     b.Property<bool>("EnableVerifiedMode")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("ForceLatestVersion")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("GoldenPassTitle")
                         .IsRequired()
                         .HasColumnType("text");
@@ -263,16 +263,10 @@ namespace shrimpcast.Migrations
                     b.Property<bool>("ShowBingo")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("ShowConnectedUsers")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("ShowGoldenPassButton")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("ShowPoll")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("ShowViewerCountPerStream")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("ShowVotes")
@@ -663,9 +657,6 @@ namespace shrimpcast.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Thumbnail")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
                         .HasColumnType("text");
 
                     b.Property<string>("Url")

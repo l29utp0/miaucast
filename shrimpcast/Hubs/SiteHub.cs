@@ -76,8 +76,8 @@ namespace shrimpcast.Hubs
             var Session = await _sessionRepository.GetExistingAsync(accessToken, RemoteAddress);
             var isClosed = !(Session?.IsAdmin).GetValueOrDefault() && Configuration.OpenAt > DateTime.UtcNow;
             var reachedMaxUsers = Configuration.MaxConnectedUsers != 0 && ActiveConnections.Count >= Configuration.MaxConnectedUsers
-                                  && !(Session?.IsAdmin).GetValueOrDefault() && !(Session?.IsMod).GetValueOrDefault()  && !(Session?.IsGolden).GetValueOrDefault();
-            var reachedMaxConnectionsPerAddress = ActiveConnections.Where(ac => ac.Value.RemoteAdress == RemoteAddress || ac.Value.Session.SessionToken == accessToken).Count() 
+                                  && !(Session?.IsAdmin).GetValueOrDefault() && !(Session?.IsMod).GetValueOrDefault() && !(Session?.IsGolden).GetValueOrDefault();
+            var reachedMaxConnectionsPerAddress = ActiveConnections.Where(ac => ac.Value.RemoteAdress == RemoteAddress || ac.Value.Session.SessionToken == accessToken).Count()
                 >= Configuration.MaxConnectionsPerIP;
             var mustPassTurnstail = await NeedsPassTurnstail(Session);
 
@@ -110,11 +110,22 @@ namespace shrimpcast.Hubs
                 var SessionId = GetCurrentConnection().Session.SessionId;
                 ActiveConnections.TryRemove(Context.ConnectionId, out _);
                 await TriggerUserCountChange(false, null, SessionId);
+                await TriggerSourceViewerCountChange(false);
                 await base.OnDisconnectedAsync(exception);
-            } catch (Exception) {} // Session already disconnected
+            } catch (Exception) { } // Session already disconnected
         }
 
         public async Task GetUserCount() => await TriggerUserCountChange(true, null, null);
+
+        public async Task GetSourceViewerCount() => await TriggerSourceViewerCountChange(true);
+
+        public async void SetQueryParams([FromBody] string? source)
+        {
+            var Connection = GetCurrentConnection();
+            if (Connection.QueryParams == source) return;
+            Connection.QueryParams = source;
+            await TriggerSourceViewerCountChange(false);
+        }
         #endregion
 
         #region Chat
@@ -151,11 +162,14 @@ namespace shrimpcast.Hubs
             addedMessage.RemoteAddress = string.Empty;
             addedMessage.UserColorDisplay = string.Empty;
             await NotifyNewMessage(addedMessage);
-            await Clients.Clients(GetAdminSessions()).SendAsync("NameChange", new
+
+            var nameChangePayload = new
             {
                 addedMessage.SessionId,
                 newName,
-            });
+            };
+            if (Configuration.ShowConnectedUsers) await Clients.All.SendAsync("NameChange", nameChangePayload);
+            else await Clients.Clients(GetAdminSessions()).SendAsync("NameChange", nameChangePayload);
 
             var shouldBan = await _autoModFilterRepository.Contains(newName);
             if (shouldBan) BackgroundJob.Enqueue(() => PerformBackgroundBan(addedMessage.SentBy, addedMessage.SessionId, Constants.FIREANDFORGET_TOKEN));
@@ -511,7 +525,7 @@ namespace shrimpcast.Hubs
             return result ? existingPollOptionId == pollOptionId ? -1 : pollOptionId : 0;
         }
 
-        public async Task<List<object>> GetPollVotes([FromBody] int pollOptionId)
+        public async Task<object> GetPollVotes([FromBody] int pollOptionId)
         {
             var Connection = GetCurrentConnection();
             var Session = Connection.Session;
@@ -522,7 +536,19 @@ namespace shrimpcast.Hubs
                 throw new Exception("Acesso negado.");
             }
 
-            return await _pollRepository.GetOptionVotes(pollOptionId);
+            var votes = await _pollRepository.GetOptionVotes(pollOptionId);
+            var activeConnectionsCount = votes.Where(v => ActiveConnections.Any(ac => ac.Value.Session.SessionId == v.SessionId
+                                                                                   || ac.Value.RemoteAdress == v.RemoteAddress));
+            return new
+            {
+                activeUsers = activeConnectionsCount.Count(),
+                votes = votes.Select(vote => new
+                {
+                    vote.SessionId,
+                    vote.SessionName,
+                    connected = activeConnectionsCount.Any(v => v.SessionId == vote.SessionId),
+                })
+            };
         }
         #endregion
 
@@ -571,8 +597,15 @@ namespace shrimpcast.Hubs
             var Session = Connection.Session;
             if (!Session.IsMod && !Session.IsAdmin)
             {
+                var bingoOptionVotesCount = GetBingoOptionVoteCount(existingOption.BingoOptionId);
+                var autoMarkingThreshold = Configuration.AutoMarkingUserCountThreshold;
+                var shouldPreAddVote = CanVote(Connection.RemoteAdress, existingOption.BingoOptionId) ? 1 : 0;
+                var remainingVotes = Configuration.EnableAutoBingoMarking && autoMarkingThreshold > 1
+                                     ? $" ({bingoOptionVotesCount + shouldPreAddVote}/{autoMarkingThreshold})" 
+                                     : string.Empty; 
+                
                 if (existingOption.IsChecked ||
-                   await NewMessage($"[BINGO]: Sugeriu marcar [{existingOption.Content}].") == -1) return true;
+                   await NewMessage($"[BINGO]: Sugeriu marcar [{existingOption.Content}]{remainingVotes}.") == -1) return true;
                 var ShouldTriggerAutoMarking = ShouldTriggerBingoAutoMarking(Connection.RemoteAdress, existingOption.BingoOptionId);
                 if (!ShouldTriggerAutoMarking) return true;
             }
@@ -702,7 +735,7 @@ namespace shrimpcast.Hubs
 
         public async Task<List<object>> ListActiveUsers()
         {
-            await ShouldGrantAccess();
+            if (!Configuration.ShowConnectedUsers) await ShouldGrantAccess();
             var users = ActiveConnections.OrderBy(ac => ac.Value.ConnectedAt).DistinctBy(ac => ac.Value.Session.SessionId).Select(ac => (object)new
             {
                 ac.Value.Session.SessionId,
@@ -823,16 +856,34 @@ namespace shrimpcast.Hubs
             }
         }
 
+        private async Task TriggerSourceViewerCountChange(bool SelfInvoked)
+        {
+            var values = Configuration.Sources.Where(source => source.IsEnabled)
+                                               .Select(source => new
+                                               {
+                                                   name = source.Name,
+                                                   count = ActiveConnections.Where(ac => ac.Value.QueryParams == source.Name)
+                                                                            .DistinctBy(ac => ac.Value.RemoteAdress)
+                                                                            .Count()
+                                               });
+            if (SelfInvoked) await Clients.Caller.SendAsync("SourceViewerCountChange", values);
+            else await Clients.All.SendAsync("SourceViewerCountChange", values);
+        }
+
+
         private async Task SendAdminUserStatusUpdate(Session? session = null, int? sessionId = null)
         {
             var admins = GetAdminSessions();
             var eventType = session != null ? "UserConnected" : "UserDisconnected";
-            await Clients.Clients(admins).SendAsync(eventType, session != null ? new
+            object? value = session != null ? new
             {
                 session.SessionId,
                 session.SessionNames.Last().Name,
-                session.IsAdmin
-            } : sessionId);
+                session.IsAdmin,
+            } : sessionId;
+            
+            if (Configuration.ShowConnectedUsers) await Clients.All.SendAsync(eventType, value);
+            else await Clients.Clients(admins).SendAsync(eventType, value);
         }
 
         private async Task<string?> IsChatActionAllowed()
@@ -918,28 +969,36 @@ namespace shrimpcast.Hubs
             return null;
         }
 
-        private bool ShouldTriggerBingoAutoMarking (string RemoteAddress, int BingoSuggestionId)
+        private int GetBingoOptionVoteCount(int BingoSuggestionId)
         {
-            if (!Configuration.EnableAutoBingoMarking) return false;
-
             var suggestions = _bingoSuggestions.All;
             var utcNow = DateTime.UtcNow;
-
-            suggestions.TryAdd(Guid.NewGuid().ToString(), new BingoSuggestion
-            {
-                BingoSuggestionId = BingoSuggestionId,
-                RemoteAddress = RemoteAddress,
-                Timestamp = utcNow
-            });
-
             var keysToRemove = suggestions.Where(suggestion => (utcNow - suggestion.Value.Timestamp).TotalSeconds >= Configuration.AutoMarkingSecondsThreshold)
-                                          .Select(suggestion => suggestion.Key);
+                              .Select(suggestion => suggestion.Key);
 
             foreach (var key in keysToRemove) suggestions.TryRemove(key, out _);
 
-            var uniqueSuggestions = suggestions.Where(suggestion => suggestion.Value.BingoSuggestionId == BingoSuggestionId)
-                                               .DistinctBy(suggestion => suggestion.Value.RemoteAddress).Count();
-            return uniqueSuggestions >= Configuration.AutoMarkingUserCountThreshold;
+            return _bingoSuggestions.All.Where(suggestion => suggestion.Value.BingoSuggestionId == BingoSuggestionId)
+                                        .DistinctBy(suggestion => suggestion.Value.RemoteAddress).Count();
+        }
+
+        private bool CanVote(string RemoteAddress, int BingoSuggestionId) =>
+            !_bingoSuggestions.All.Any(bS => bS.Value.RemoteAddress == RemoteAddress && bS.Value.BingoSuggestionId == BingoSuggestionId);
+
+        private bool ShouldTriggerBingoAutoMarking (string RemoteAddress, int BingoSuggestionId)
+        {
+            if (!Configuration.EnableAutoBingoMarking) return false;
+            if (CanVote(RemoteAddress, BingoSuggestionId))
+            {
+                _bingoSuggestions.All.TryAdd(Guid.NewGuid().ToString(), new BingoSuggestion
+                {
+                    BingoSuggestionId = BingoSuggestionId,
+                    RemoteAddress = RemoteAddress,
+                    Timestamp = DateTime.UtcNow
+                });
+            }
+
+            return GetBingoOptionVoteCount(BingoSuggestionId) >= Configuration.AutoMarkingUserCountThreshold;
         }
 
         private async Task NotifyNewMessage(Message message) =>
@@ -1036,6 +1095,9 @@ namespace shrimpcast.Hubs
                         return true;
                     case string _message when _message.StartsWith(Constants.DOCKER_RESTART):
                         await DockerRestart();
+                        return true;
+                    case string _message when _message.StartsWith(Constants.REDIRECT_SOURCE):
+                        await RedirectFromSource(message);
                         return true;
                     default:
                         return false;
@@ -1144,6 +1206,36 @@ namespace shrimpcast.Hubs
                 await DispatchSystemMessage($"[SYSTEM] Restarting media server. Playback will automatically resume shortly.", true, true);
                 var result = await ProcessHelper.DockerRestart();
                 await DispatchSystemMessage(result);
+            }
+            catch (Exception ex)
+            {
+                await DispatchSystemMessage(ex.Message);
+            }
+        }
+
+        private async Task RedirectFromSource(string Message)
+        {
+            await DispatchSystemMessage($"Executing {Constants.REDIRECT_SOURCE} command...");
+            try
+            {
+                var strings = Message.Split(" ");
+                var from = strings[1].Trim().ToLower();
+                var to = strings[2].Trim().ToLower();
+
+                var isFromValid = await _sourceRepository.ExistsByName(from);
+                var isToValid = await _sourceRepository.ExistsByName(to);
+                if (!isFromValid || !isToValid)
+                {
+                    await DispatchSystemMessage($"One or more sources are invalid [{from}] [{to}]"); 
+                    return;  
+                }
+
+                await Clients.All.SendAsync("RedirectSource", new
+                {
+                    from,
+                    to,
+                });
+                await DispatchSystemMessage($"Redirected users from {from} to {to}");
             }
             catch (Exception ex)
             {

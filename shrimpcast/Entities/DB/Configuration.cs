@@ -196,6 +196,14 @@ namespace shrimpcast.Entities.DB
         [NotMapped]
         public string? TurnstileSecretKeyNotMapped { get; set; }
 
+        public required bool EnablePWA { get; set; }
+
+        public required bool ShowConnectedUsers { get; set; }
+
+        public required bool ForceLatestVersion { get; set; }
+
+        public required bool ShowViewerCountPerStream { get; set; }
+
         public object Clone() => MemberwiseClone();
     }
 
@@ -208,12 +216,15 @@ namespace shrimpcast.Entities.DB
                     name = "Site",
                     values = new object[]
                     {
+                        new { name = nameof(config.EnablePWA).ToLower(), label = "Ligar PWA", value = config.EnablePWA },
+                        new { name = nameof(config.ForceLatestVersion).ToLower(), label = "Forçar última versão", value = config.ForceLatestVersion },
                         new { name = nameof(config.HideStreamTitle).ToLower(), label = "Esconder título do stream", value = config.HideStreamTitle },
+                        new { name = nameof(config.ShowConnectedUsers).ToLower(), label = "Lista de utilizadores pública", value = config.ShowConnectedUsers },
                         new { name = nameof(config.MaxConnectionsPerIP).ToLower(), label = "Máx. de conexões por IP", value = config.MaxConnectionsPerIP },
                         new { name = nameof(config.MaxConnectedUsers).ToLower(), label = "Máx. utilizadores conectados (0 = ∞)", value = config.MaxConnectedUsers },
                         new { name = nameof(config.MinABTimeInMs).ToLower(), label = "Min.tempo automod (ms)", value = config.MinABTimeInMs },
                         new { name = nameof(config.MaxABTimeInMs).ToLower(), label = "Máx. tempo automod (ms)", value = config.MaxABTimeInMs },
-                        new { name = nameof(config.OpenAt).ToLower(), label = "Abrir site a", value = config.OpenAt },
+                        new { name = nameof(config.OpenAt).ToLower(), label = "Abrir site em", value = config.OpenAt },
                         new { name = nameof(config.StreamTitle).ToLower(), label = "Título stream", value = config.StreamTitle },
                         new { name = nameof(config.StreamDescription).ToLower(), label = "Descrição stream", value = config.StreamDescription },
                     }
@@ -240,6 +251,7 @@ namespace shrimpcast.Entities.DB
                     values = new object[]
                     {
                         new { name = nameof(config.StreamEnabled).ToLower(), label = "Ligar stream", value = config.StreamEnabled },
+                        new { name = nameof(config.ShowViewerCountPerStream).ToLower(), label = "Mostrar contador por stream", value = config.ShowViewerCountPerStream },
                         new
                         {
                             name = nameof(config.Sources).ToLower(),
@@ -248,6 +260,7 @@ namespace shrimpcast.Entities.DB
                             {
                                 new { name = nameof(Source.IsEnabled).ToLower(), label = "Ligado" },
                                 new { name = nameof(Source.Name).ToLower(), label = "Nome" },
+                                new { name = nameof(Source.Title).ToLower(), label = "Título" },
                                 new { name = nameof(Source.Url).ToLower(), label = "URL" },
                                 new { name = nameof(Source.Thumbnail).ToLower(), label = "Thumbnail" },
                                 new { name = nameof(Source.UseLegacyPlayer).ToLower(), label = "Player nativo" },

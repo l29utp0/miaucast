@@ -49,13 +49,13 @@ const RenderChatMessages = React.memo((props) => {
   const [messages, setMessages] = useState([]);
   const [pendingMessages, setPendingMessages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [mentionSound] = useState(new Audio('/images/noti.mp4'));
   const [currentCombo, setCurrentCombo] = useState({
     emote: null,
     count: 0,
     messageIds: new Set(),
     lastUpdate: 0,
   });
-  const { inputRef, setMessage } = props;
 
   const {
     signalR,
@@ -65,8 +65,14 @@ const RenderChatMessages = React.memo((props) => {
     isGolden,
     goldenPassExpanded,
     setNameSuggestions,
+    enabledSources,
+    emotes,
+    inputRef,
+    setMessage
   } = props;
 
+  const sources = enabledSources.map((source) => `/${source.name}`).join("|");
+  const emotesRegex = emotes.map((emote) => emote.name).join("|");
   const scrollReference = useRef();
   const comboTimeoutRef = useRef();
 
@@ -115,6 +121,17 @@ const RenderChatMessages = React.memo((props) => {
             (m) => m.messageId === message.messageId,
           );
           messageList.splice(index, 1);
+        }
+
+        // Add mention sound check
+        if (message.messageType === "UserMessage" && message.content) {
+          const currentUser = LocalStorageManager.getName();
+          const mentionRegex = new RegExp(`@${currentUser}(?=[\\s.]|$)`);
+
+          // Play sound if user is mentioned and message is not from themselves
+          if (mentionRegex.test(message.content) && message.sentBy !== currentUser) {
+            mentionSound.play().catch(err => console.log('Error playing mention sound:', err));
+          }
         }
 
         const isBannedType = message.messageType === "UserBanned";
@@ -235,7 +252,7 @@ const RenderChatMessages = React.memo((props) => {
         return messageList;
       });
     },
-    [configuration.maxMessagesToShow, props.emotes],
+    [configuration.maxMessagesToShow, props.emotes, mentionSound],
   );
 
   const updateNameSuggestions = useCallback(() => {
@@ -342,6 +359,9 @@ const RenderChatMessages = React.memo((props) => {
               userSessionId={props.sessionId}
               maxLengthTruncation={configuration.maxLengthTruncation}
               isComboMessage={currentCombo.messageIds.has(message.messageId)}
+              sources={sources}
+              enabledSources={enabledSources}
+              emotesRegex={emotesRegex}
               onNameClick={handleNameClick}
               {...message}
             />
@@ -361,9 +381,9 @@ const RenderChatMessages = React.memo((props) => {
       )}
       <ComboDisplay
         combo={currentCombo}
-        emotes={props.emotes}
-        setMessage={props.setMessage}
-        inputRef={props.inputRef}
+        emotes={emotes}
+        setMessage={setMessage}
+        inputRef={inputRef}
       />
     </Box>
   );

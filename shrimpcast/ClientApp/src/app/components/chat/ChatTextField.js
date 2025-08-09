@@ -1,14 +1,6 @@
 import SendIcon from "@mui/icons-material/Send";
-import {
-  Box,
-  Checkbox,
-  CircularProgress,
-  IconButton,
-  InputAdornment,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useState, useRef } from "react";
+import { Box, Checkbox, CircularProgress, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import MessageManager from "../../managers/MessageManager";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import Emotes from "./Emotes/Emotes";
@@ -69,70 +61,66 @@ const LabelSx = (isChecked) => ({
 });
 
 const ChatTextField = (props) => {
-  const [focused, setFocused] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [showAutocomplete, setShowAutocomplete] = useState(false);
-  const [autoCompleteIndex, setAutoCompleteIndex] = useState(0);
-  const [emotes, setEmotes] = useState(false);
-  const inputRef = useRef(null);
-
-  const { signalR, configuration, isAdmin, message, setMessage } = props;
-
-  const changeInput = (e) => {
-    const target = e.target,
-      ne = e.nativeEvent;
-    setMessage(target.value);
-    if (ne?.data === "@") {
-      setAutoCompleteIndex(0);
-      setShowAutocomplete(true);
-    } else if (
-      ne?.inputType === "deleteContentBackward" &&
-      message.charAt(target.selectionStart) === "@"
-    ) {
-      setShowAutocomplete(false);
-    }
-  };
-
-  const submitMessage = async () => {
-    setShowAutocomplete(false);
-    let value = message.trim();
-    if (!value || loading) return;
-
-    setLoading(true);
-    const response = await MessageManager.NewMessage(signalR, value);
-    setLoading(false);
-    if (response) setMessage("");
-  };
-
-  const handleKeys = async (e) => {
-    if (e.key === "Enter") {
-      if (!showAutocomplete) await submitMessage();
-      else
-        setAutoCompleteIndex(
-          autoCompleteIndex === 0
-            ? Number.MIN_SAFE_INTEGER
-            : -autoCompleteIndex,
-        );
-    }
-    if (!showAutocomplete) return;
-    switch (e.key) {
-      case "Escape":
+  const [focused, setFocused] = useState(false),
+    [loading, setLoading] = useState(false),
+    [showAutocomplete, setShowAutocomplete] = useState(false),
+    [autoCompleteIndex, setAutoCompleteIndex] = useState(0),
+    { signalR, configuration, isAdmin, message, setMessage, connectionStatus } = props,
+    changeInput = (e) => {
+      const target = e.target,
+        ne = e.nativeEvent;
+      setMessage(target.value);
+      if (ne?.data === "@") {
+        setAutoCompleteIndex(0);
+        setShowAutocomplete(true);
+      } else if (ne?.inputType === "deleteContentBackward" && message.charAt(target.selectionStart) === "@") {
         setShowAutocomplete(false);
-        break;
-      case "ArrowUp":
-        autoCompleteIndex > 0 && setAutoCompleteIndex((index) => index - 1);
-        break;
-      case "ArrowDown":
-        setAutoCompleteIndex((index) => index + 1);
-        break;
-      default:
-        break;
-    }
-  };
+      }
+    },
+    submitMessage = async () => {
+      setShowAutocomplete(false);
+      let value = message.trim();
+      if (!value || loading) return;
 
-  const isDisabled = !configuration.chatEnabled && !isAdmin;
-  const setEmotesOpen = () => setEmotes(true);
-  const toggleAutoScroll = () => props.toggleAutoScroll((state) => !state);
+      setLoading(true);
+      const response = await MessageManager.NewMessage(signalR, value);
+      setLoading(false);
+      if (response) setMessage("");
+    },
+    handleKeys = async (e) => {
+      if (e.key === "Enter") {
+        if (!showAutocomplete) await submitMessage();
+        else setAutoCompleteIndex(autoCompleteIndex === 0 ? Number.MIN_SAFE_INTEGER : -autoCompleteIndex);
+      }
+      if (!showAutocomplete) return;
+      switch (e.key) {
+        case "Escape":
+          setShowAutocomplete(false);
+          break;
+        case "ArrowUp":
+          autoCompleteIndex > 0 && setAutoCompleteIndex((index) => index - 1);
+          break;
+        case "ArrowDown":
+          setAutoCompleteIndex((index) => index + 1);
+          break;
+        default:
+          break;
+      }
+    },
+    isDisabled = !configuration.chatEnabled && !isAdmin,
+    textFieldReference = useRef(),
+    [emotes, setEmotes] = useState(false),
+    setEmotesOpen = () => setEmotes(true),
+    toggleAutoScroll = () => props.toggleAutoScroll((state) => !state),
+    replyToUser = (e) => {
+      setMessage((message) => message + e.detail.content);
+      textFieldReference.current.focus();
+    };
+
+  useEffect(() => {
+    document.addEventListener("userReply", replyToUser);
+    return () => document.removeEventListener("userReply", replyToUser);
+  }, );
 
   return (
     <Box sx={SendInputSx}>
@@ -177,7 +165,6 @@ const ChatTextField = (props) => {
             </InputAdornment>
           ),
         }}
-        inputRef={props.inputRef}
         inputProps={{
           maxLength: 500,
         }}
@@ -197,8 +184,9 @@ const ChatTextField = (props) => {
         disabled={isDisabled}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        inputRef={textFieldReference}
       />
-      <WiFiSignalStrength {...props} />
+      {connectionStatus === "Connected" && <WiFiSignalStrength {...props} />}
       <Box sx={ScrollSx(props.autoScroll)}>
         <Typography
           className="noselect"
@@ -214,7 +202,7 @@ const ChatTextField = (props) => {
           setEmotes={setEmotes}
           emotes={props.emotes}
           setMessage={setMessage}
-          inputRef={inputRef}
+          inputRef={textFieldReference}
         />
       )}
     </Box>

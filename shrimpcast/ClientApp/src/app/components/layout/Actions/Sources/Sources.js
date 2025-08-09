@@ -95,6 +95,7 @@ const Sources = ({ fields, sources, setConfig, utcToLocal }) => {
     defaultNewSource = {
       isEnabled: false,
       name: "",
+      title: "",
       url: "",
       thumbnail: "",
       useLegacyPlayer: false,
@@ -169,6 +170,27 @@ const Sources = ({ fields, sources, setConfig, utcToLocal }) => {
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2">{source.name}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Tooltip title={source.title}>
+                    <Button
+                      onClick={() =>
+                        openEditContent(
+                          "Título source",
+                          "Título para mostrar...",
+                          source.title,
+                          source.sourceId,
+                          "title",
+                          true
+                        )
+                      }
+                      variant="outlined"
+                      color="success"
+                      size="small"
+                    >
+                      Show
+                    </Button>
+                  </Tooltip>
                 </TableCell>
                 <TableCell>
                   <Tooltip title={source.url}>
@@ -276,6 +298,15 @@ const Sources = ({ fields, sources, setConfig, utcToLocal }) => {
                 </TableCell>
                 <TableCell>
                   <TextField
+                    value={newSourceData.title}
+                    onChange={(e) => setNewSourceData({ ...newSourceData, title: e.target.value })}
+                    label="Title"
+                    variant="outlined"
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
                     value={newSourceData.url}
                     onChange={(e) => setNewSourceData({ ...newSourceData, url: e.target.value.trim() })}
                     label="URL"
@@ -362,7 +393,7 @@ const Sources = ({ fields, sources, setConfig, utcToLocal }) => {
 
       {deleteConfirmOpen && (
         <ConfirmDialog
-          title={`Are you sure you want to remove ${sourceToDelete.name}?`}
+          title={`Tens a certeza que queres remover ${sourceToDelete.name}?`}
           confirm={() => removeItem(sourceToDelete)}
           cancel={() => setDeleteConfirmOpen(false)}
         />

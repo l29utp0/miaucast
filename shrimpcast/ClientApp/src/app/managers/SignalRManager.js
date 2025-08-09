@@ -24,7 +24,8 @@ class SignalRManager {
     bingoReset: "BingoReset",
     goldStatusUpdate: "GoldStatusUpdate",
     nameChange: "NameChange",
-    messageHistory: "MessageHistory",
+    redirectSource: "RedirectSource",
+    sourceViewerCountChange: "SourceViewerCountChange",
   };
 
   static async connect() {
@@ -44,49 +45,8 @@ class SignalRManager {
         },
       })
       .build();
-
-    // Set up reconnection behavior
-    connection.onreconnected(async (connectionId) => {
-      console.log("Connection re-established with ID:", connectionId);
-
-      // Request missing messages since last known message
-      const lastMessageId = LocalStorageManager.getLastMessageId();
-      if (lastMessageId) {
-        try {
-          await connection.invoke("GetMessagesSince", lastMessageId);
-        } catch (ex) {
-          console.error("Error retrieving message history:", ex);
-        }
-      }
-    });
-
     await connection.start().catch((ex) => console.log(ex));
     return connection;
-  }
-
-  static setupMessageTracking(signalR) {
-    signalR.on(this.events.messageReceived, (message) => {
-      if (message.messageId && message.messageType === "UserMessage") {
-        LocalStorageManager.saveLastMessageId(message.messageId);
-      }
-    });
-
-    // Handle message history responses
-    signalR.on(this.events.messageHistory, (messages) => {
-      console.log("Received message history:", messages.length, "messages");
-      if (messages && messages.length) {
-        // Find the latest message ID to update our tracking
-        const latestMessage = messages.reduce(
-          (latest, current) =>
-            latest.messageId > current.messageId ? latest : current,
-          { messageId: 0 },
-        );
-
-        if (latestMessage.messageId > 0) {
-          LocalStorageManager.saveLastMessageId(latestMessage.messageId);
-        }
-      }
-    });
   }
 }
 export default SignalRManager;

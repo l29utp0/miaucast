@@ -19,7 +19,7 @@ const PollButtonSx = {
     backgroundColor: "primary.900",
     position: "absolute",
     width: "100%",
-    zIndex: 2,
+    zIndex: 3,
     overflowY: "auto",
   });
 
