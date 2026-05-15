@@ -162,6 +162,10 @@ html {
     display: none;
 }
 
+.op-progressbar {
+    display: none;
+}
+
 #player_id {
     --op-accent-color: #ff1744;
 }

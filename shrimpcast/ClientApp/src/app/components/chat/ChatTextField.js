@@ -35,6 +35,7 @@ const ScrollSx = (isChecked) => ({
   height: "13.5px",
   borderRadius: "1px",
   borderTopRightRadius: "5px",
+  display: "none",
 });
 
 const CheckBoxSx = {

@@ -11,7 +11,7 @@ const RTTSx = {
     left: "1px",
     backgroundColor: "primary.900",
     height: "13.5px",
-    display: "flex",
+    display: "none",
     borderTopLeftRadius: "2px",
   },
   SignalIconSx = (color) => ({

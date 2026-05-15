@@ -22,7 +22,7 @@ const About = (props) => {
   const [open, setOpen] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
 
-  const emailAddress = "l29utp0@pm.me";
+  const emailAddress = "info@ptchan.org";
 
   const setClosed = () => setOpen(false);
   const setOpened = () => setOpen(true);
@@ -181,12 +181,20 @@ const About = (props) => {
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
 
                   <Link
-                    href="https://github.com/l29utp0/ptchinacast"
+                    href="https://steamcommunity.com/groups/miaugg"
                     target="_blank"
                     color="secondary"
                     sx={{ display: "flex", alignItems: "center", gap: 1 }}
                   >
-                    Source
+                    Grupo Steam
+                  </Link>
+                  <Link
+                    href="https://steamcommunity.com/chat/invite/YPJMVO55"
+                    target="_blank"
+                    color="secondary"
+                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                  >
+                    Voice Chat
                   </Link>
                 </Box>
               </Grid>

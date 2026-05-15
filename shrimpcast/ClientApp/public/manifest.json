@@ -6,7 +6,19 @@
       "src": "images/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "images/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "images/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "images/web-app-manifest-512x512.png",
@@ -18,5 +30,21 @@
   "theme_color": "#212121",
   "background_color": "#212121",
   "start_url": "./index.html",
-  "display": "standalone"
+  "display": "standalone",
+  "screenshots": [
+    {
+      "src": "images/desktop-view.webp",
+      "sizes": "2560x1440",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Desktop view of the application interface"
+    },
+    {
+      "src": "images/mobile-view.webp",
+      "sizes": "427x931",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "Mobile view of the application interface"
+    }
+  ]
 }
